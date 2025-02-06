@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -343,6 +344,22 @@ class InMemoryStore {
             i++;
         }
         return !rev ? range : range.reversed();
+    }
+
+    public Object zRank(String key, String member, boolean withScore) {
+        TreeSet<ScoreMember> treeSet = getTreeSet(key);
+        if (treeSet.isEmpty()) return null;
+        int rank = 0;
+        ScoreMember scoreMember = null;
+        for (ScoreMember sm : treeSet) {
+            if (Objects.equals(sm.getMember(), member)) {
+                scoreMember = sm;
+                break;
+            }
+            rank++;
+        }
+        if (scoreMember == null) return null;
+        return withScore ? List.of(rank, scoreMember.getScore()) : rank;
     }
 
     public void jsonArrAppend(String key, Object value) {

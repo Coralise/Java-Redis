@@ -164,6 +164,14 @@ public class CommandHandler implements Runnable {
                         out.println(INVALID_ARGS_RESPONSE);
                     }
                     return;
+
+                case "ZRANK":
+                    if (tokens.size() > 2) {
+                        out.println(dataStore.zRank(tokens.get(1), tokens.get(2), tokens.size() == 4 && tokens.get(3).equalsIgnoreCase("WITHSCORE")));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
                 default:
                     break;
             }

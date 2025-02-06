@@ -402,4 +402,21 @@ public class CommandHandlerTest {
         response = sendMessage("ZRANGE zset5 0 -1 WITHSCORES");
         assertEquals("[member1, 3]", response);
     }
+
+    @Test
+    public void testZrankCommand() throws IOException {
+        sendMessage("ZADD zset6 1 member1");
+        sendMessage("ZADD zset6 2 member2");
+        sendMessage("ZADD zset6 3 member3");
+        String response = sendMessage("ZRANK zset6 member1");
+        assertEquals("0", response);
+        response = sendMessage("ZRANK zset6 member2");
+        assertEquals("1", response);
+        response = sendMessage("ZRANK zset6 member3");
+        assertEquals("2", response);
+        response = sendMessage("ZRANK zset6 member3 WITHSCORE");
+        assertEquals("[2, 3]", response);
+        response = sendMessage("ZRANK zset6 member4");
+        assertEquals("null", response);
+    }
 }
