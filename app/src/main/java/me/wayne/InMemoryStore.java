@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import me.wayne.daos.StreamEntry;
+
 class InMemoryStore {
 
     private final Map<String, Object> store = new HashMap<>();
@@ -394,26 +396,26 @@ class InMemoryStore {
             throw new IllegalArgumentException("Invalid ID format");
         }
 
-        Map<String, ArrayList<String>> streamMap = getStreamMap(key);
+        ArrayList<StreamEntry> streamList = getStreamList(key);
 
         int sequence = pattern.matcher(id).matches() ? Integer.parseInt(id.split("-")[1]) : 0;
-        while (streamMap.containsKey(id + sequence)) sequence++;
+        while (streamList.contains(id + sequence)) sequence++;
         id += sequence;
 
-        ArrayList<String> list = new ArrayList<>();
+        ArrayList<String> fieldsAndValuesList = new ArrayList<>();
         for (int i = 1; i < fieldsAndValues.size(); i += 2) {
-            list.add(fieldsAndValues.get(i-1));
-            list.add(fieldsAndValues.get(i));
+            fieldsAndValuesList.add(fieldsAndValues.get(i-1));
+            fieldsAndValuesList.add(fieldsAndValues.get(i));
         }
 
-        streamMap.put(id, list);
-        store.put(key, streamMap);
+        streamList.add(new StreamEntry(id, fieldsAndValuesList));
+        store.put(key, streamList);
 
         return id;
     }
 
     public List<List<Object>> xRange(String key, String start, String end, int count) {
-        Map<String, ArrayList<String>> streamMap = getStreamMap(key);
+        ArrayList<StreamEntry> streamList = getStreamList(key);
         List<List<Object>> range = new ArrayList<>();
 
         boolean startExclusive = false;
@@ -435,34 +437,15 @@ class InMemoryStore {
         }
 
         int i = 0;
-        for (Map.Entry<String, ArrayList<String>> entry : streamMap.entrySet()) {
+        for (StreamEntry entry : streamList) {
             if (count > 0 && i >= count) break;
-            long entryTimestamp = Long.parseLong(entry.getKey().split("-")[0]);
-            int entrySequence = Integer.parseInt(entry.getKey().split("-")[1]);
-            if (start.equals("-")) {
-                if (!end.equals("+")) {
-                    if (!endExclusive) {
-                        if (entryTimestamp > endTimestamp || (entryTimestamp == endTimestamp && entrySequence > endSequence)) break;
-                    } else {
-                        if (entryTimestamp >= endTimestamp || (entryTimestamp == endTimestamp && entrySequence >= endSequence)) break;
-                    }
-                }
-                range.add(List.of(entry.getKey(), entry.getValue()));
-                i++;
-            } else {
-                if (!startExclusive) {
-                    if (entryTimestamp < startTimestamp || (entryTimestamp == startTimestamp && entrySequence < startSequence)) continue;
-                } else {
-                    if (entryTimestamp <= startTimestamp || (entryTimestamp == startTimestamp && entrySequence <= startSequence)) continue;
-                }
-                if (!end.equals("+")) {
-                    if (!endExclusive) {
-                        if (entryTimestamp > endTimestamp || (entryTimestamp == endTimestamp && entrySequence > endSequence)) break;
-                    } else {
-                        if (entryTimestamp >= endTimestamp || (entryTimestamp == endTimestamp && entrySequence >= endSequence)) break;
-                    }
-                }
-                range.add(List.of(entry.getKey(), entry.getValue()));
+            long entryTimestamp = entry.getTimestamp();
+            int entrySequence = entry.getSequence();
+            boolean withinStartRange = start.equals("-") || (!startExclusive && (entryTimestamp > startTimestamp || (entryTimestamp == startTimestamp && entrySequence >= startSequence))) || (startExclusive && (entryTimestamp > startTimestamp || (entryTimestamp == startTimestamp && entrySequence > startSequence)));
+            boolean withinEndRange = end.equals("+") || (!endExclusive && (entryTimestamp < endTimestamp || (entryTimestamp == endTimestamp && entrySequence <= endSequence))) || (endExclusive && (entryTimestamp < endTimestamp || (entryTimestamp == endTimestamp && entrySequence < endSequence)));
+
+            if (withinStartRange && withinEndRange) {
+                range.add(List.of(entry.getId(), entry.getFieldsAndValues()));
                 i++;
             }
         }
@@ -479,15 +462,15 @@ class InMemoryStore {
     }
 
     @SuppressWarnings("unchecked")
-    private LinkedHashMap<String, ArrayList<String>> getStreamMap(String key) {
-        LinkedHashMap<String, ArrayList<String>> map;
+    private ArrayList<StreamEntry> getStreamList(String key) {
+        ArrayList<StreamEntry> list;
         if (!store.containsKey(key)) {
-            map = new LinkedHashMap<>();
+            list = new ArrayList<>();
         } else {
-            AssertUtil.assertTrue(store.get(key) instanceof Map, "Existing value is not of type Map");
-            map = new LinkedHashMap<>((Map<String, ArrayList<String>>) store.get(key));
+            AssertUtil.assertTrue(store.get(key) instanceof List, nonListErrorMsg);
+            list = new ArrayList<>((ArrayList<StreamEntry>) store.get(key));
         }
-        return map;
+        return list;
     }
 
     @SuppressWarnings("unchecked")
