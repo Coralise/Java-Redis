@@ -384,37 +384,36 @@ class InMemoryStore {
 
     public String xAdd(String key, String id, List<String> fieldsAndValues) {
         Pattern pattern = Pattern.compile("\\d+-\\d+");
-        if (id.equals("*")) id = String.valueOf(System.currentTimeMillis()) + "-";
-        else {
-            Pattern pattern2 = Pattern.compile("\\d+");
-            if (pattern.matcher(id).matches()) {
-                // Continue
-            } else if (pattern2.matcher(id).matches()) {
-                id += "-";
-            } else {
-                throw new IllegalArgumentException("Invalid ID format");
-            }
+        if (id.equals("*")) {
+            id = System.currentTimeMillis() + "-";
+        } else if (pattern.matcher(id).matches()) {
+            // Continue
+        } else if (id.matches("\\d+")) {
+            id += "-";
+        } else {
+            throw new IllegalArgumentException("Invalid ID format");
         }
 
-        Map<String, JSONObject> streamMap = getStreamMap(key);
+        Map<String, ArrayList<String>> streamMap = getStreamMap(key);
 
         int sequence = pattern.matcher(id).matches() ? Integer.parseInt(id.split("-")[1]) : 0;
         while (streamMap.containsKey(id + sequence)) sequence++;
         id += sequence;
 
-        JSONObject jsonObject = new JSONObject();
+        ArrayList<String> list = new ArrayList<>();
         for (int i = 1; i < fieldsAndValues.size(); i += 2) {
-            jsonObject.put(fieldsAndValues.get(i-1), fieldsAndValues.get(i));
+            list.add(fieldsAndValues.get(i-1));
+            list.add(fieldsAndValues.get(i));
         }
 
-        streamMap.put(id, jsonObject);
+        streamMap.put(id, list);
         store.put(key, streamMap);
 
         return id;
     }
 
     public List<List<Object>> xRange(String key, String start, String end, int count) {
-        Map<String, JSONObject> streamMap = getStreamMap(key);
+        Map<String, ArrayList<String>> streamMap = getStreamMap(key);
         List<List<Object>> range = new ArrayList<>();
 
         boolean startExclusive = false;
@@ -436,7 +435,7 @@ class InMemoryStore {
         }
 
         int i = 0;
-        for (Map.Entry<String, JSONObject> entry : streamMap.entrySet()) {
+        for (Map.Entry<String, ArrayList<String>> entry : streamMap.entrySet()) {
             if (count > 0 && i >= count) break;
             long entryTimestamp = Long.parseLong(entry.getKey().split("-")[0]);
             int entrySequence = Integer.parseInt(entry.getKey().split("-")[1]);
@@ -480,13 +479,13 @@ class InMemoryStore {
     }
 
     @SuppressWarnings("unchecked")
-    private LinkedHashMap<String, JSONObject> getStreamMap(String key) {
-        LinkedHashMap<String, JSONObject> map;
+    private LinkedHashMap<String, ArrayList<String>> getStreamMap(String key) {
+        LinkedHashMap<String, ArrayList<String>> map;
         if (!store.containsKey(key)) {
             map = new LinkedHashMap<>();
         } else {
             AssertUtil.assertTrue(store.get(key) instanceof Map, "Existing value is not of type Map");
-            map = new LinkedHashMap<>((Map<String, JSONObject>) store.get(key));
+            map = new LinkedHashMap<>((Map<String, ArrayList<String>>) store.get(key));
         }
         return map;
     }

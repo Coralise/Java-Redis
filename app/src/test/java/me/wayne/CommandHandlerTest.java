@@ -446,10 +446,10 @@ public class CommandHandlerTest {
         assertEquals("[member1]", response);
         response = sendMessage("ZRANGE zset8 4 5 BYSCORE");
         assertEquals("[]", response);
-    }
+        }
 
-    @Test
-    public void testXaddAndXrangeComplexCommand() throws IOException {
+        @Test
+        public void testXaddAndXrangeComplexCommand() throws IOException {
         String id1 = sendMessage("XADD mystream * field1 value1");
         wait(1);
         String id2 = sendMessage("XADD mystream * field2 value2");
@@ -468,40 +468,40 @@ public class CommandHandlerTest {
         assertEquals(1, response.split("],").length);
 
         response = sendMessage("XRANGE mystream " + id1 + "-0 " + id2 + "-0");
-        assertEquals("[[" + id1 + ", {\"field1\":\"value1\"}], [" + id2 + ", {\"field2\":\"value2\"}]]", response);
+        assertEquals("[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]]]", response);
 
         response = sendMessage("XRANGE mystream " + id3 + "-0 " + id4 + "-0");
-        assertEquals("[[" + id3 + ", {\"field3\":\"value3\"}], [" + id4 + ", {\"field4\":\"value4\"}]]", response);
+        assertEquals("[[" + id3 + ", [field3, value3]], [" + id4 + ", [field4, value4]]]", response);
         
         response = sendMessage("XRANGE mystream " + id2 + "-0 " + id4 + "-0 COUNT 2");
-        assertEquals("[[" + id2 + ", {\"field2\":\"value2\"}], [" + id3 + ", {\"field3\":\"value3\"}]]", response);
+        assertEquals("[[" + id2 + ", [field2, value2]], [" + id3 + ", [field3, value3]]]", response);
         assertEquals(2, response.split("],").length);
 
         // Interchange between -, +, IDs, and IDs not in the stream
         response = sendMessage("XRANGE mystream - " + id2 + "-0");
-        assertEquals("[[" + id1 + ", {\"field1\":\"value1\"}], [" + id2 + ", {\"field2\":\"value2\"}]]", response);
+        assertEquals("[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]]]", response);
 
         response = sendMessage("XRANGE mystream " + id3 + "-0 +");
-        assertEquals("[[" + id3 + ", {\"field3\":\"value3\"}], [" + id4 + ", {\"field4\":\"value4\"}]]", response);
+        assertEquals("[[" + id3 + ", [field3, value3]], [" + id4 + ", [field4, value4]]]", response);
 
         response = sendMessage("XRANGE mystream 0-0 " + id2 + "-0");
-        assertEquals("[[" + id1 + ", {\"field1\":\"value1\"}], [" + id2 + ", {\"field2\":\"value2\"}]]", response);
+        assertEquals("[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]]]", response);
 
         response = sendMessage("XRANGE mystream " + id3 + "-0 9999999999999-0");
-        assertEquals("[[" + id3 + ", {\"field3\":\"value3\"}], [" + id4 + ", {\"field4\":\"value4\"}]]", response);
+        assertEquals("[[" + id3 + ", [field3, value3]], [" + id4 + ", [field4, value4]]]", response);
 
         response = sendMessage("XRANGE mystream 0-0 9999999999999-0");
         assertEquals(4, response.split("],").length);
 
         // Using IDs with (
         response = sendMessage("XRANGE mystream (" + id1 + "-0 " + id3 + "-0");
-        assertEquals("[[" + id2 + ", {\"field2\":\"value2\"}], [" + id3 + ", {\"field3\":\"value3\"}]]", response);
+        assertEquals("[[" + id2 + ", [field2, value2]], [" + id3 + ", [field3, value3]]]", response);
 
         response = sendMessage("XRANGE mystream " + id1 + "-0 (" + id4 + "-0");
-        assertEquals("[[" + id1 + ", {\"field1\":\"value1\"}], [" + id2 + ", {\"field2\":\"value2\"}], [" + id3 + ", {\"field3\":\"value3\"}]]", response);
-    }
+        assertEquals("[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]], [" + id3 + ", [field3, value3]]]", response);
+        }
 
-    private void wait(int seconds) {
+        private void wait(int seconds) {
         try {
             Thread.sleep(1000 * seconds);
         } catch (InterruptedException e) {
