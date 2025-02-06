@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import org.json.JSONObject;
 
 public class CommandHandler implements Runnable {
+    private static final String ERROR_UNKOWN_COMMAND = "ERROR: Unkown Command";
     private static final String INVALID_ARGS_RESPONSE = "ERROR: Invalid number of arguments";
     private static final String OK_RESPONSE = "OK";
     private Socket clientSocket;
@@ -37,253 +38,278 @@ public class CommandHandler implements Runnable {
                 List<String> tokens = getArgs(inputLine);
                 String command = tokens.get(0).toUpperCase();
 
-                try {
-                    switch (command) {
-                        case "SET":
-                            if (tokens.size() == 3) {
-                                dataStore.set(tokens.get(1), tokens.get(2));
-                                out.println(OK_RESPONSE);
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "GET":
-                            if (tokens.size() == 2) {
-                                Object value = dataStore.get(tokens.get(1));
-                                out.println(value != null ? value : "NULL");
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "DELETE":
-                            if (tokens.size() == 2) {
-                                out.println(dataStore.delete(tokens.get(1)));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "APPEND":
-                            if (tokens.size() == 3) {
-                                dataStore.append(tokens.get(1), tokens.get(2));
-                                out.println(OK_RESPONSE);
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "STRLEN":
-                            if (tokens.size() == 2) {
-                                int length = dataStore.strLen(tokens.get(1));
-                                out.println(length);
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "GETRANGE":
-                            if (tokens.size() == 4) {
-                                String value = dataStore.getRange(tokens.get(1), Integer.parseInt(tokens.get(2)), Integer.parseInt(tokens.get(3)));
-                                out.println(value);
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "SETRANGE":
-                            if (tokens.size() == 4) {
-                                String value = dataStore.setRange(tokens.get(1), Integer.parseInt(tokens.get(2)), tokens.get(3));
-                                out.println(value);
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "INCR":
-                            if (tokens.size() == 2) {
-                                dataStore.incr(tokens.get(1));
-                                out.println(OK_RESPONSE);
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "DECR":
-                            if (tokens.size() == 2) {
-                                dataStore.decr(tokens.get(1));
-                                out.println(OK_RESPONSE);
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "INCRBY":
-                            if (tokens.size() == 3) {
-                                dataStore.incrBy(tokens.get(1), Integer.parseInt(tokens.get(2)));
-                                out.println(OK_RESPONSE);
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "DECRBY":
-                            if (tokens.size() == 3) {
-                                dataStore.decrBy(tokens.get(1), Integer.parseInt(tokens.get(2)));
-                                out.println(OK_RESPONSE);
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "LPUSH":
-                            if (tokens.size() > 1) {
-                                out.println(dataStore.lPush(tokens.get(1), tokens.subList(2, tokens.size())));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "RPUSH":
-                            if (tokens.size() > 1) {
-                                out.println(dataStore.rPush(tokens.get(1), tokens.subList(2, tokens.size())));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "LPOP":
-                            if (tokens.size() > 1) {
-                                out.println(dataStore.lPop(tokens.get(1), tokens.size() == 3 ? Integer.parseInt(tokens.get(2)) : 1));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "RPOP":
-                            if (tokens.size() > 1) {
-                                out.println(dataStore.rPop(tokens.get(1), tokens.size() == 3 ? Integer.parseInt(tokens.get(2)) : 1));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "LRANGE":
-                            if (tokens.size() == 4) {
-                                out.println(dataStore.lRange(tokens.get(1), Integer.parseInt(tokens.get(2)), Integer.parseInt(tokens.get(3))));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "LINDEX":
-                            if (tokens.size() == 3) {
-                                out.println(dataStore.lIndex(tokens.get(1), Integer.parseInt(tokens.get(2))));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "LSET":
-                            if (tokens.size() == 4) {
-                                if (dataStore.lSet(tokens.get(1), Integer.parseInt(tokens.get(2)), tokens.get(3))) out.println(OK_RESPONSE);
-                                else out.println(INVALID_ARGS_RESPONSE);
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "JSON.SET":
-                            String jsonValue = getJsonValue(inputLine);
-                            JSONObject jsonObject = new JSONObject("{ \"" + tokens.get(2) + "\": " + jsonValue + " }");
-                            dataStore.setJson(tokens.get(1), jsonObject);
-                            out.println(OK_RESPONSE);
-                            break;
-                        case "JSON.GET":
-                            if (tokens.size() == 3) {
-                                JSONObject json = dataStore.getJson(tokens.get(1));
-                                Object value = json.get(tokens.get(2));
-                                out.println(value != null ? value : "NULL");
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "SADD":
-                            if (tokens.size() > 2) {
-                                out.println(dataStore.sAdd(tokens.get(1), tokens.subList(2, tokens.size())));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "SREM":
-                            if (tokens.size() > 2) {
-                                out.println(dataStore.sRem(tokens.get(1), tokens.subList(2, tokens.size())));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "SISMEMBER":
-                            if (tokens.size() == 3) {
-                                out.println(dataStore.sIsMember(tokens.get(1), tokens.get(2)));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "SMEMBERS":
-                            if (tokens.size() == 2) {
-                                out.println(dataStore.sMembers(tokens.get(1)));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "SINTER":
-                            if (tokens.size() > 1) {
-                                out.println(dataStore.sInter(tokens.subList(1, tokens.size())));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "SUNION":
-                            if (tokens.size() > 1) {
-                                out.println(dataStore.sUnion(tokens.subList(1, tokens.size())));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "SDIFF":
-                            if (tokens.size() > 1) {
-                                out.println(dataStore.sDiff(tokens.subList(1, tokens.size())));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "HSET":
-                            if (tokens.size() > 3) {
-                                out.println(dataStore.hSet(tokens.get(1), tokens.subList(2, tokens.size())));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "HGET":
-                            if (tokens.size() == 3) {
-                                out.println(dataStore.hGet(tokens.get(1), tokens.get(2)));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "HGETALL":
-                            if (tokens.size() == 2) {
-                                out.println(dataStore.hGetAll(tokens.get(1)));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "HDEL":
-                            if (tokens.size() > 2) {
-                                out.println(dataStore.hDel(tokens.get(1), tokens.subList(2, tokens.size())));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        case "HEXISTS":
-                            if (tokens.size() == 3) {
-                                out.println(dataStore.hExists(tokens.get(1), tokens.get(2)));
-                            } else {
-                                out.println(INVALID_ARGS_RESPONSE);
-                            }
-                            break;
-                        default:
-                            out.println("ERROR: Unkown Command");
-                            break;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                handleCommand(out, inputLine, tokens, command);
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleCommand(PrintWriter out, String inputLine, List<String> tokens, String command) {
+        try {
+
+            switch (command) {
+                case "SET":
+                    if (tokens.size() == 3) {
+                        dataStore.set(tokens.get(1), tokens.get(2));
+                        out.println(OK_RESPONSE);
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "GET":
+                    if (tokens.size() == 2) {
+                        Object value = dataStore.get(tokens.get(1));
+                        out.println(value != null ? value : "NULL");
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "DELETE":
+                    if (tokens.size() == 2) {
+                        out.println(dataStore.delete(tokens.get(1)));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "APPEND":
+                    if (tokens.size() == 3) {
+                        dataStore.append(tokens.get(1), tokens.get(2));
+                        out.println(OK_RESPONSE);
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "STRLEN":
+                    if (tokens.size() == 2) {
+                        int length = dataStore.strLen(tokens.get(1));
+                        out.println(length);
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "GETRANGE":
+                    if (tokens.size() == 4) {
+                        String value = dataStore.getRange(tokens.get(1), Integer.parseInt(tokens.get(2)), Integer.parseInt(tokens.get(3)));
+                        out.println(value);
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "SETRANGE":
+                    if (tokens.size() == 4) {
+                        String value = dataStore.setRange(tokens.get(1), Integer.parseInt(tokens.get(2)), tokens.get(3));
+                        out.println(value);
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "INCR":
+                    if (tokens.size() == 2) {
+                        dataStore.incr(tokens.get(1));
+                        out.println(OK_RESPONSE);
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "DECR":
+                    if (tokens.size() == 2) {
+                        dataStore.decr(tokens.get(1));
+                        out.println(OK_RESPONSE);
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "INCRBY":
+                    if (tokens.size() == 3) {
+                        dataStore.incrBy(tokens.get(1), Integer.parseInt(tokens.get(2)));
+                        out.println(OK_RESPONSE);
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "DECRBY":
+                    if (tokens.size() == 3) {
+                        dataStore.decrBy(tokens.get(1), Integer.parseInt(tokens.get(2)));
+                        out.println(OK_RESPONSE);
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                default:
+                    break;
+            }
+
+            if (command.startsWith("S")) switch (command) {
+                case "SADD":
+                    if (tokens.size() > 2) {
+                        out.println(dataStore.sAdd(tokens.get(1), tokens.subList(2, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "SREM":
+                    if (tokens.size() > 2) {
+                        out.println(dataStore.sRem(tokens.get(1), tokens.subList(2, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "SISMEMBER":
+                    if (tokens.size() == 3) {
+                        out.println(dataStore.sIsMember(tokens.get(1), tokens.get(2)));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "SMEMBERS":
+                    if (tokens.size() == 2) {
+                        out.println(dataStore.sMembers(tokens.get(1)));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "SINTER":
+                    if (tokens.size() > 1) {
+                        out.println(dataStore.sInter(tokens.subList(1, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "SUNION":
+                    if (tokens.size() > 1) {
+                        out.println(dataStore.sUnion(tokens.subList(1, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "SDIFF":
+                    if (tokens.size() > 1) {
+                        out.println(dataStore.sDiff(tokens.subList(1, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                default:
+                    out.println(ERROR_UNKOWN_COMMAND);
+                    return;
+            }
+            else if (command.startsWith("L") || command.startsWith("R")) switch (command) {
+                case "LPUSH":
+                    if (tokens.size() > 1) {
+                        out.println(dataStore.lPush(tokens.get(1), tokens.subList(2, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "RPUSH":
+                    if (tokens.size() > 1) {
+                        out.println(dataStore.rPush(tokens.get(1), tokens.subList(2, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "LPOP":
+                    if (tokens.size() > 1) {
+                        out.println(dataStore.lPop(tokens.get(1), tokens.size() == 3 ? Integer.parseInt(tokens.get(2)) : 1));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "RPOP":
+                    if (tokens.size() > 1) {
+                        out.println(dataStore.rPop(tokens.get(1), tokens.size() == 3 ? Integer.parseInt(tokens.get(2)) : 1));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "LRANGE":
+                    if (tokens.size() == 4) {
+                        out.println(dataStore.lRange(tokens.get(1), Integer.parseInt(tokens.get(2)), Integer.parseInt(tokens.get(3))));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "LINDEX":
+                    if (tokens.size() == 3) {
+                        out.println(dataStore.lIndex(tokens.get(1), Integer.parseInt(tokens.get(2))));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "LSET":
+                    if (tokens.size() == 4) {
+                        if (dataStore.lSet(tokens.get(1), Integer.parseInt(tokens.get(2)), tokens.get(3))) out.println(OK_RESPONSE);
+                        else out.println(INVALID_ARGS_RESPONSE);
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                default:
+                    out.println(ERROR_UNKOWN_COMMAND);
+                    return;
+            }
+            else if (command.startsWith("H")) switch (command) {
+                case "HSET":
+                    if (tokens.size() > 3) {
+                        out.println(dataStore.hSet(tokens.get(1), tokens.subList(2, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "HGET":
+                    if (tokens.size() == 3) {
+                        out.println(dataStore.hGet(tokens.get(1), tokens.get(2)));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "HGETALL":
+                    if (tokens.size() == 2) {
+                        out.println(dataStore.hGetAll(tokens.get(1)));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "HDEL":
+                    if (tokens.size() > 2) {
+                        out.println(dataStore.hDel(tokens.get(1), tokens.subList(2, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "HEXISTS":
+                    if (tokens.size() == 3) {
+                        out.println(dataStore.hExists(tokens.get(1), tokens.get(2)));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                default:
+                    out.println(ERROR_UNKOWN_COMMAND);
+                    return;
+            }
+            else if (command.startsWith("JSON")) switch (command) {
+                case "JSON.SET":
+                    String jsonValue = getJsonValue(inputLine);
+                    JSONObject jsonObject = new JSONObject("{ \"" + tokens.get(2) + "\": " + jsonValue + " }");
+                    dataStore.setJson(tokens.get(1), jsonObject);
+                    out.println(OK_RESPONSE);
+                    return;
+                case "JSON.GET":
+                    if (tokens.size() == 3) {
+                        JSONObject json = dataStore.getJson(tokens.get(1));
+                        Object value = json.get(tokens.get(2));
+                        out.println(value != null ? value : "NULL");
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                default:
+                    out.println(ERROR_UNKOWN_COMMAND);
+                    return;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
