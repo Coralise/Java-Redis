@@ -334,15 +334,27 @@ class InMemoryStore {
 
         boolean withScores = options.contains("WITHSCORES");
         boolean rev = options.contains("REV");
+        boolean byScore = options.contains("BYSCORE");
 
-        for (ScoreMember scoreMember : treeSet) {
-            if (i >= start && i <= stop) {
-                range.add(scoreMember.getMember());
-                if (withScores) range.add(scoreMember.getScore().toString());
+        if (!byScore) {
+            for (ScoreMember scoreMember : treeSet) {
+                if (i >= start && i <= stop) {
+                    range.add(scoreMember.getMember());
+                    if (withScores) range.add(scoreMember.getScore().toString());
+                }
+                i++;
             }
-            i++;
+            return !rev ? range : range.reversed();
+        } else {
+            List<ScoreMember> scoreMembers = new ArrayList<>(treeSet);
+            for (int j = 0; j < scoreMembers.size(); j++) {
+                if (scoreMembers.get(j).getScore() >= start && scoreMembers.get(j).getScore() <= stop) {
+                    range.add(scoreMembers.get(j).getMember());
+                    if (withScores) range.add(scoreMembers.get(j).getScore().toString());
+                }
+            }
+            return !rev ? range : range.reversed();
         }
-        return !rev ? range : range.reversed();
     }
 
     public Object zRank(String key, String member, boolean withScore) {
@@ -351,6 +363,21 @@ class InMemoryStore {
         if (scoreMember == null) return null;
         int rank = treeSet.headSet(scoreMember).size();
         return withScore ? List.of(rank, scoreMember.getScore()) : rank;
+    }
+
+    public int zRem(String key, List<String> members) {
+        TreeSet<ScoreMember> treeSet = getTreeSet(key);
+        int removed = 0;
+        for (String member : members) {
+            ScoreMember scoreMember = getScoreMember(key, member);
+            if (scoreMember != null && treeSet.remove(scoreMember)) {
+                removeFromTreeSetMembers(key, scoreMember);
+                removed++;
+            }
+            
+        }
+        store.put(key, treeSet);
+        return removed;
     }
 
     public void jsonArrAppend(String key, Object value) {
@@ -405,6 +432,11 @@ class InMemoryStore {
 
     private void addToTreeSetMembers(String key, ScoreMember scoreMember) {
         treeSetMembers.computeIfAbsent(key, k -> new HashMap<>())   .put(scoreMember.getMember(), scoreMember.getScore());
+    }
+
+    private void removeFromTreeSetMembers(String key, ScoreMember scoreMember) {
+        Map<String, Integer> members = treeSetMembers.get(key);
+        if (members != null) members.remove(scoreMember.getMember());
     }
 
     @SuppressWarnings("unchecked")

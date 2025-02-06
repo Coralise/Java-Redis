@@ -419,4 +419,32 @@ public class CommandHandlerTest {
         response = sendMessage("ZRANK zset6 member4");
         assertEquals("null", response);
     }
+
+    @Test
+    public void testZremCommand() throws IOException {
+        sendMessage("ZADD zset7 1 member1");
+        sendMessage("ZADD zset7 2 member2");
+        sendMessage("ZADD zset7 3 member3");
+        String response = sendMessage("ZREM zset7 member2 member1 member5");
+        assertEquals("2", response);
+        response = sendMessage("ZRANGE zset7 0 -1 WITHSCORES");
+        assertEquals("[member3, 3]", response);
+        response = sendMessage("ZREM zset7 member4");
+        assertEquals("0", response);
+    }
+
+    @Test
+    public void testZrangeByScoreCommand() throws IOException {
+        sendMessage("ZADD zset8 1 member1");
+        sendMessage("ZADD zset8 2 member2");
+        sendMessage("ZADD zset8 3 member3");
+        String response = sendMessage("ZRANGE zset8 1 2 BYSCORE");
+        assertEquals("[member1, member2]", response);
+        response = sendMessage("ZRANGE zset8 2 3 BYSCORE WITHSCORES");
+        assertEquals("[member2, 2, member3, 3]", response);
+        response = sendMessage("ZRANGE zset8 0 1 BYSCORE");
+        assertEquals("[member1]", response);
+        response = sendMessage("ZRANGE zset8 4 5 BYSCORE");
+        assertEquals("[]", response);
+    }
 }

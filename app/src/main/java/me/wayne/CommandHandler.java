@@ -172,6 +172,13 @@ public class CommandHandler implements Runnable {
                         out.println(INVALID_ARGS_RESPONSE);
                     }
                     return;
+                case "ZREM":
+                    if (tokens.size() > 2) {
+                        out.println(dataStore.zRem(tokens.get(1), tokens.subList(2, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
                 default:
                     break;
             }
