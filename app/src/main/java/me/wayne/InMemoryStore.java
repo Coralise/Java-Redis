@@ -218,6 +218,49 @@ class InMemoryStore {
         return new ArrayList<>(difference);
     }
 
+    public int hSet(String key, List<String> fieldsAndValues) {
+        HashMap<String, String> hashMap = new HashMap<>();
+        int added = 0;
+        for (int i = 1; i < fieldsAndValues.size(); i += 2) {
+            hashMap.put(fieldsAndValues.get(i-1), fieldsAndValues.get(i));
+            added++;
+        }
+        store.put(key, hashMap);
+        return added;
+    }
+
+    public String hGet(String key, String field) {
+        if (!store.containsKey(key)) return null;
+        HashMap<String, String> hashMap = getHashMap(key);
+        return hashMap.get(field);
+    }
+
+    public List<String> hGetAll(String key) {
+        if (!store.containsKey(key)) return new ArrayList<>();
+        HashMap<String, String> hashMap = getHashMap(key);
+        List<String> fieldsAndValues = new ArrayList<>();
+        for (Map.Entry<String, String> entry : hashMap.entrySet()) {
+            fieldsAndValues.add(entry.getKey());
+            fieldsAndValues.add(entry.getValue());
+        }
+        return fieldsAndValues;
+    }
+
+    public int hDel(String key, List<String> fields) {
+        if (!store.containsKey(key)) return 0;
+        HashMap<String, String> hashMap = getHashMap(key);
+        int removed = 0;
+        for (String field : fields) if (hashMap.remove(field) != null) removed++;
+        store.put(key, hashMap);
+        return removed;
+    }
+
+    public int hExists(String key, String field) {
+        if (!store.containsKey(key)) return 0;
+        HashMap<String, String> hashMap = getHashMap(key);
+        return hashMap.containsKey(field) ? 1 : 0;
+    }
+
     public void jsonArrAppend(String key, Object value) {
         AssertUtil.assertTrue(store.containsKey(key), keyDoesntExistMsg);
         AssertUtil.assertTrue(store.get(key) instanceof JSONArray, nonJsonErrorMsg);
@@ -236,6 +279,18 @@ class InMemoryStore {
             list = new ArrayList<>((List<String>) store.get(key));
         }
         return list;
+    }
+
+    @SuppressWarnings("unchecked")
+    private HashMap<String, String> getHashMap(String key) {
+        HashMap<String, String> map;
+        if (!store.containsKey(key)) {
+            map = new HashMap<>();
+        } else {
+            AssertUtil.assertTrue(store.get(key) instanceof Map, "Existing value is not of type Map");
+            map = new HashMap<>((Map<String, String>) store.get(key));
+        }
+        return map;
     }
 
     @SuppressWarnings("unchecked")

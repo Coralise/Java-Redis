@@ -240,6 +240,41 @@ public class CommandHandler implements Runnable {
                                 out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
+                        case "HSET":
+                            if (tokens.size() > 3) {
+                                out.println(dataStore.hSet(tokens.get(1), tokens.subList(2, tokens.size())));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "HGET":
+                            if (tokens.size() == 3) {
+                                out.println(dataStore.hGet(tokens.get(1), tokens.get(2)));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "HGETALL":
+                            if (tokens.size() == 2) {
+                                out.println(dataStore.hGetAll(tokens.get(1)));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "HDEL":
+                            if (tokens.size() > 2) {
+                                out.println(dataStore.hDel(tokens.get(1), tokens.subList(2, tokens.size())));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "HEXISTS":
+                            if (tokens.size() == 3) {
+                                out.println(dataStore.hExists(tokens.get(1), tokens.get(2)));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
                         default:
                             out.println("ERROR: Unkown Command");
                             break;
