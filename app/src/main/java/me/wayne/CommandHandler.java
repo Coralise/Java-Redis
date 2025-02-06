@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import org.json.JSONObject;
 
 public class CommandHandler implements Runnable {
-    private static final String ERROR_RESPONSE = "ERROR";
+    private static final String INVALID_ARGS_RESPONSE = "ERROR: Invalid number of arguments";
     private static final String OK_RESPONSE = "OK";
     private Socket clientSocket;
     private InMemoryStore dataStore;
@@ -44,7 +44,7 @@ public class CommandHandler implements Runnable {
                                 dataStore.set(tokens.get(1), tokens.get(2));
                                 out.println(OK_RESPONSE);
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "GET":
@@ -52,14 +52,14 @@ public class CommandHandler implements Runnable {
                                 Object value = dataStore.get(tokens.get(1));
                                 out.println(value != null ? value : "NULL");
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "DELETE":
                             if (tokens.size() == 2) {
                                 out.println(dataStore.delete(tokens.get(1)));
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "APPEND":
@@ -67,7 +67,7 @@ public class CommandHandler implements Runnable {
                                 dataStore.append(tokens.get(1), tokens.get(2));
                                 out.println(OK_RESPONSE);
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "STRLEN":
@@ -75,7 +75,7 @@ public class CommandHandler implements Runnable {
                                 int length = dataStore.strLen(tokens.get(1));
                                 out.println(length);
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "GETRANGE":
@@ -83,7 +83,7 @@ public class CommandHandler implements Runnable {
                                 String value = dataStore.getRange(tokens.get(1), Integer.parseInt(tokens.get(2)), Integer.parseInt(tokens.get(3)));
                                 out.println(value);
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "SETRANGE":
@@ -91,7 +91,7 @@ public class CommandHandler implements Runnable {
                                 String value = dataStore.setRange(tokens.get(1), Integer.parseInt(tokens.get(2)), tokens.get(3));
                                 out.println(value);
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "INCR":
@@ -99,7 +99,7 @@ public class CommandHandler implements Runnable {
                                 dataStore.incr(tokens.get(1));
                                 out.println(OK_RESPONSE);
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "DECR":
@@ -107,7 +107,7 @@ public class CommandHandler implements Runnable {
                                 dataStore.decr(tokens.get(1));
                                 out.println(OK_RESPONSE);
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "INCRBY":
@@ -115,7 +115,7 @@ public class CommandHandler implements Runnable {
                                 dataStore.incrBy(tokens.get(1), Integer.parseInt(tokens.get(2)));
                                 out.println(OK_RESPONSE);
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "DECRBY":
@@ -123,41 +123,57 @@ public class CommandHandler implements Runnable {
                                 dataStore.decrBy(tokens.get(1), Integer.parseInt(tokens.get(2)));
                                 out.println(OK_RESPONSE);
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "LPUSH":
-                            out.println(dataStore.lPush(tokens.get(1), tokens.subList(2, tokens.size())));
+                            if (tokens.size() > 1) {
+                                out.println(dataStore.lPush(tokens.get(1), tokens.subList(2, tokens.size())));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
                             break;
                         case "RPUSH":
-                            out.println(dataStore.rPush(tokens.get(1), tokens.subList(2, tokens.size())));
+                            if (tokens.size() > 1) {
+                                out.println(dataStore.rPush(tokens.get(1), tokens.subList(2, tokens.size())));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
                             break;
                         case "LPOP":
-                            out.println(dataStore.lPop(tokens.get(1), tokens.size() == 3 ? Integer.parseInt(tokens.get(2)) : 1));
+                            if (tokens.size() > 1) {
+                                out.println(dataStore.lPop(tokens.get(1), tokens.size() == 3 ? Integer.parseInt(tokens.get(2)) : 1));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
                             break;
                         case "RPOP":
-                            out.println(dataStore.rPop(tokens.get(1), tokens.size() == 3 ? Integer.parseInt(tokens.get(2)) : 1));
+                            if (tokens.size() > 1) {
+                                out.println(dataStore.rPop(tokens.get(1), tokens.size() == 3 ? Integer.parseInt(tokens.get(2)) : 1));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
                             break;
                         case "LRANGE":
                             if (tokens.size() == 4) {
                                 out.println(dataStore.lRange(tokens.get(1), Integer.parseInt(tokens.get(2)), Integer.parseInt(tokens.get(3))));
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "LINDEX":
                             if (tokens.size() == 3) {
                                 out.println(dataStore.lIndex(tokens.get(1), Integer.parseInt(tokens.get(2))));
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "LSET":
                             if (tokens.size() == 4) {
                                 if (dataStore.lSet(tokens.get(1), Integer.parseInt(tokens.get(2)), tokens.get(3))) out.println(OK_RESPONSE);
-                                else out.println(ERROR_RESPONSE);
+                                else out.println(INVALID_ARGS_RESPONSE);
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         case "JSON.SET":
@@ -172,7 +188,56 @@ public class CommandHandler implements Runnable {
                                 Object value = json.get(tokens.get(2));
                                 out.println(value != null ? value : "NULL");
                             } else {
-                                out.println(ERROR_RESPONSE);
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "SADD":
+                            if (tokens.size() > 2) {
+                                out.println(dataStore.sAdd(tokens.get(1), tokens.subList(2, tokens.size())));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "SREM":
+                            if (tokens.size() > 2) {
+                                out.println(dataStore.sRem(tokens.get(1), tokens.subList(2, tokens.size())));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "SISMEMBER":
+                            if (tokens.size() == 3) {
+                                out.println(dataStore.sIsMember(tokens.get(1), tokens.get(2)));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "SMEMBERS":
+                            if (tokens.size() == 2) {
+                                out.println(dataStore.sMembers(tokens.get(1)));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "SINTER":
+                            if (tokens.size() > 1) {
+                                out.println(dataStore.sInter(tokens.subList(1, tokens.size())));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "SUNION":
+                            if (tokens.size() > 1) {
+                                out.println(dataStore.sUnion(tokens.subList(1, tokens.size())));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
+                            }
+                            break;
+                        case "SDIFF":
+                            if (tokens.size() > 1) {
+                                out.println(dataStore.sDiff(tokens.subList(1, tokens.size())));
+                            } else {
+                                out.println(INVALID_ARGS_RESPONSE);
                             }
                             break;
                         default:

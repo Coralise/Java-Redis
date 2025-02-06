@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -54,6 +57,11 @@ public class CommandHandlerTest {
     public void testSetCommand() throws IOException {
         String response = sendMessage("SET key1 \"value 1\"");
         assertEquals("OK", response);
+
+        response = sendMessage("SET key2 \"value 2\" anotherArg");
+        assertEquals("ERROR: Invalid number of arguments", response);
+        response = sendMessage("SET key2");
+        assertEquals("ERROR: Invalid number of arguments", response);
     }
 
     @Test
@@ -230,5 +238,70 @@ public class CommandHandlerTest {
         assertEquals("OK", response);
         response = sendMessage("LINDEX list5 0");
         assertEquals("new Value", response);
+        response = sendMessage("LSET list5 -1 \"new Value at last\"");
+        assertEquals("OK", response);
+        response = sendMessage("LINDEX list5 -1");
+        assertEquals("new Value at last", response);
+    }
+
+    @Test
+    public void testSaddCommand() throws IOException {
+        String response = sendMessage("SADD set1 member1 member2 member3");
+        assertEquals("3", response);
+        response = sendMessage("SMEMBERS set1");
+        Set<String> expectedMembers = new HashSet<>(Arrays.asList("member1", "member2", "member3"));
+        assertEquals(expectedMembers, new HashSet<>(Arrays.asList(response.replace("[", "").replace("]", "").split(", "))));
+        response = sendMessage("SADD set1 member2 member4");
+        assertEquals("1", response);
+    }
+
+    @Test
+    public void testSremCommand() throws IOException {
+        String response = sendMessage("SADD myset \"one\"");
+        assertEquals("1", response);
+        response = sendMessage("SADD myset \"two\"");
+        assertEquals("1", response);
+        response = sendMessage("SADD myset \"three\"");
+        assertEquals("1", response);
+        response = sendMessage("SREM myset \"one\"");
+        assertEquals("1", response);
+        response = sendMessage("SREM myset \"four\"");
+        assertEquals("0", response);
+        response = sendMessage("SMEMBERS myset");
+        Set<String> expectedMembers = new HashSet<>(Arrays.asList("two", "three"));
+        assertEquals(expectedMembers, new HashSet<>(Arrays.asList(response.replace("[", "").replace("]", "").split(", "))));
+    }
+
+    @Test
+    public void testSinterCommand() throws IOException {
+        String response = sendMessage("SADD sInter1 a b c d");
+        assertEquals("4", response);
+        response = sendMessage("SADD sInter2 c");
+        assertEquals("1", response);
+        response = sendMessage("SADD sInter3 a c e");
+        assertEquals("3", response);
+        response = sendMessage("SINTER sInter1 sInter2 sInter3");
+        Set<String> expectedMembers = new HashSet<>(Arrays.asList("c"));
+        assertEquals(expectedMembers, new HashSet<>(Arrays.asList(response.replace("[", "").replace("]", "").split(", "))));
+    }
+
+    @Test
+    public void testSunionCommand() throws IOException {
+        sendMessage("SADD sUnion1 a b c d");
+        sendMessage("SADD sUnion2 c");
+        sendMessage("SADD sUnion3 a c e");
+        String response = sendMessage("SUNION sUnion1 sUnion2 sUnion3");
+        Set<String> expectedMembers = new HashSet<>(Arrays.asList("a", "b", "c", "d", "e"));
+        assertEquals(expectedMembers, new HashSet<>(Arrays.asList(response.replace("[", "").replace("]", "").split(", "))));
+    }
+
+    @Test
+    public void testSdiffCommand() throws IOException {
+        sendMessage("SADD sDiff1 a b c d");
+        sendMessage("SADD sDiff2 c");
+        sendMessage("SADD sDiff3 a c e");
+        String response = sendMessage("SDIFF sDiff1 sDiff2 sDiff3");
+        Set<String> expectedMembers = new HashSet<>(Arrays.asList("b", "d"));
+        assertEquals(expectedMembers, new HashSet<>(Arrays.asList(response.replace("[", "").replace("]", "").split(", "))));
     }
 }
