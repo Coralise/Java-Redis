@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -348,17 +347,9 @@ class InMemoryStore {
 
     public Object zRank(String key, String member, boolean withScore) {
         TreeSet<ScoreMember> treeSet = getTreeSet(key);
-        if (treeSet.isEmpty()) return null;
-        int rank = 0;
-        ScoreMember scoreMember = null;
-        for (ScoreMember sm : treeSet) {
-            if (Objects.equals(sm.getMember(), member)) {
-                scoreMember = sm;
-                break;
-            }
-            rank++;
-        }
+        ScoreMember scoreMember = getScoreMember(key, member);
         if (scoreMember == null) return null;
+        int rank = treeSet.headSet(scoreMember).size();
         return withScore ? List.of(rank, scoreMember.getScore()) : rank;
     }
 
