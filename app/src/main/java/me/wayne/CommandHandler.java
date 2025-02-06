@@ -357,7 +357,27 @@ public class CommandHandler implements Runnable {
                     out.println(ERROR_UNKOWN_COMMAND);
                     return;
             }
+            else if (command.startsWith("X")) switch (command) {
+                case "XADD":
+                    if (tokens.size() > 4) {
+                        out.println(dataStore.xAdd(tokens.get(1), tokens.get(2), tokens.subList(3, tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "XRANGE":
+                    if (tokens.size() > 3) {
+                        out.println(dataStore.xRange(tokens.get(1), tokens.get(2), tokens.get(3), tokens.size() > 5 && tokens.get(4).equalsIgnoreCase("COUNT") ? Integer.parseInt(tokens.get(5)) : 0));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                default:
+                    out.println(ERROR_UNKOWN_COMMAND);
+                    return;
+            }
         } catch (Exception e) {
+            out.println("ERROR: " + e.getMessage());
             e.printStackTrace();
         }
     }

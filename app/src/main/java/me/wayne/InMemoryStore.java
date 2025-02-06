@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -238,13 +240,13 @@ class InMemoryStore {
 
     public String hGet(String key, String field) {
         if (!store.containsKey(key)) return null;
-        HashMap<String, String> hashMap = getHashMap(key);
+        Map<String, String> hashMap = getMap(key);
         return hashMap.get(field);
     }
 
     public List<String> hGetAll(String key) {
         if (!store.containsKey(key)) return new ArrayList<>();
-        HashMap<String, String> hashMap = getHashMap(key);
+        Map<String, String> hashMap = getMap(key);
         List<String> fieldsAndValues = new ArrayList<>();
         for (Map.Entry<String, String> entry : hashMap.entrySet()) {
             fieldsAndValues.add(entry.getKey());
@@ -255,7 +257,7 @@ class InMemoryStore {
 
     public int hDel(String key, List<String> fields) {
         if (!store.containsKey(key)) return 0;
-        HashMap<String, String> hashMap = getHashMap(key);
+        Map<String, String> hashMap = getMap(key);
         int removed = 0;
         for (String field : fields) if (hashMap.remove(field) != null) removed++;
         store.put(key, hashMap);
@@ -264,7 +266,7 @@ class InMemoryStore {
 
     public int hExists(String key, String field) {
         if (!store.containsKey(key)) return 0;
-        HashMap<String, String> hashMap = getHashMap(key);
+        Map<String, String> hashMap = getMap(key);
         return hashMap.containsKey(field) ? 1 : 0;
     }
 
@@ -380,12 +382,102 @@ class InMemoryStore {
         return removed;
     }
 
+    public String xAdd(String key, String id, List<String> fieldsAndValues) {
+        if (id.equals("*")) id = String.valueOf(System.currentTimeMillis()) + "-";
+
+        Map<String, JSONObject> streamMap = getStreamMap(key);
+
+        int sequence = 0;
+        while (streamMap.containsKey(id + sequence)) sequence++;
+        id += sequence;
+
+        JSONObject jsonObject = new JSONObject();
+        for (int i = 1; i < fieldsAndValues.size(); i += 2) {
+            jsonObject.put(fieldsAndValues.get(i-1), fieldsAndValues.get(i));
+        }
+
+        streamMap.put(id, jsonObject);
+        store.put(key, streamMap);
+
+        return id;
+    }
+
+    public List<List<Object>> xRange(String key, String start, String end, int count) {
+        Map<String, JSONObject> streamMap = getStreamMap(key);
+        List<List<Object>> range = new ArrayList<>();
+
+        boolean startExclusive = false;
+        long startTimestamp = -1;
+        int startSequence = -1;
+        if (!start.equals("-")) {
+            startExclusive = start.startsWith("(");
+            startTimestamp = Long.parseLong(!startExclusive ? start.split("-")[0] : start.substring(1).split("-")[0]);
+            startSequence = Integer.parseInt(start.split("-")[1]);
+        }
+
+        boolean endExclusive = false;        
+        long endTimestamp = -1;        
+        int endSequence = -1;            
+        if (!end.equals("+")) {
+            endExclusive = end.startsWith("(");
+            endTimestamp = Long.parseLong(!endExclusive ? end.split("-")[0] : end.substring(1).split("-")[0]);
+            endSequence = Integer.parseInt(end.split("-")[1]);
+        }
+
+        int i = 0;
+        for (Map.Entry<String, JSONObject> entry : streamMap.entrySet()) {
+            if (count > 0 && i >= count) break;
+            long entryTimestamp = Long.parseLong(entry.getKey().split("-")[0]);
+            int entrySequence = Integer.parseInt(entry.getKey().split("-")[1]);
+            if (start.equals("-")) {
+                if (!end.equals("+")) {
+                    if (!endExclusive) {
+                        if (entryTimestamp > endTimestamp || (entryTimestamp == endTimestamp && entrySequence > endSequence)) break;
+                    } else {
+                        if (entryTimestamp >= endTimestamp || (entryTimestamp == endTimestamp && entrySequence >= endSequence)) break;
+                    }
+                }
+                range.add(List.of(entry.getKey(), entry.getValue()));
+                i++;
+            } else {
+                if (!startExclusive) {
+                    if (entryTimestamp < startTimestamp || (entryTimestamp == startTimestamp && entrySequence < startSequence)) continue;
+                } else {
+                    if (entryTimestamp <= startTimestamp || (entryTimestamp == startTimestamp && entrySequence <= startSequence)) continue;
+                }
+                if (!end.equals("+")) {
+                    if (!endExclusive) {
+                        if (entryTimestamp > endTimestamp || (entryTimestamp == endTimestamp && entrySequence > endSequence)) break;
+                    } else {
+                        if (entryTimestamp >= endTimestamp || (entryTimestamp == endTimestamp && entrySequence >= endSequence)) break;
+                    }
+                }
+                range.add(List.of(entry.getKey(), entry.getValue()));
+                i++;
+            }
+        }
+
+        return range;
+    }
+
     public void jsonArrAppend(String key, Object value) {
         AssertUtil.assertTrue(store.containsKey(key), keyDoesntExistMsg);
         AssertUtil.assertTrue(store.get(key) instanceof JSONArray, nonJsonErrorMsg);
         JSONArray jsonArray = (JSONArray) store.get(key);
         jsonArray.put(value);
         store.put(key, jsonArray);
+    }
+
+    @SuppressWarnings("unchecked")
+    private LinkedHashMap<String, JSONObject> getStreamMap(String key) {
+        LinkedHashMap<String, JSONObject> map;
+        if (!store.containsKey(key)) {
+            map = new LinkedHashMap<>();
+        } else {
+            AssertUtil.assertTrue(store.get(key) instanceof Map, "Existing value is not of type Map");
+            map = new LinkedHashMap<>((Map<String, JSONObject>) store.get(key));
+        }
+        return map;
     }
 
     @SuppressWarnings("unchecked")
@@ -401,7 +493,7 @@ class InMemoryStore {
     }
 
     @SuppressWarnings("unchecked")
-    private HashMap<String, String> getHashMap(String key) {
+    private Map<String, String> getMap(String key) {
         HashMap<String, String> map;
         if (!store.containsKey(key)) {
             map = new HashMap<>();
