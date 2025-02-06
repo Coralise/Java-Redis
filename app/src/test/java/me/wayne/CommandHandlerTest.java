@@ -346,4 +346,60 @@ public class CommandHandlerTest {
         response = sendMessage("HEXISTS myhash field2");
         assertEquals("0", response);
     }
+
+    @Test
+    public void testZaddCommand() throws IOException {
+        String response = sendMessage("ZADD zset1 1 member1");
+        assertEquals("1", response);
+        response = sendMessage("ZADD zset1 3 member3");
+        assertEquals("1", response);
+        response = sendMessage("ZADD zset1 2 member2");
+        assertEquals("1", response);
+        response = sendMessage("ZADD zset1 2 member2");
+        assertEquals("0", response); // member2 already exists with the same score
+        response = sendMessage("ZRANGE zset1 0 -1 WITHSCORES");
+        assertEquals("[1 member1, 2 member2, 3 member3]", response);
+    }
+
+    @Test
+    public void testZaddCommandWithNxOption() throws IOException {
+        String response = sendMessage("ZADD zset2 NX 1 member1");
+        assertEquals("1", response);
+        response = sendMessage("ZADD zset2 CH NX 2 member1");
+        assertEquals("0", response); // member1 already exists, NX prevents update
+        response = sendMessage("ZRANGE zset2 0 -1 WITHSCORES");
+        assertEquals("[1 member1]", response);
+    }
+
+    @Test
+    public void testZaddCommandWithXxOption() throws IOException {
+        String response = sendMessage("ZADD zset3 XX 1 member1");
+        assertEquals("0", response); // member1 does not exist, XX prevents addition
+        response = sendMessage("ZADD zset3 1 member1");
+        assertEquals("1", response);
+        response = sendMessage("ZADD zset3 CH XX 2 member1");
+        assertEquals("1", response); // member1 exists, XX allows update
+        response = sendMessage("ZRANGE zset3 0 -1 WITHSCORES");
+        assertEquals("[2 member1]", response);
+    }
+
+    @Test
+    public void testZaddCommandWithChOption() throws IOException {
+        String response = sendMessage("ZADD zset4 CH 1 member1");
+        assertEquals("1", response);
+        response = sendMessage("ZADD zset4 CH 2 member1");
+        assertEquals("1", response); // CH counts the update as a change
+        response = sendMessage("ZRANGE zset4 0 -1 WITHSCORES");
+        assertEquals("[2 member1]", response);
+    }
+
+    @Test
+    public void testZaddCommandWithIncrOption() throws IOException {
+        String response = sendMessage("ZADD zset5 INCR 1 member1");
+        assertEquals("1", response);
+        response = sendMessage("ZADD zset5 CH INCR 2 member1");
+        assertEquals("1", response);
+        response = sendMessage("ZRANGE zset5 0 -1 WITHSCORES");
+        assertEquals("[3 member1]", response);
+    }
 }

@@ -136,6 +136,34 @@ public class CommandHandler implements Runnable {
                         out.println(INVALID_ARGS_RESPONSE);
                     }
                     return;
+                case "ZADD":
+                    if (tokens.size() > 3) {
+                        ArrayList<String> options = new ArrayList<>();
+                        for (int i = 2; i < tokens.size(); i++) {
+                            String option = tokens.get(i).toUpperCase();
+                            if (option.equals("XX") || option.equals("NX") || option.equals("LT") || option.equals("GT") || option.equals("CH") || option.equals("INCR")) {
+                                options.add(option);
+                            } else {
+                                break;
+                            }
+                        }
+                        out.println(dataStore.zAdd(tokens.get(1), options, tokens.subList(2 + options.size(), tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "ZRANGE":
+                    if (tokens.size() > 3) {
+                        ArrayList<String> options = new ArrayList<>();
+                        for (int i = 4; i < tokens.size(); i++) {
+                            String option = tokens.get(i).toUpperCase();
+                            options.add(option);
+                        }
+                        out.println(dataStore.zRange(tokens.get(1), Integer.parseInt(tokens.get(2)), Integer.parseInt(tokens.get(3)), options));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
                 default:
                     break;
             }

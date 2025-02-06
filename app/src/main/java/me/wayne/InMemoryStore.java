@@ -1,17 +1,24 @@
 package me.wayne;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 class InMemoryStore {
+
     private final Map<String, Object> store = new HashMap<>();
+
+    private final Map<String, Map<String, Integer>> treeSetMembers = new HashMap<>();
+    
     private String nonIntegerErrorMsg = "Value is not of type Integer";
     private String nonStringErrorMsg = "Value is not of type String";
     private String keyDoesntExistMsg = "Key does not exist";
@@ -261,6 +268,75 @@ class InMemoryStore {
         return hashMap.containsKey(field) ? 1 : 0;
     }
 
+    public int zAdd(String key, List<String> options, List<String> scoresAndMembers) {
+        TreeSet<ScoreMember> treeSet = getTreeSet(key);
+
+        boolean nx = options.contains("NX");
+        boolean xx = options.contains("XX");
+        AssertUtil.assertTrue(!(nx && xx), "Both NX and XX options are specified");
+        boolean gt = options.contains("GT");
+        boolean lt = options.contains("LT");
+        AssertUtil.assertTrue(!(gt && lt), "Both GT and LT options are specified");
+        boolean ch = options.contains("CH");
+        boolean incr = options.contains("INCR");
+
+        if (incr) AssertUtil.assertTrue(scoresAndMembers.size() == 2, "INCR option requires a single score and member");
+
+        int updated = 0;
+
+        for (int i = 1; i < scoresAndMembers.size(); i += 2) {
+
+            int score;
+            try {
+                score = Integer.parseInt(scoresAndMembers.get(i-1));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid score: " + scoresAndMembers.get(i-1), e);
+            }
+            ScoreMember scoreMember = new ScoreMember(score, scoresAndMembers.get(i));
+
+            ScoreMember existingScoreMember = getScoreMember(key, scoreMember.getMember());
+
+            if (existingScoreMember != null) {
+                if (nx) continue;
+                if (gt && scoreMember.getScore() <= existingScoreMember.getScore()) continue;
+                if (lt && scoreMember.getScore() >= existingScoreMember.getScore()) continue;
+
+                if (incr) scoreMember = new ScoreMember(scoreMember.getScore() + existingScoreMember.getScore(), scoreMember.getMember());
+                else if (scoreMember.getScore().equals(existingScoreMember.getScore())) continue;
+
+                treeSet.remove(existingScoreMember);
+                treeSet.add(scoreMember);
+                addToTreeSetMembers(key, scoreMember);
+                if (ch) updated++;
+            } else {
+                if (xx) continue;
+                treeSet.add(scoreMember);
+                addToTreeSetMembers(key, scoreMember);
+                updated++;
+            }
+
+        }
+
+        store.put(key, treeSet);
+
+        return updated;
+    }
+
+    public List<String> zRange(String key, int start, int stop, List<String> options) {
+        TreeSet<ScoreMember> treeSet = getTreeSet(key);
+        List<String> range = new ArrayList<>();
+        int i = 0;
+        while (stop < 0) stop += treeSet.size();
+
+        boolean withScores = options.contains("WITHSCORES");
+
+        for (ScoreMember scoreMember : treeSet) {
+            if (i >= start && i <= stop) range.add(withScores ? scoreMember.getScore() + " " + scoreMember.getMember() : scoreMember.getMember());
+            i++;
+        }
+        return range;
+    }
+
     public void jsonArrAppend(String key, Object value) {
         AssertUtil.assertTrue(store.containsKey(key), keyDoesntExistMsg);
         AssertUtil.assertTrue(store.get(key) instanceof JSONArray, nonJsonErrorMsg);
@@ -291,6 +367,28 @@ class InMemoryStore {
             map = new HashMap<>((Map<String, String>) store.get(key));
         }
         return map;
+    }
+
+    @SuppressWarnings("unchecked")
+    private TreeSet<ScoreMember> getTreeSet(String key) {
+        Comparator<ScoreMember> integerComparator = (s1, s2) -> s1.getScore().compareTo(s2.getScore());
+        TreeSet<ScoreMember> set = new TreeSet<>(integerComparator);
+        if (store.containsKey(key)) {
+            AssertUtil.assertTrue(store.get(key) instanceof SortedSet, "Existing value is not of type SortedSet");
+            set.addAll((SortedSet<ScoreMember>) store.get(key));
+        }
+        return set;
+    }
+
+    private ScoreMember getScoreMember(String key, String member) {
+        Map<String, Integer> members = treeSetMembers.get(key);
+        if (members == null) return null;
+        Integer score = members.get(member);
+        return score == null ? null : new ScoreMember(score, member);
+    }
+
+    private void addToTreeSetMembers(String key, ScoreMember scoreMember) {
+        treeSetMembers.computeIfAbsent(key, k -> new HashMap<>())   .put(scoreMember.getMember(), scoreMember.getScore());
     }
 
     @SuppressWarnings("unchecked")
