@@ -383,11 +383,22 @@ class InMemoryStore {
     }
 
     public String xAdd(String key, String id, List<String> fieldsAndValues) {
+        Pattern pattern = Pattern.compile("\\d+-\\d+");
         if (id.equals("*")) id = String.valueOf(System.currentTimeMillis()) + "-";
+        else {
+            Pattern pattern2 = Pattern.compile("\\d+");
+            if (pattern.matcher(id).matches()) {
+                // Continue
+            } else if (pattern2.matcher(id).matches()) {
+                id += "-";
+            } else {
+                throw new IllegalArgumentException("Invalid ID format");
+            }
+        }
 
         Map<String, JSONObject> streamMap = getStreamMap(key);
 
-        int sequence = 0;
+        int sequence = pattern.matcher(id).matches() ? Integer.parseInt(id.split("-")[1]) : 0;
         while (streamMap.containsKey(id + sequence)) sequence++;
         id += sequence;
 
