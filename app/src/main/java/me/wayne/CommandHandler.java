@@ -136,49 +136,6 @@ public class CommandHandler implements Runnable {
                         out.println(INVALID_ARGS_RESPONSE);
                     }
                     return;
-                case "ZADD":
-                    if (tokens.size() > 3) {
-                        ArrayList<String> options = new ArrayList<>();
-                        for (int i = 2; i < tokens.size(); i++) {
-                            String option = tokens.get(i).toUpperCase();
-                            if (option.equals("XX") || option.equals("NX") || option.equals("LT") || option.equals("GT") || option.equals("CH") || option.equals("INCR")) {
-                                options.add(option);
-                            } else {
-                                break;
-                            }
-                        }
-                        out.println(dataStore.zAdd(tokens.get(1), options, tokens.subList(2 + options.size(), tokens.size())));
-                    } else {
-                        out.println(INVALID_ARGS_RESPONSE);
-                    }
-                    return;
-                case "ZRANGE":
-                    if (tokens.size() > 3) {
-                        ArrayList<String> options = new ArrayList<>();
-                        for (int i = 4; i < tokens.size(); i++) {
-                            String option = tokens.get(i).toUpperCase();
-                            options.add(option);
-                        }
-                        out.println(dataStore.zRange(tokens.get(1), Integer.parseInt(tokens.get(2)), Integer.parseInt(tokens.get(3)), options));
-                    } else {
-                        out.println(INVALID_ARGS_RESPONSE);
-                    }
-                    return;
-
-                case "ZRANK":
-                    if (tokens.size() > 2) {
-                        out.println(dataStore.zRank(tokens.get(1), tokens.get(2), tokens.size() == 4 && tokens.get(3).equalsIgnoreCase("WITHSCORE")));
-                    } else {
-                        out.println(INVALID_ARGS_RESPONSE);
-                    }
-                    return;
-                case "ZREM":
-                    if (tokens.size() > 2) {
-                        out.println(dataStore.zRem(tokens.get(1), tokens.subList(2, tokens.size())));
-                    } else {
-                        out.println(INVALID_ARGS_RESPONSE);
-                    }
-                    return;
                 default:
                     break;
             }
@@ -344,6 +301,54 @@ public class CommandHandler implements Runnable {
                         JSONObject json = dataStore.getJson(tokens.get(1));
                         Object value = json.get(tokens.get(2));
                         out.println(value != null ? value : "NULL");
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                default:
+                    out.println(ERROR_UNKOWN_COMMAND);
+                    return;
+            }
+            else if (command.startsWith("Z")) switch (command) {
+                case "ZADD":
+                    if (tokens.size() > 3) {
+                        ArrayList<String> options = new ArrayList<>();
+                        for (int i = 2; i < tokens.size(); i++) {
+                            String option = tokens.get(i).toUpperCase();
+                            if (option.equals("XX") || option.equals("NX") || option.equals("LT") || option.equals("GT") || option.equals("CH") || option.equals("INCR")) {
+                                options.add(option);
+                            } else {
+                                break;
+                            }
+                        }
+                        out.println(dataStore.zAdd(tokens.get(1), options, tokens.subList(2 + options.size(), tokens.size())));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "ZRANGE":
+                    if (tokens.size() > 3) {
+                        ArrayList<String> options = new ArrayList<>();
+                        for (int i = 4; i < tokens.size(); i++) {
+                            String option = tokens.get(i).toUpperCase();
+                            options.add(option);
+                        }
+                        out.println(dataStore.zRange(tokens.get(1), Integer.parseInt(tokens.get(2)), Integer.parseInt(tokens.get(3)), options));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+
+                case "ZRANK":
+                    if (tokens.size() > 2) {
+                        out.println(dataStore.zRank(tokens.get(1), tokens.get(2), tokens.size() == 4 && tokens.get(3).equalsIgnoreCase("WITHSCORE")));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
+                case "ZREM":
+                    if (tokens.size() > 2) {
+                        out.println(dataStore.zRem(tokens.get(1), tokens.subList(2, tokens.size())));
                     } else {
                         out.println(INVALID_ARGS_RESPONSE);
                     }
