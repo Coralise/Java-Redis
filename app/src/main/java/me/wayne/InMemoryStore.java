@@ -285,36 +285,9 @@ class InMemoryStore {
         int updated = 0;
 
         for (int i = 1; i < scoresAndMembers.size(); i += 2) {
-
-            int score;
-            try {
-                score = Integer.parseInt(scoresAndMembers.get(i-1));
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid score: " + scoresAndMembers.get(i-1), e);
-            }
+            int score = parseScore(scoresAndMembers.get(i-1));
             ScoreMember scoreMember = new ScoreMember(score, scoresAndMembers.get(i));
-
-            ScoreMember existingScoreMember = getScoreMember(key, scoreMember.getMember());
-
-            if (existingScoreMember != null) {
-                if (nx) continue;
-                if (gt && scoreMember.getScore() <= existingScoreMember.getScore()) continue;
-                if (lt && scoreMember.getScore() >= existingScoreMember.getScore()) continue;
-
-                if (incr) scoreMember = new ScoreMember(scoreMember.getScore() + existingScoreMember.getScore(), scoreMember.getMember());
-                else if (scoreMember.getScore().equals(existingScoreMember.getScore())) continue;
-
-                treeSet.remove(existingScoreMember);
-                treeSet.add(scoreMember);
-                addToTreeSetMembers(key, scoreMember);
-                if (ch) updated++;
-            } else {
-                if (xx) continue;
-                treeSet.add(scoreMember);
-                addToTreeSetMembers(key, scoreMember);
-                updated++;
-            }
-
+            updated += processScoreMember(key, treeSet, nx, xx, gt, lt, ch, incr, scoreMember);
         }
 
         store.put(key, treeSet);
@@ -322,19 +295,54 @@ class InMemoryStore {
         return updated;
     }
 
+    private int parseScore(String scoreStr) {
+        try {
+            return Integer.parseInt(scoreStr);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid score: " + scoreStr, e);
+        }
+    }
+
+    private int processScoreMember(String key, TreeSet<ScoreMember> treeSet, boolean nx, boolean xx, boolean gt, boolean lt, boolean ch, boolean incr, ScoreMember scoreMember) {
+        ScoreMember existingScoreMember = getScoreMember(key, scoreMember.getMember());
+        if (existingScoreMember != null) {
+            if (nx) return 0;
+            if (gt && scoreMember.getScore() <= existingScoreMember.getScore()) return 0;
+            if (lt && scoreMember.getScore() >= existingScoreMember.getScore()) return 0;
+
+            if (incr) scoreMember = new ScoreMember(scoreMember.getScore() + existingScoreMember.getScore(), scoreMember.getMember());
+            else if (scoreMember.getScore().equals(existingScoreMember.getScore())) return 0;
+
+            treeSet.remove(existingScoreMember);
+            treeSet.add(scoreMember);
+            addToTreeSetMembers(key, scoreMember);
+            return ch ? 1 : 0;
+        } else {
+            if (xx) return 0;
+            treeSet.add(scoreMember);
+            addToTreeSetMembers(key, scoreMember);
+            return 1;
+        }
+    }
+
     public List<String> zRange(String key, int start, int stop, List<String> options) {
         TreeSet<ScoreMember> treeSet = getTreeSet(key);
         List<String> range = new ArrayList<>();
         int i = 0;
+        while (start < 0) start += treeSet.size();
         while (stop < 0) stop += treeSet.size();
 
         boolean withScores = options.contains("WITHSCORES");
+        boolean rev = options.contains("REV");
 
         for (ScoreMember scoreMember : treeSet) {
-            if (i >= start && i <= stop) range.add(withScores ? scoreMember.getScore() + " " + scoreMember.getMember() : scoreMember.getMember());
+            if (i >= start && i <= stop) {
+                range.add(scoreMember.getMember());
+                if (withScores) range.add(scoreMember.getScore().toString());
+            }
             i++;
         }
-        return range;
+        return !rev ? range : range.reversed();
     }
 
     public void jsonArrAppend(String key, Object value) {
