@@ -12,7 +12,7 @@ public class SIsMemberCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(InMemoryStore store, List<String> args) {
+    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         String value = args.get(1);
         if (!store.getStore().containsKey(key)) return 0;

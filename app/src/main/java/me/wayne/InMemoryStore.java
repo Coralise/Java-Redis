@@ -3,7 +3,7 @@ package me.wayne;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
+import me.wayne.daos.ConsumerGroup;
 
 public class InMemoryStore {
 
@@ -12,12 +12,34 @@ public class InMemoryStore {
     // Key: Sorted set key, Value: Map of member to score
     private final Map<String, Map<String, Integer>> treeSetMembers = new HashMap<>();
 
+    // Key: Consumer group name, Value: ConsumerGroup object
+    private final Map<String, ConsumerGroup> consumerGroups = new HashMap<>();
+    // Key: Stream key, Value: Consumer group name
+    private final Map<String, String> streamConsumerMap = new HashMap<>();
+
     public Map<String, Object> getStore() {
         return store;
     }
 
     public Map<String, Map<String, Integer>> getTreeSetMembers() {
         return treeSetMembers;
+    }
+    
+    public void addConsumerGroup(ConsumerGroup consumerGroup) {
+        consumerGroups.put(consumerGroup.getGroupName(), consumerGroup);
+        streamConsumerMap.put(consumerGroup.getStreamKey(), consumerGroup.getGroupName());
+    }
+
+    public ConsumerGroup getConsumerGroupByGroupName(String groupName) {
+        return consumerGroups.get(groupName);
+    }
+
+    public ConsumerGroup getConsumerGroupByStreamKey(String streamKey) {
+        return consumerGroups.get(streamConsumerMap.get(streamKey));
+    }
+
+    public boolean hasCustomerGroup(String groupName) {
+        return consumerGroups.containsKey(groupName);
     }
 
     // public void setJson(String key, JSONObject value) {

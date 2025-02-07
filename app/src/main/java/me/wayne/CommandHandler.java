@@ -6,29 +6,20 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.wayne.daos.commands.*;
 
 public class CommandHandler implements Runnable {
-    private static final String ERROR_UNKOWN_COMMAND = "ERROR: Unkown Command";
-    private Socket clientSocket;
-    private InMemoryStore dataStore;
-    private Map<String, AbstractCommand<?>> commands = new HashMap<>();
 
-    public InMemoryStore getDataStore() {
-        return dataStore;
-    }
-
-    public CommandHandler(Socket clientSocket, InMemoryStore dataStore) {
-        this.clientSocket = clientSocket;
-        this.dataStore = dataStore;
-
+    private static final Map<String, AbstractCommand<?>> commands = new HashMap<>();
+    static {
         commands.put("APPEND", new AppendCommand());
         commands.put("DECRBY", new DecrByCommand());
         commands.put("DECR", new DecrCommand());
@@ -66,7 +57,22 @@ public class CommandHandler implements Runnable {
         commands.put("ZRANGE", new ZRangeCommand());
         commands.put("ZRANK", new ZRankCommand());
         commands.put("ZREM", new ZRemCommand());
-        
+        commands.put("XGROUP", new XGroupCommand());
+        commands.put("XREADGROUP", new XReadGroupCommand());
+    }
+
+    private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());
+    private static final String ERROR_UNKOWN_COMMAND = "ERROR: Unkown Command";
+    private Socket clientSocket;
+    private InMemoryStore dataStore;
+
+    public InMemoryStore getDataStore() {
+        return dataStore;
+    }
+
+    public CommandHandler(Socket clientSocket, InMemoryStore dataStore) {
+        this.clientSocket = clientSocket;
+        this.dataStore = dataStore;
     }
 
     @Override
@@ -78,12 +84,13 @@ public class CommandHandler implements Runnable {
             while ((inputLine = in.readLine()) != null) {
                 AbstractCommand<?> command = commands.get(inputLine.split(" ")[0].toUpperCase());
                 if (command != null) {
+                    final String fInputLine = inputLine;
                     try {
-                        out.println(command.executeCommand(dataStore, inputLine));
+                        Object result = command.executeCommand(Thread.currentThread(), dataStore, fInputLine);
+                        out.println(result);
                     } catch (Exception e) {
                         out.println(e.getMessage());
-                        System.out.println(e.getMessage());
-                        System.err.println(Arrays.toString(e.getStackTrace()));
+                        logger.log(Level.WARNING, e.getMessage());
                     }
                 } else {
                     out.println(ERROR_UNKOWN_COMMAND);

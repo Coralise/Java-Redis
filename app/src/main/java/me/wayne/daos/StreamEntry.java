@@ -3,28 +3,21 @@ package me.wayne.daos;
 import java.util.List;
 
 public class StreamEntry {
-    private final String id;
+    private final StreamId id;
+
     private final List<String> fieldsAndValues;
 
-    public StreamEntry(String id, List<String> fields) {
+    public StreamEntry(StreamId id, List<String> fields) {
         this.id = id;
         this.fieldsAndValues = fields;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public long getTimestamp() {
-        return Long.parseLong(id.split("-")[0]);
-    }
-
-    public int getSequence() {
-        return Integer.parseInt(id.split("-")[1]);
-    }
-
     public List<String> getFieldsAndValues() {
         return fieldsAndValues;
+    }
+    
+    public StreamId getId() {
+        return id;
     }
 
     @Override
@@ -61,7 +54,7 @@ public class StreamEntry {
 
     @Override
     public String toString() {
-        return "[" + id + ", " + fieldsAndValues + "]";
+        return "[" + id.getId() + ", " + fieldsAndValues + "]";
     }
 
     

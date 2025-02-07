@@ -12,7 +12,7 @@ public class SetRangeCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(InMemoryStore store, List<String> args) {
+    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         int offset = Integer.parseInt(args.get(1));
         String value = args.get(2);

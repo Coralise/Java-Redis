@@ -14,7 +14,7 @@ public class XRangeCommand extends AbstractCommand<ArrayList<StreamEntry>> {
 
     @SuppressWarnings("all")
     @Override
-    protected ArrayList<StreamEntry> processCommand(InMemoryStore store, List<String> args) {
+    protected ArrayList<StreamEntry> processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         String start = args.get(1);
         String end = args.get(2);
@@ -43,8 +43,8 @@ public class XRangeCommand extends AbstractCommand<ArrayList<StreamEntry>> {
         int i = 0;
         for (StreamEntry entry : streamList) {
             if (count > 0 && i >= count) break;
-            long entryTimestamp = entry.getTimestamp();
-            int entrySequence = entry.getSequence();
+            long entryTimestamp = entry.getId().getTimeStamp();
+            int entrySequence = entry.getId().getSequence();
             boolean withinStartRange = start.equals("-") || (!startExclusive && (entryTimestamp > startTimestamp || (entryTimestamp == startTimestamp && entrySequence >= startSequence))) || (startExclusive && (entryTimestamp > startTimestamp || (entryTimestamp == startTimestamp && entrySequence > startSequence)));
             boolean withinEndRange = end.equals("+") || (!endExclusive && (entryTimestamp < endTimestamp || (entryTimestamp == endTimestamp && entrySequence <= endSequence))) || (endExclusive && (entryTimestamp < endTimestamp || (entryTimestamp == endTimestamp && entrySequence < endSequence)));
 
@@ -54,7 +54,6 @@ public class XRangeCommand extends AbstractCommand<ArrayList<StreamEntry>> {
             }
         }
 
-        System.out.println(range);
         return range;
     }
     

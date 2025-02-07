@@ -12,7 +12,7 @@ public class RPushCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(InMemoryStore store, List<String> args) {
+    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         List<String> values = args.subList(1, args.size());
         ArrayList<String> list = getList(store, key);

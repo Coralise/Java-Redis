@@ -14,7 +14,7 @@ public class RPopCommand extends AbstractCommand<List<String>> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected List<String> processCommand(InMemoryStore store, List<String> args) {
+    protected List<String> processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         int count = args.size() > 1 ? Integer.parseInt(args.get(1)) : 1;
         AssertUtil.assertTrue(store.getStore().containsKey(key), KEY_DOESNT_EXIST_MSG);

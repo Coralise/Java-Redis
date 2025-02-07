@@ -12,7 +12,7 @@ public class StrLenCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(InMemoryStore store, List<String> args) {
+    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         AssertUtil.assertTrue(store.getStore().containsKey(key), KEY_DOESNT_EXIST_MSG);
         AssertUtil.assertTrue(store.getStore().get(key) instanceof CharSequence, "Value is not of type CharSequence");

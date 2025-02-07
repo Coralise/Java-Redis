@@ -14,7 +14,7 @@ public class LRangeCommand extends AbstractCommand<List<String>> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected List<String> processCommand(InMemoryStore store, List<String> args) {
+    protected List<String> processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         int start = Integer.parseInt(args.get(1));
         int stop = Integer.parseInt(args.get(2));

@@ -13,7 +13,7 @@ public class SUnionCommand extends AbstractCommand<Object> {
     }
 
     @Override
-    protected Object processCommand(InMemoryStore store, List<String> args) {
+    protected Object processCommand(Thread thread, InMemoryStore store, List<String> args) {
         List<String> keys = args;
         List<HashSet<String>> hashSets = new ArrayList<>();
         for (String key : keys) hashSets.add(getHashSet(store, key));

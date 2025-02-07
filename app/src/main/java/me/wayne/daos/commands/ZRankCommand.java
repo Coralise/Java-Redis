@@ -13,7 +13,7 @@ public class ZRankCommand extends AbstractCommand<Object> {
     }
 
     @Override
-    protected Object processCommand(InMemoryStore store, List<String> args) {
+    protected Object processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         String member = args.get(1);
         boolean withScore = args.size() == 3 && args.get(2).equals("WITHSCORE");

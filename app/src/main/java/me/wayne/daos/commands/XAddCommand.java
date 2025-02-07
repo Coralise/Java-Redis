@@ -7,7 +7,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import me.wayne.InMemoryStore;
+import me.wayne.daos.ConsumerGroup;
 import me.wayne.daos.StreamEntry;
+import me.wayne.daos.StreamId;
 
 public class XAddCommand extends AbstractCommand<String> {
 
@@ -17,14 +19,12 @@ public class XAddCommand extends AbstractCommand<String> {
 
     @SuppressWarnings("all")
     @Override
-    protected String processCommand(InMemoryStore store, List<String> args) {
+    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
 
         String key = args.get(0);
         XAddArguments xAddArguments = parseXAddArguments(args);
         String id = xAddArguments.id;
         List<String> fieldsAndValues = xAddArguments.fieldsAndValues;
-
-        System.out.println("id: " + id);
 
         Pattern pattern = Pattern.compile("\\d+-\\d+");
         if (id.equals("*")) {
@@ -49,10 +49,15 @@ public class XAddCommand extends AbstractCommand<String> {
             fieldsAndValuesList.add(fieldsAndValues.get(i));
         }
 
-        streamList.add(new StreamEntry(id, fieldsAndValuesList));
+        StreamEntry streamEntry = new StreamEntry(new StreamId(id), fieldsAndValuesList);
+        streamList.add(streamEntry);
         store.getStore().put(key, streamList);
 
-        System.out.println("Added id: " + id);
+        ConsumerGroup consumerGroup = store.getConsumerGroupByStreamKey(key);
+        if (consumerGroup != null && consumerGroup.hasConsumers()) {
+            consumerGroup.feedEntry(streamEntry);
+        }
+
         return id;
     }
 

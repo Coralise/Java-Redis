@@ -11,7 +11,7 @@ public class GetCommand extends AbstractCommand<Object> {
     }
 
     @Override
-    protected Object processCommand(InMemoryStore store, List<String> args) {
+    protected Object processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         return store.getStore().get(key);
     }

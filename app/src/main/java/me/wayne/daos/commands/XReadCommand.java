@@ -19,7 +19,7 @@ public class XReadCommand extends AbstractCommand<Map<String, List<StreamEntry>>
 
     @SuppressWarnings("all")
     @Override
-    protected Map<String, List<StreamEntry>> processCommand(InMemoryStore store, List<String> args) {
+    protected Map<String, List<StreamEntry>> processCommand(Thread thread, InMemoryStore store, List<String> args) {
         LinkedHashMap<String, List<StreamEntry>> streams = new LinkedHashMap<>();
 
         Map<String, Object> parsedCommand = parseXReadCommand(args);
@@ -32,7 +32,7 @@ public class XReadCommand extends AbstractCommand<Map<String, List<StreamEntry>>
             for (int i = 0;i < keys.size();i++) {
                 String key = keys.get(i);
                 String id = ids.get(i);
-                List<StreamEntry> range = xRange.processCommand(store, List.of(key, "(" + id, "+", "COUNT", String.valueOf(count)));
+                List<StreamEntry> range = xRange.processCommand(thread, store, List.of(key, "(" + id, "+", "COUNT", String.valueOf(count)));
                 streams.put(key, range);
             }
         } else {
@@ -42,7 +42,7 @@ public class XReadCommand extends AbstractCommand<Map<String, List<StreamEntry>>
                 for (int i = 0; i < keys.size(); i++) {
                     String key = keys.get(i);
                     String id = ids.get(i);
-                    List<StreamEntry> range = xRange.processCommand(store, List.of(key, "(" + id, "+", "COUNT", String.valueOf(count)));
+                    List<StreamEntry> range = xRange.processCommand(thread, store, List.of(key, "(" + id, "+", "COUNT", String.valueOf(count)));
                     if (!range.isEmpty()) {
                         streams.put(key, range);
                         entriesFound = true;

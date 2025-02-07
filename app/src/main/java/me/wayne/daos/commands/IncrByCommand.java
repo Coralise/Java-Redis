@@ -12,7 +12,7 @@ public class IncrByCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(InMemoryStore store, List<String> args) {
+    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         int increment = getValueAsInteger(args.get(1));
         AssertUtil.assertTrue(store.getStore().containsKey(key), KEY_DOESNT_EXIST_MSG);

@@ -48,15 +48,15 @@ public abstract class AbstractCommand<T> {
         return command;
     }
 
-    public T executeCommand(InMemoryStore store, String inputLine) {
+    public T executeCommand(Thread thread, InMemoryStore store, String inputLine) {
         List<String> args = getArgs(inputLine);
         if (args.size() < minArgs || (maxArgs != -1 && args.size() > maxArgs)) {
             throw new IllegalArgumentException(INVALID_ARGS_RESPONSE);
         }
-        return processCommand(store, args);
+        return processCommand(thread, store, args);
     }
 
-    protected abstract T processCommand(InMemoryStore store, List<String> args);
+    protected abstract T processCommand(Thread thread, InMemoryStore store, List<String> args);
 
     private List<String> getArgs(String input) {
         List<String> result = new ArrayList<>();

@@ -13,7 +13,7 @@ public class HGetAllCommand extends AbstractCommand<List<String>> {
     }
 
     @Override
-    protected List<String> processCommand(InMemoryStore store, List<String> args) {
+    protected List<String> processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         if (!store.getStore().containsKey(key)) return new ArrayList<>();
         Map<String, String> hashMap = getMap(store, key);

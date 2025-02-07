@@ -13,7 +13,7 @@ public class SInterCommand extends AbstractCommand<List<String>> {
     }
 
     @Override
-    protected List<String> processCommand(InMemoryStore store, List<String> args) {
+    protected List<String> processCommand(Thread thread, InMemoryStore store, List<String> args) {
         List<String> keys = args;
         List<HashSet<String>> hashSets = new ArrayList<>();
         for (String key : keys) hashSets.add(getHashSet(store, key));

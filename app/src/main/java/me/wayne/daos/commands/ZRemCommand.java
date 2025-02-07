@@ -13,7 +13,7 @@ public class ZRemCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(InMemoryStore store, List<String> args) {
+    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         List<String> members = args.subList(1, args.size());
         TreeSet<ScoreMember> treeSet = getTreeSet(store, key);

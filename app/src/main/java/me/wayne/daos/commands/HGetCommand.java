@@ -12,7 +12,7 @@ public class HGetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(InMemoryStore store, List<String> args) {
+    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         String field = args.get(1);
         if (!store.getStore().containsKey(key)) return null;
