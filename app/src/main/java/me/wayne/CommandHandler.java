@@ -6,7 +6,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +47,7 @@ public class CommandHandler implements Runnable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void handleCommand(PrintWriter out, String inputLine, List<String> tokens, String command) {
         try {
 
@@ -372,6 +375,14 @@ public class CommandHandler implements Runnable {
                         out.println(INVALID_ARGS_RESPONSE);
                     }
                     return;
+                case "XREAD":
+                    if (tokens.size() > 3) {
+                        Map<String, Object> xReadCommand = parseXReadCommand(tokens);
+                        out.println(dataStore.xRead((List<String>) xReadCommand.get("keys"), (List<String>) xReadCommand.get("ids"), (Integer) xReadCommand.get("count"), (Long) xReadCommand.get("block")));
+                    } else {
+                        out.println(INVALID_ARGS_RESPONSE);
+                    }
+                    return;
                 default:
                     out.println(ERROR_UNKOWN_COMMAND);
                     return;
@@ -405,5 +416,45 @@ public class CommandHandler implements Runnable {
             return m.group(1);
         }
         return m.find() ? m.group(1) : "\"\"";
+    }
+
+    public Map<String, Object> parseXReadCommand(List<String> tokens) {
+        Map<String, Object> result = new HashMap<>();
+        List<String> keys = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+        int count = 0;
+        long block = 0;
+
+        int index = 1; // Start after the "XREAD" command
+        while (index < tokens.size()) {
+            String token = tokens.get(index);
+            switch (token.toUpperCase()) {
+                case "COUNT":
+                    count = Integer.parseInt(tokens.get(++index));
+                    break;
+                case "BLOCK":
+                    block = Long.parseLong(tokens.get(++index));
+                    break;
+                case "STREAMS":
+                    index++;
+                    while (index < tokens.size() && !tokens.get(index).matches("\\d+-\\d+")) {
+                        keys.add(tokens.get(index++));
+                    }
+                    while (index < tokens.size()) {
+                        ids.add(tokens.get(index++));
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unexpected token: " + token);
+            }
+            index++;
+        }
+
+        result.put("count", count);
+        result.put("block", block);
+        result.put("keys", keys);
+        result.put("ids", ids);
+
+        return result;
     }
 }

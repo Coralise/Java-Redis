@@ -1,4 +1,4 @@
-package me.wayne;
+package me.wayne.daos;
 
 public class ScoreMember {
     

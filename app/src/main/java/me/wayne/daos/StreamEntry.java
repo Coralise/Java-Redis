@@ -59,5 +59,10 @@ public class StreamEntry {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "[" + id + ", " + fieldsAndValues + "]";
+    }
+
     
 }

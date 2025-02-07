@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import me.wayne.daos.ScoreMember;
 import me.wayne.daos.StreamEntry;
 
 class InMemoryStore {
@@ -384,6 +385,7 @@ class InMemoryStore {
         return removed;
     }
 
+    @SuppressWarnings("all")
     public String xAdd(String key, String id, List<String> fieldsAndValues) {
         Pattern pattern = Pattern.compile("\\d+-\\d+");
         if (id.equals("*")) {
@@ -411,12 +413,14 @@ class InMemoryStore {
         streamList.add(new StreamEntry(id, fieldsAndValuesList));
         store.put(key, streamList);
 
+        System.out.println("Added id: " + id);
         return id;
     }
 
-    public List<List<Object>> xRange(String key, String start, String end, int count) {
+    @SuppressWarnings("all")
+    public List<StreamEntry> xRange(String key, String start, String end, int count) {
         ArrayList<StreamEntry> streamList = getStreamList(key);
-        List<List<Object>> range = new ArrayList<>();
+        ArrayList<StreamEntry> range = new ArrayList<>();
 
         boolean startExclusive = false;
         long startTimestamp = -1;
@@ -424,7 +428,7 @@ class InMemoryStore {
         if (!start.equals("-")) {
             startExclusive = start.startsWith("(");
             startTimestamp = Long.parseLong(!startExclusive ? start.split("-")[0] : start.substring(1).split("-")[0]);
-            startSequence = Integer.parseInt(start.split("-")[1]);
+            startSequence = Integer.parseInt(start.split("-").length > 1 ? !start.split("-")[1].equals("") ? start.split("-")[1] : "0" : "0");
         }
 
         boolean endExclusive = false;        
@@ -433,7 +437,7 @@ class InMemoryStore {
         if (!end.equals("+")) {
             endExclusive = end.startsWith("(");
             endTimestamp = Long.parseLong(!endExclusive ? end.split("-")[0] : end.substring(1).split("-")[0]);
-            endSequence = Integer.parseInt(end.split("-")[1]);
+            endSequence = Integer.parseInt(end.split("-").length > 1 ? !end.split("-")[1].equals("") ? end.split("-")[1] : "0" : "0");
         }
 
         int i = 0;
@@ -445,12 +449,49 @@ class InMemoryStore {
             boolean withinEndRange = end.equals("+") || (!endExclusive && (entryTimestamp < endTimestamp || (entryTimestamp == endTimestamp && entrySequence <= endSequence))) || (endExclusive && (entryTimestamp < endTimestamp || (entryTimestamp == endTimestamp && entrySequence < endSequence)));
 
             if (withinStartRange && withinEndRange) {
-                range.add(List.of(entry.getId(), entry.getFieldsAndValues()));
+                range.add(entry);
                 i++;
             }
         }
 
         return range;
+    }
+
+    public Map<String, List<StreamEntry>> xRead(List<String> keys, List<String> ids, int count, long blockTimeout) {
+        LinkedHashMap<String, List<StreamEntry>> streams = new LinkedHashMap<>();
+        
+        if (blockTimeout <= 0) {
+            for (int i = 0;i < keys.size();i++) {
+                String key = keys.get(i);
+                String id = ids.get(i);
+                List<StreamEntry> range = xRange(key, "(" + id, "+", count);
+                streams.put(key, range);
+            }
+        } else {
+            long startTime = System.currentTimeMillis();
+            boolean entriesFound = false;
+            while (!entriesFound && (System.currentTimeMillis() - startTime) < blockTimeout) {
+                for (int i = 0; i < keys.size(); i++) {
+                    String key = keys.get(i);
+                    String id = ids.get(i);
+                    List<StreamEntry> range = xRange(key, "(" + id, "+", count);
+                    if (!range.isEmpty()) {
+                        streams.put(key, range);
+                        entriesFound = true;
+                    }
+                }
+        
+                if (!entriesFound) {
+                    try {
+                        Thread.sleep(100); // Wait for 100 milliseconds before checking again
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            }
+        }
+        return streams;
     }
 
     public void jsonArrAppend(String key, Object value) {

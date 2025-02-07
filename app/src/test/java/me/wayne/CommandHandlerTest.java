@@ -446,10 +446,10 @@ public class CommandHandlerTest {
         assertEquals("[member1]", response);
         response = sendMessage("ZRANGE zset8 4 5 BYSCORE");
         assertEquals("[]", response);
-        }
+    }
 
-        @Test
-        public void testXaddAndXrangeComplexCommand() throws IOException {
+    @Test
+    public void testXaddAndXrangeComplexCommand() throws IOException {
         String id1 = sendMessage("XADD mystream * field1 value1");
         wait(1);
         String id2 = sendMessage("XADD mystream * field2 value2");
@@ -499,9 +499,75 @@ public class CommandHandlerTest {
 
         response = sendMessage("XRANGE mystream " + id1 + "-0 (" + id4 + "-0");
         assertEquals("[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]], [" + id3 + ", [field3, value3]]]", response);
-        }
+    }
 
-        private void wait(int seconds) {
+    @Test
+    public void testXreadCommand() throws IOException {
+        String id1 = sendMessage("XADD mystreamXread * field1 value1");
+        wait(1);
+        String id2 = sendMessage("XADD mystreamXread * field2 value2");
+        wait(1);
+        String id3 = sendMessage("XADD mystreamXread * field3 value3");
+        wait(1);
+        String id4 = sendMessage("XADD mystreamXread * field4 value4");
+
+        String response = sendMessage("XREAD COUNT 2 STREAMS mystreamXread 0-0");
+        assertEquals("{mystreamXread=[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]]]}", response);
+
+        response = sendMessage("XREAD COUNT 1 STREAMS mystreamXread " + id1);
+        assertEquals("{mystreamXread=[[" + id2 + ", [field2, value2]]]}", response);
+
+        response = sendMessage("XREAD STREAMS mystreamXread " + id2);
+        assertEquals("{mystreamXread=[[" + id3 + ", [field3, value3]], [" + id4 + ", [field4, value4]]]}", response);
+
+        response = sendMessage("XREAD STREAMS mystreamXread " + id3);
+        assertEquals("{mystreamXread=[[" + id4 + ", [field4, value4]]]}", response);
+
+        response = sendMessage("XREAD STREAMS mystreamXread " + id4);
+        assertEquals("{mystreamXread=[]}", response);
+
+        // Additional tests with multiple streams
+        wait(1);
+        String id5 = sendMessage("XADD mystream2 * fieldA valueA");
+        wait(1);
+        String id6 = sendMessage("XADD mystream2 * fieldB valueB");
+
+        response = sendMessage("XREAD COUNT 2 STREAMS mystreamXread mystream2 0-0 0-0");
+        assertEquals("{mystreamXread=[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]]], mystream2=[[" + id5 + ", [fieldA, valueA]], [" + id6 + ", [fieldB, valueB]]]}",
+            response);
+
+        response = sendMessage("XREAD STREAMS mystreamXread mystream2 " + id2 + " 0-0");
+        assertEquals("{mystreamXread=[[" + id3 + ", [field3, value3]], [" + id4 + ", [field4, value4]]], mystream2=[[" + id5 + ", [fieldA, valueA]], [" + id6 + ", [fieldB, valueB]]]}",
+            response);
+    }
+
+    // @Test
+    // public void testXReadBlockOption() throws IOException {
+    //     // Add initial entries to the stream
+    //     sendMessage("XADD mystream * field1 value1");
+    //     wait(1);
+    //     String id2 = sendMessage("XADD mystream * field2 value2");
+
+    //     // Start a thread to add a new entry after a delay
+    //     new Thread(() -> {
+    //         System.out.println("Adding new entry after 2 seconds");
+    //         try {
+    //             Thread.sleep(2000); // Wait for 2000 milliseconds
+    //             sendMessage("XADD mystream * field3 value3");
+    //         } catch (InterruptedException | IOException e) {
+    //             Thread.currentThread().interrupt();
+    //         }
+    //     }).start();
+
+    //     // Call xRead with BLOCK option and a timeout of 5000 milliseconds
+    //     long blockTimeout = 10000;
+    //     String response = sendMessage("XREAD BLOCK " + blockTimeout + " STREAMS mystream " + id2);
+
+    //     assertEquals(1, response.split("],").length);
+    // }
+
+    @SuppressWarnings("squid:S2925")
+    private void wait(int seconds) {
         try {
             Thread.sleep(1000 * seconds);
         } catch (InterruptedException e) {
