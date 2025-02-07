@@ -59,6 +59,7 @@ public class CommandHandler implements Runnable {
         commands.put("ZREM", new ZRemCommand());
         commands.put("XGROUP", new XGroupCommand());
         commands.put("XREADGROUP", new XReadGroupCommand());
+        commands.put("XACK", new XAckCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());

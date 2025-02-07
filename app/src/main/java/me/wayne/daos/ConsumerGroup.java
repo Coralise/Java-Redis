@@ -1,6 +1,7 @@
 package me.wayne.daos;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -35,9 +36,12 @@ public class ConsumerGroup {
         pendingEntries.add(entryId);
     }
 
-    public void acknowledgeEntry(StreamId entryId) {
+    public boolean acknowledgeEntry(StreamId entryId) {
         LOGGER.log(Level.INFO, "Acknowledging entry {0} for group {1}", new Object[]{entryId, groupName});
-        pendingEntries.remove(entryId);
+        LOGGER.log(Level.INFO, "Pending entries size: {0}", pendingEntries.size());
+        boolean remove = pendingEntries.remove(entryId);
+        LOGGER.log(Level.INFO, "Pending entries size: {0}", pendingEntries.size());
+        return remove;
     }
 
     public boolean hasConsumer(String consumerName) {
@@ -84,6 +88,10 @@ public class ConsumerGroup {
     
     public String getGroupName() {
         return groupName;
+    }
+
+    public Map<String, Thread> getConsumers() {
+        return new HashMap<>(consumers);
     }
     
 }
