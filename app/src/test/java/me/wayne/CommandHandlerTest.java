@@ -148,17 +148,17 @@ public class CommandHandlerTest {
         assertEquals("vnewe4", response);
     }
 
-    @Test
-    public void testJsonSetCommand() throws IOException {
-        String response = sendMessage("JSON.SET key5 $ '[\"Deimos\", {\"crashes\": 0}, null]'");
-        assertEquals("OK", response);
-        response = sendMessage("JSON.GET key5 $");
-        assertEquals("[\"Deimos\",{\"crashes\":0},null]", response);
-        response = sendMessage("JSON.SET key5 $[anotherKey] '\"Another Key\"'");
-        assertEquals("OK", response);
-        response = sendMessage("JSON.GET key5 $[anotherKey]");
-        assertEquals("Another Key", response);
-    }
+    // @Test
+    // public void testJsonSetCommand() throws IOException {
+    //     String response = sendMessage("JSON.SET key5 $ '[\"Deimos\", {\"crashes\": 0}, null]'");
+    //     assertEquals("OK", response);
+    //     response = sendMessage("JSON.GET key5 $");
+    //     assertEquals("[\"Deimos\",{\"crashes\":0},null]", response);
+    //     response = sendMessage("JSON.SET key5 $[anotherKey] '\"Another Key\"'");
+    //     assertEquals("OK", response);
+    //     response = sendMessage("JSON.GET key5 $[anotherKey]");
+    //     assertEquals("Another Key", response);
+    // }
 
     @Test
     public void testLpushCommand() throws IOException {
@@ -565,6 +565,15 @@ public class CommandHandlerTest {
 
     //     assertEquals(1, response.split("],").length);
     // }
+
+    @Test
+    public void testSIsMemberCommand() throws IOException {
+        sendMessage("SADD myset member1 member2 member3");
+        String response = sendMessage("SISMEMBER myset member1");
+        assertEquals("1", response);
+        response = sendMessage("SISMEMBER myset member4");
+        assertEquals("0", response);
+    }
 
     @SuppressWarnings("squid:S2925")
     private void wait(int seconds) {

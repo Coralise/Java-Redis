@@ -1,6 +1,6 @@
 package me.wayne;
 
-class AssertUtil {
+public class AssertUtil {
 
     private AssertUtil() {
     }
