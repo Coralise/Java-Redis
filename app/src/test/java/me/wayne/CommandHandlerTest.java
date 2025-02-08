@@ -1,6 +1,7 @@
 package me.wayne;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
 import java.io.BufferedReader;
@@ -56,7 +57,7 @@ public class CommandHandlerTest {
         assertEquals("OK", response);
 
         response = sendMessage("SET key2 \"value 2\" anotherArg");
-        assertEquals("ERROR: Invalid number of arguments", response);
+        assertEquals("Unknown option: ANOTHERARG", response);
         response = sendMessage("SET key2");
         assertEquals("ERROR: Invalid number of arguments", response);
     }
@@ -405,6 +406,44 @@ public class CommandHandlerTest {
         assertEquals("103.28914783747071", response);
         response = sendMessage("GEODIST geosetGeoDist Palermo Catania ft");
         assertEquals("545365.3450812175", response);
+    }
+
+    @Test
+    public void testSetBitAndGetCommand() throws IOException {
+        sendMessage("SETBIT bitmapsarestrings 2 1");
+        sendMessage("SETBIT bitmapsarestrings 3 1");
+        sendMessage("SETBIT bitmapsarestrings 5 1");
+        sendMessage("SETBIT bitmapsarestrings 10 1");
+        sendMessage("SETBIT bitmapsarestrings 11 1");
+        sendMessage("SETBIT bitmapsarestrings 14 1");
+        String response = sendMessage("GET bitmapsarestrings");
+        assertEquals("42", response);
+
+        sendMessage("SETBIT bitsetTest 1 1");
+        sendMessage("SETBIT bitsetTest 3 1");
+        sendMessage("SETBIT bitsetTest 5 1");
+        sendMessage("SETBIT bitsetTest 9 1");
+        sendMessage("SETBIT bitsetTest 10 1");
+        sendMessage("SETBIT bitsetTest 13 1");
+        sendMessage("SETBIT bitsetTest 15 1");
+        sendMessage("SETBIT bitsetTest 17 1");
+        sendMessage("SETBIT bitsetTest 18 1");
+        sendMessage("SETBIT bitsetTest 19 1");
+        sendMessage("SETBIT bitsetTest 22 1");
+        sendMessage("SETBIT bitsetTest 23 1");
+        sendMessage("SETBIT bitsetTest 25 1");
+        sendMessage("SETBIT bitsetTest 26 1");
+        sendMessage("SETBIT bitsetTest 27 1");
+        sendMessage("SETBIT bitsetTest 29 1");
+
+        // Get the bitset as a string and verify the result
+        response = sendMessage("GET bitsetTest");
+        assertEquals("Test", response);
+
+        sendMessage("SET stringTest stringTest");
+        sendMessage("SETBIT stringTest 20 1");
+        response = sendMessage("GET stringTest");
+        assertEquals("stzingTest", response);
     }
 
     @SuppressWarnings("squid:S2925")

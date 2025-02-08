@@ -137,23 +137,15 @@ public class GeoSearchCommand extends AbstractCommand<List<List<Object>>> {
 
     }
 
-    private static final double EARTH_RADIUS_KM = 6371.0;
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
-        // Convert degrees to radians
-        lat1 = Math.toRadians(lat1);
-        lon1 = Math.toRadians(lon1);
-        lat2 = Math.toRadians(lat2);
-        lon2 = Math.toRadians(lon2);
-
-        // Compute central angle (Δσ) using spherical law of cosines
-        double deltaSigma = Math.acos(Math.sin(lat1) * Math.sin(lat2) +
-                                      Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
-
-        // Compute traversine function: 1 - cos(Δσ)
-        double traversine = 1 - Math.cos(deltaSigma);
-
-        // Compute distance using the Traversine formula
-        return EARTH_RADIUS_KM * Math.acos(1 - traversine);
+        final int R = 6371000; // Radius of the Earth in meters
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 
     private double convertToMeters(double value, String unit) {
