@@ -393,6 +393,20 @@ public class CommandHandlerTest {
         assertEquals("[[Catania, 166.2273571807551, 3476216502357864], [edge1, 91.3748784790091, 3476038982646536], [Palermo, 0.0, 3476004292229755]]", response);
     }
 
+    @Test
+    public void testGeoDistCommand() throws IOException {
+        sendMessage("GEOADD geosetGeoDist 13.361389 38.115556 Palermo");
+        sendMessage("GEOADD geosetGeoDist 15.087269 37.502669 Catania");
+        String response = sendMessage("GEODIST geosetGeoDist Palermo Catania km");
+        assertEquals("166.2273571807551", response);
+        response = sendMessage("GEODIST geosetGeoDist Palermo Catania m");
+        assertEquals("166227.3571807551", response);
+        response = sendMessage("GEODIST geosetGeoDist Palermo Catania mi");
+        assertEquals("103.28914783747071", response);
+        response = sendMessage("GEODIST geosetGeoDist Palermo Catania ft");
+        assertEquals("545365.3450812175", response);
+    }
+
     @SuppressWarnings("squid:S2925")
     private void wait(int seconds) {
         try {

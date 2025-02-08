@@ -62,6 +62,7 @@ public class CommandHandler implements Runnable {
         commands.put("XACK", new XAckCommand());
         commands.put("GEOADD", new GeoAddCommand());
         commands.put("GEOSEARCH", new GeoSearchCommand());
+        commands.put("GEODIST", new GeoDistCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());
