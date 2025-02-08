@@ -66,6 +66,7 @@ public class CommandHandler implements Runnable {
         commands.put("SETBIT", new SetBitCommand());
         commands.put("GETBIT", new GetBitCommand());
         commands.put("BITCOUNT", new BitCountCommand());
+        commands.put("BITOP", new BitOpCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());

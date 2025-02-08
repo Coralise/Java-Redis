@@ -487,6 +487,22 @@ public class CommandHandlerTest {
         assertEquals("stzingTest", response);
     }
 
+    @Test
+    public void testBitOpCommand() throws IOException {
+        sendMessage("SET key1 \"foobar\"");
+        sendMessage("SET key2 \"abcdef\"");
+        String response = sendMessage("BITOP AND dest key1 key2");
+        assertEquals("6", response);
+        response = sendMessage("GET dest");
+        assertEquals("`bc`ab", response);
+
+        sendMessage("SET key3 \"ghijklmnop\"");
+        response = sendMessage("BITOP OR dest key1 key2 key3");
+        assertEquals("10", response);
+        response = sendMessage("GET dest");
+        assertEquals("goono~mnop    ", response);
+    }
+
     @SuppressWarnings("squid:S2925")
     private void wait(int seconds) {
         try {
