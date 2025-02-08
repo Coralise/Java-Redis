@@ -1,7 +1,6 @@
 package me.wayne;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Mockito.mock;
 
 import java.io.BufferedReader;
@@ -409,7 +408,7 @@ public class CommandHandlerTest {
     }
 
     @Test
-    public void testSetBitAndGetCommand() throws IOException {
+    public void testBitCommands() throws IOException {
         sendMessage("SETBIT bitmapsarestrings 2 1");
         sendMessage("SETBIT bitmapsarestrings 3 1");
         sendMessage("SETBIT bitmapsarestrings 5 1");
@@ -418,6 +417,29 @@ public class CommandHandlerTest {
         sendMessage("SETBIT bitmapsarestrings 14 1");
         String response = sendMessage("GET bitmapsarestrings");
         assertEquals("42", response);
+
+        // Add GETBIT commands
+        assertEquals("1", sendMessage("GETBIT bitmapsarestrings 2"));
+        assertEquals("1", sendMessage("GETBIT bitmapsarestrings 3"));
+        assertEquals("1", sendMessage("GETBIT bitmapsarestrings 5"));
+        assertEquals("0", sendMessage("GETBIT bitmapsarestrings 200"));
+        assertEquals("1", sendMessage("GETBIT bitmapsarestrings 10"));
+        assertEquals("1", sendMessage("GETBIT bitmapsarestrings 11"));
+        assertEquals("1", sendMessage("GETBIT bitmapsarestrings 14"));
+        assertEquals("0", sendMessage("GETBIT bitmapsarestrings 1"));
+        assertEquals("0", sendMessage("GETBIT bitmapsarestrings 4"));
+
+        // Add BITCOUNT commands
+        response = sendMessage("BITCOUNT bitmapsarestrings");
+        assertEquals("6", response);
+        response = sendMessage("BITCOUNT bitmapsarestrings 0 0");
+        assertEquals("3", response);
+        response = sendMessage("BITCOUNT bitmapsarestrings 0 1 BYTE");
+        assertEquals("6", response);
+        response = sendMessage("BITCOUNT bitmapsarestrings 0 10 BIT");
+        assertEquals("4", response);
+        response = sendMessage("BITCOUNT bitmapsarestrings 0 13 BIT");
+        assertEquals("5", response);
 
         sendMessage("SETBIT bitsetTest 1 1");
         sendMessage("SETBIT bitsetTest 3 1");
@@ -439,6 +461,25 @@ public class CommandHandlerTest {
         // Get the bitset as a string and verify the result
         response = sendMessage("GET bitsetTest");
         assertEquals("Test", response);
+
+        // Add BITCOUNT commands for bitsetTest
+        response = sendMessage("BITCOUNT bitsetTest");
+        assertEquals("16", response);
+
+        response = sendMessage("BITCOUNT bitsetTest 0 1");
+        assertEquals("7", response);
+
+        response = sendMessage("BITCOUNT bitsetTest 0 2 BYTE");
+        assertEquals("12", response);
+
+        response = sendMessage("BITCOUNT bitsetTest 0 16 BIT");
+        assertEquals("7", response);
+
+        response = sendMessage("BITCOUNT bitsetTest 0 100 BIT");
+        assertEquals("16", response);
+
+        response = sendMessage("BITCOUNT bitsetTest 1 100");
+        assertEquals("13", response);
 
         sendMessage("SET stringTest stringTest");
         sendMessage("SETBIT stringTest 20 1");

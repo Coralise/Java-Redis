@@ -1,7 +1,6 @@
 package me.wayne.daos.commands;
 
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -26,7 +25,6 @@ public class SetBitCommand extends AbstractCommand<Integer> {
         Object value = store.getStore().get(key);
         if (value == null) bytes = new byte[(offset / 8) + 1];
         else if (value instanceof String val) bytes = val.getBytes();
-        else if (value instanceof byte[] b) bytes = b;
         else throw new AssertionError("ERROR: value is not a valid bitset");
 
         logger.log(Level.INFO, "BitSet String: {0}", new String(bytes));
@@ -35,7 +33,7 @@ public class SetBitCommand extends AbstractCommand<Integer> {
         bytes = setBit(bytes, offset, bitValue);
         logger.log(Level.INFO, "BitSet: {0}", bitSetToBinaryString(bytes));
 
-        store.getStore().put(key, bytes);
+        store.getStore().put(key, new String(bytes));
         return previousBit;
     }
     

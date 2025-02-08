@@ -64,6 +64,8 @@ public class CommandHandler implements Runnable {
         commands.put("GEOSEARCH", new GeoSearchCommand());
         commands.put("GEODIST", new GeoDistCommand());
         commands.put("SETBIT", new SetBitCommand());
+        commands.put("GETBIT", new GetBitCommand());
+        commands.put("BITCOUNT", new BitCountCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());
