@@ -1,6 +1,6 @@
 package me.wayne.daos;
 
-public class ScoreMember {
+public class ScoreMember implements Comparable<ScoreMember> {
     
     private final Integer score;
     private final String member;
@@ -49,6 +49,13 @@ public class ScoreMember {
         return true;
     }
 
-    
+    @Override
+    public int compareTo(ScoreMember o) {
+        int result = this.score.compareTo(o.score);
+        if (result == 0) {
+            result = this.member.compareTo(o.member);
+        }
+        return result;
+    }
 
 }

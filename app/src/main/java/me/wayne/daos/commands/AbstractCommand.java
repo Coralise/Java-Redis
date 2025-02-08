@@ -9,16 +9,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
+import me.wayne.daos.GeoMember;
 import me.wayne.daos.ScoreMember;
 import me.wayne.daos.StreamEntry;
 
 public abstract class AbstractCommand<T> {
     
+    protected final Logger logger = Logger.getLogger(this.getClass().getName());
     protected static final String ERROR_UNKOWN_COMMAND = "ERROR: Unkown Command";
     protected static final String INVALID_ARGS_RESPONSE = "ERROR: Invalid number of arguments";
     protected static final String OK_RESPONSE = "OK";
@@ -122,11 +125,28 @@ public abstract class AbstractCommand<T> {
 
     @SuppressWarnings("unchecked")
     protected TreeSet<ScoreMember> getTreeSet(InMemoryStore store, String key) {
-        Comparator<ScoreMember> integerComparator = (s1, s2) -> s1.getScore().compareTo(s2.getScore());
-        TreeSet<ScoreMember> set = new TreeSet<>(integerComparator);
+        TreeSet<ScoreMember> set = new TreeSet<>();
         if (store.getStore().containsKey(key)) {
             AssertUtil.assertTrue(store.getStore().get(key) instanceof SortedSet, "Existing value is not of type SortedSet");
+            SortedSet<?> unknownSet = (SortedSet<?>) store.getStore().get(key);
+            if (!unknownSet.isEmpty()) {
+                AssertUtil.assertTrue(unknownSet.first() instanceof ScoreMember, "Existing value elements is not of type ScoreMember");
+            }
             set.addAll((SortedSet<ScoreMember>) store.getStore().get(key));
+        }
+        return set;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected TreeSet<GeoMember> getGeoSet(InMemoryStore store, String key) {
+        TreeSet<GeoMember> set = new TreeSet<>();
+        if (store.getStore().containsKey(key)) {
+            AssertUtil.assertTrue(store.getStore().get(key) instanceof SortedSet, "Existing value is not of type SortedSet");
+            SortedSet<?> unknownSet = (SortedSet<?>) store.getStore().get(key);
+            if (!unknownSet.isEmpty()) {
+                AssertUtil.assertTrue(unknownSet.first() instanceof GeoMember, "Existing value elements is not of type GeoMember");
+            }
+            set.addAll((SortedSet<GeoMember>) store.getStore().get(key));
         }
         return set;
     }

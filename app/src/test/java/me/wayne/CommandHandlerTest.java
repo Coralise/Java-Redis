@@ -339,6 +339,60 @@ public class CommandHandlerTest {
             response);
     }
 
+    @Test
+    public void testGeoAddCommand() throws IOException {
+        String response = sendMessage("GEOADD geosetGeoAdd 13.361389 38.115556 Palermo");
+        assertEquals("1", response);
+        response = sendMessage("GEOADD geosetGeoAdd 15.087269 37.502669 Catania");
+        assertEquals("1", response);
+        response = sendMessage("GEOADD geosetGeoAdd NX CH 13.361389 38.115556 Palermo");
+        assertEquals("0", response); // Palermo already exists
+        response = sendMessage("GEOADD geosetGeoAdd XX CH 15.361389 48.115556 Foo");
+        assertEquals("0", response); // Foo doesn't exist but XX option is used
+        response = sendMessage("GEOADD geosetGeoAdd CH 13.361389 38.115556 Palermo");
+        assertEquals("1", response); // Palermo already exists, CH counts the update as a change
+        response = sendMessage("GEOADD geosetGeoAdd CH 16.361389 39.115556 Palermo");
+        assertEquals("1", response); // Palermo updated, CH counts the update as a change
+    }
+
+    @Test
+    public void testGeoAddMultipleMembers() throws IOException {
+        String response = sendMessage("GEOADD geoset 13.361389 38.115556 Palermo 15.087269 37.502669 Catania");
+        assertEquals("2", response);
+        response = sendMessage("GEOADD geoset NX 13.361389 38.115556 Palermo 16.361389 39.115556 Rome");
+        assertEquals("1", response); // Only Rome is added, Palermo already exists
+        response = sendMessage("GEOADD geoset 0 0 Center");
+        assertEquals("1", response);
+    }
+
+    @Test
+    public void testGeoSearchCommand() throws IOException {
+        String response = sendMessage("GEOADD Sicily 13.361389 38.115556 \"Palermo\" 15.087269 37.502669 \"Catania\"");
+        assertEquals("2", response);
+        sendMessage("GEOADD Sicily 12.758489 38.788135 \"edge1\" 17.241510 38.788135 \"edge2\"");
+
+        response = sendMessage("GEOSEARCH Sicily FROMLONLAT 15 37 BYRADIUS 200 km ASC");
+        assertEquals("[[Catania], [Palermo]]", response);
+
+        response = sendMessage("GEOSEARCH Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC WITHCOORD WITHDIST");
+        assertEquals("[[Catania, 56.42541980224439, [15.087269, 37.502669]], [Palermo, 190.38870648178343, [13.361389, 38.115556]], [edge2, 279.6614460135385, [17.24151, 38.788135]], [edge1, 279.66150770904176, [12.758489, 38.788135]]]", response);
+
+        response = sendMessage("GEOSEARCH Sicily FROMLONLAT 15 37 BYBOX 400 400 km ASC WITHCOORD WITHDIST WITHHASH");
+        assertEquals("[[Catania, 56.42541980224439, 3476216502357864, [15.087269, 37.502669]], [Palermo, 190.38870648178343, 3476004292229755, [13.361389, 38.115556]], [edge2, 279.6614460135385, 3478108620044552, [17.24151, 38.788135]], [edge1, 279.66150770904176, 3476038982646536, [12.758489, 38.788135]]]", response);
+
+        response = sendMessage("GEOSEARCH Sicily FROMMEMBER Palermo BYRADIUS 200 km");
+        assertEquals("[[Palermo], [edge1], [Catania]]", response);
+
+        response = sendMessage("GEOSEARCH Sicily FROMMEMBER Palermo BYRADIUS 200 km WITHDIST");
+        assertEquals("[[Palermo, 0.0], [edge1, 91.3748784790091], [Catania, 166.2273571807551]]", response);
+
+        response = sendMessage("GEOSEARCH Sicily FROMMEMBER Palermo BYRADIUS 200 km WITHDIST WITHHASH");
+        assertEquals("[[Palermo, 0.0, 3476004292229755], [edge1, 91.3748784790091, 3476038982646536], [Catania, 166.2273571807551, 3476216502357864]]", response);
+
+        response = sendMessage("GEOSEARCH Sicily FROMMEMBER Palermo BYRADIUS 200 km WITHDIST WITHHASH DESC");
+        assertEquals("[[Catania, 166.2273571807551, 3476216502357864], [edge1, 91.3748784790091, 3476038982646536], [Palermo, 0.0, 3476004292229755]]", response);
+    }
+
     @SuppressWarnings("squid:S2925")
     private void wait(int seconds) {
         try {

@@ -60,6 +60,8 @@ public class CommandHandler implements Runnable {
         commands.put("XGROUP", new XGroupCommand());
         commands.put("XREADGROUP", new XReadGroupCommand());
         commands.put("XACK", new XAckCommand());
+        commands.put("GEOADD", new GeoAddCommand());
+        commands.put("GEOSEARCH", new GeoSearchCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());
@@ -92,6 +94,7 @@ public class CommandHandler implements Runnable {
                     } catch (Exception e) {
                         out.println(e.getMessage());
                         logger.log(Level.WARNING, e.getMessage());
+                        e.printStackTrace();
                     }
                 } else {
                     out.println(ERROR_UNKOWN_COMMAND);
