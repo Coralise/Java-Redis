@@ -544,6 +544,62 @@ class CommandHandlerTest {
         assertEquals("36", response);
     }
 
+    @Test
+    void testTsCreateCommand() throws IOException {
+        String response = sendMessage("TS.CREATE temperature:2:32 RETENTION 60000 DUPLICATE_POLICY MAX LABELS sensor_id 2 area_id 32");
+        assertEquals("OK", response);
+    }
+
+    @Test
+    void testTsAddCommand() throws IOException {
+        String response = sendMessage("TS.ADD temperature:3:11 1548149183000 27 RETENTION 31536000000 DUPLICATE_POLICY LAST");
+        assertEquals("1548149183000", response);
+        response = sendMessage("TS.ADD temperature:3:11 1000 30");
+        assertEquals("ERROR: Timestamp is past the retention time: 1000", response);
+        long timestamp = System.currentTimeMillis();
+        response = sendMessage("TS.ADD temperature:3:11 * 32");
+        assertEquals((double) timestamp, Double.parseDouble(response), 1000);
+    }
+
+    @Test
+    void testTsRangeCommand() throws IOException {
+        sendMessage("TS.CREATE temperature:4:22 RETENTION 60000 DUPLICATE_POLICY MAX LABELS sensor_id 4 area_id 22");
+        sendMessage("TS.ADD temperature:4:22 1548149183000 27");
+        sendMessage("TS.ADD temperature:4:22 1548149184000 28");
+        sendMessage("TS.ADD temperature:4:22 1548149185000 29");
+        sendMessage("TS.ADD temperature:4:22 1548149186000 30");
+
+        String response = sendMessage("TS.RANGE temperature:4:22 1548149183000 1548149186000");
+        assertEquals("[[1548149183000, 27.0], [1548149184000, 28.0], [1548149185000, 29.0], [1548149186000, 30.0]]", response);
+
+        response = sendMessage("TS.RANGE temperature:4:22 1548149183000 1548149186000 AGGREGATION avg 2000");
+        assertEquals("[[1548149183000, 27.5], [1548149185000, 29.5]]", response);
+
+        response = sendMessage("TS.RANGE temperature:4:22 1548149183000 1548149186000 AGGREGATION sum 2000");
+        assertEquals("[[1548149183000, 55.0], [1548149185000, 59.0]]", response);
+
+        response = sendMessage("TS.RANGE temperature:4:22 1548149183000 1548149186000 AGGREGATION min 2000");
+        assertEquals("[[1548149183000, 27.0], [1548149185000, 29.0]]", response);
+
+        response = sendMessage("TS.RANGE temperature:4:22 1548149183000 1548149186000 AGGREGATION max 2000");
+        assertEquals("[[1548149183000, 28.0], [1548149185000, 30.0]]", response);
+
+        response = sendMessage("TS.RANGE temperature:4:22 1548149183000 1548149186000 AGGREGATION count 2000");
+        assertEquals("[[1548149183000, 2.0], [1548149185000, 2.0]]", response);
+        
+        response = sendMessage("TS.RANGE temperature:4:22 1548149183000 1548149186000 ALIGN 1548149179000 AGGREGATION count 2000 EMPTY");
+        assertEquals("[[1548149179000, 0.0], [1548149181000, 0.0], [1548149183000, 2.0], [1548149185000, 2.0]]", response);
+
+        response = sendMessage("TS.RANGE temperature:4:22 1548149183000 1548149186000 AGGREGATION avg 2000");
+        assertEquals("[[1548149183000, 27.5], [1548149185000, 29.5]]", response);
+
+        response = sendMessage("TS.RANGE temperature:4:22 1548149183000 1548149186000 AGGREGATION avg 2000 ALIGN END");
+        assertEquals("[[1548149182000, 27.0], [1548149184000, 28.5], [1548149186000, 30.0]]", response);
+
+        response = sendMessage("TS.GET temperature:4:22");
+        assertEquals("[1548149186000, 30.0]", response);
+    }
+
     @SuppressWarnings("squid:S2925")
     private void wait(int seconds) {
         try {

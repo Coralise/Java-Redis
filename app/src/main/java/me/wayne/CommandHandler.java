@@ -71,6 +71,10 @@ public class CommandHandler implements Runnable {
         commands.put("PFADD", new PfAddCommand());
         commands.put("PFCOUNT", new PfCountCommand());
         commands.put("PFMERGE", new PfMergeCommand());
+        commands.put("TS.CREATE", new TsCreateCommand());
+        commands.put("TS.ADD", new TsAddCommand());
+        commands.put("TS.RANGE", new TsRangeCommand());
+        commands.put("TS.GET", new TsGetCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());
@@ -100,11 +104,11 @@ public class CommandHandler implements Runnable {
                     try {
                         Object result = command.executeCommand(Thread.currentThread(), dataStore, fInputLine);
                         out.println(result);
-                    } catch (Exception e) {
-                        out.println(e.getMessage());
+                    } catch (AssertionError | Exception e) {
                         logger.log(Level.WARNING, e.getMessage());
+                        out.println(e.getMessage());
                         e.printStackTrace();
-                    }
+                    } 
                 } else {
                     out.println(ERROR_UNKOWN_COMMAND);
                 }
