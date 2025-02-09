@@ -1,5 +1,8 @@
 package me.wayne.daos;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+
 import me.wayne.AssertUtil;
 
 public class HyperLogLog {
@@ -21,7 +24,7 @@ public class HyperLogLog {
     }
 
     private int countTrailingZeros(int hash) {
-        return Integer.numberOfTrailingZeros((hash << precision) | (1 << (precision - 1))) + 1;
+        return Integer.numberOfTrailingZeros(hash) + 1;
     }
 
     private int getRegisterIndex(int hash) {
@@ -36,24 +39,22 @@ public class HyperLogLog {
     }
 
     public double estimate() {
-        double sum = 0;
+        BigDecimal sum = BigDecimal.ZERO;
         int zeroCount = 0;
 
         for (byte register : registers) {
-            sum += 1.0 / (1 << register);
+            sum = sum.add(BigDecimal.ONE.divide(BigDecimal.valueOf(1L << register), MathContext.DECIMAL128));
             if (register == 0) zeroCount++;
         }
-        System.out.println("Registers: " + registers.length);
-        System.out.println("Sum: " + sum);
-        System.out.println("Zero Count: " + zeroCount);
-        if (sum == 0) return 0;
+        int registerCount = registers.length;
+        if (sum == BigDecimal.ZERO) return 0;
 
         double alpha = alpha();
-        double rawEstimate = alpha * (registers.length * registers.length) / sum;
+        double rawEstimate = alpha * (registerCount * registerCount) / sum.doubleValue();
 
-        if (rawEstimate <= 2.5 * registers.length) {
+        if (rawEstimate <= 2.5 * registerCount) {
             if (zeroCount > 0) {
-                return registers.length * Math.log((double) registers.length / zeroCount);
+                return registerCount * Math.log((double) registerCount / (double) zeroCount);
             } else return rawEstimate;
         } else if (rawEstimate > (1L << 32) / 30.0) {
             return -(1L << 32) * Math.log(1.0 - (rawEstimate / (1L << 32)));
