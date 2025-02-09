@@ -73,16 +73,4 @@ public class HyperLogLog {
         }
 
     }
-
-    public int[] toBitArray(byte[] byteArray) {
-        int[] bitArray = new int[byteArray.length * 8];
-        int index = 0;
-        
-        for (byte b : byteArray) {
-            for (int i = 7; i >= 0; i--) {
-                bitArray[index++] = (b >> i) & 1;
-            }
-        }
-        return bitArray;
-    }
 }
