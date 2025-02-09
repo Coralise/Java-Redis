@@ -1,6 +1,6 @@
 package me.wayne;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.io.BufferedReader;
@@ -9,35 +9,35 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class ListCommandHandlerTest {
+class ListCommandHandlerTest {
 
     Socket socket;
     BufferedReader in = mock(BufferedReader.class);
     PrintWriter out = mock(PrintWriter.class);
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
         socket = new Socket("127.0.0.1", 3000);
         out = new PrintWriter(socket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
-    @BeforeClass
-    public static void setUpClass() {
+    @BeforeAll
+    static void setUpClass() {
         new Thread(App::new).start();
     }
 
-    public String sendMessage(String msg) throws IOException {
+    String sendMessage(String msg) throws IOException {
         out.println(msg);
         return in.readLine();
     }
 
     @Test
-    public void testLpushCommand() throws IOException {
+    void testLpushCommand() throws IOException {
         String response = sendMessage("LPUSH list1 value1 value1.2 value1.3");
         assertEquals("3", response);
         response = sendMessage("LPUSH list1 value2");
@@ -49,7 +49,7 @@ public class ListCommandHandlerTest {
     }
 
     @Test
-    public void testRpushCommand() throws IOException {
+    void testRpushCommand() throws IOException {
         String response = sendMessage("RPUSH list2 value1 value1.2 value1.3");
         assertEquals("3", response);
         response = sendMessage("RPUSH list2 value2");
@@ -61,7 +61,7 @@ public class ListCommandHandlerTest {
     }
 
     @Test
-    public void testLpopCommand() throws IOException {
+    void testLpopCommand() throws IOException {
         sendMessage("LPUSH list1 value1 value1.2 value1.3");
         String response = sendMessage("LPOP list1");
         assertEquals("[value1.3]", response);
@@ -70,7 +70,7 @@ public class ListCommandHandlerTest {
     }
 
     @Test
-    public void testRpopCommand() throws IOException {
+    void testRpopCommand() throws IOException {
         sendMessage("RPUSH list2 value1 value1.2 value1.3");
         String response = sendMessage("RPOP list2");
         assertEquals("[value1.3]", response);
@@ -79,7 +79,7 @@ public class ListCommandHandlerTest {
     }
 
     @Test
-    public void testLrangeCommand() throws IOException {
+    void testLrangeCommand() throws IOException {
         sendMessage("RPUSH list3 value1");
         sendMessage("RPUSH list3 value2");
         sendMessage("RPUSH list3 value3");
@@ -94,7 +94,7 @@ public class ListCommandHandlerTest {
     }
 
     @Test
-    public void testLindexCommand() throws IOException {
+    void testLindexCommand() throws IOException {
         sendMessage("RPUSH list4 value1");
         sendMessage("RPUSH list4 value2");
         String response = sendMessage("LINDEX list4 0");
@@ -106,7 +106,7 @@ public class ListCommandHandlerTest {
     }
 
     @Test
-    public void testLsetCommand() throws IOException {
+    void testLsetCommand() throws IOException {
         sendMessage("RPUSH list5 value1");
         sendMessage("RPUSH list5 value2");
         sendMessage("RPUSH list5 value3");

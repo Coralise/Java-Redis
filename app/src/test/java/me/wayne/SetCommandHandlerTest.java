@@ -1,6 +1,6 @@
 package me.wayne;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.io.BufferedReader;
@@ -12,35 +12,35 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class SetCommandHandlerTest {
+class SetCommandHandlerTest {
 
     Socket socket;
     BufferedReader in = mock(BufferedReader.class);
     PrintWriter out = mock(PrintWriter.class);
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
         socket = new Socket("127.0.0.1", 3000);
         out = new PrintWriter(socket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
-    @BeforeClass
-    public static void setUpClass() {
+    @BeforeAll
+    static void setUpClass() {
         new Thread(App::new).start();
     }
 
-    public String sendMessage(String msg) throws IOException {
+    String sendMessage(String msg) throws IOException {
         out.println(msg);
         return in.readLine();
     }
 
     @Test
-    public void testSaddCommand() throws IOException {
+    void testSaddCommand() throws IOException {
         String response = sendMessage("SADD set1 member1 member2 member3");
         assertEquals("3", response);
         response = sendMessage("SMEMBERS set1");
@@ -51,7 +51,7 @@ public class SetCommandHandlerTest {
     }
 
     @Test
-    public void testSremCommand() throws IOException {
+    void testSremCommand() throws IOException {
         String response = sendMessage("SADD myset \"one\"");
         assertEquals("1", response);
         response = sendMessage("SADD myset \"two\"");
@@ -68,7 +68,7 @@ public class SetCommandHandlerTest {
     }
 
     @Test
-    public void testSinterCommand() throws IOException {
+    void testSinterCommand() throws IOException {
         String response = sendMessage("SADD sInter1 a b c d");
         assertEquals("4", response);
         response = sendMessage("SADD sInter2 c");
@@ -81,7 +81,7 @@ public class SetCommandHandlerTest {
     }
 
     @Test
-    public void testSunionCommand() throws IOException {
+    void testSunionCommand() throws IOException {
         sendMessage("SADD sUnion1 a b c d");
         sendMessage("SADD sUnion2 c");
         sendMessage("SADD sUnion3 a c e");
@@ -91,7 +91,7 @@ public class SetCommandHandlerTest {
     }
 
     @Test
-    public void testSdiffCommand() throws IOException {
+    void testSdiffCommand() throws IOException {
         sendMessage("SADD sDiff1 a b c d");
         sendMessage("SADD sDiff2 c");
         sendMessage("SADD sDiff3 a c e");
@@ -101,7 +101,7 @@ public class SetCommandHandlerTest {
     }
 
     @Test
-    public void testSIsMemberCommand() throws IOException {
+    void testSIsMemberCommand() throws IOException {
         sendMessage("SADD myset member1 member2 member3");
         String response = sendMessage("SISMEMBER myset member1");
         assertEquals("1", response);

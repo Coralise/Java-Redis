@@ -1,6 +1,6 @@
 package me.wayne;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import java.io.BufferedReader;
@@ -12,35 +12,35 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class HashCommandHandlerTest {
+class HashCommandHandlerTest {
 
     Socket socket;
     BufferedReader in = mock(BufferedReader.class);
     PrintWriter out = mock(PrintWriter.class);
 
-    @Before
-    public void setUp() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
         socket = new Socket("127.0.0.1", 3000);
         out = new PrintWriter(socket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
-    @BeforeClass
-    public static void setUpClass() {
+    @BeforeAll
+    static void setUpClass() {
         new Thread(App::new).start();
     }
 
-    public String sendMessage(String msg) throws IOException {
+    String sendMessage(String msg) throws IOException {
         out.println(msg);
         return in.readLine();
     }
 
     @Test
-    public void testHsetAndHgetCommands() throws IOException {
+    void testHsetAndHgetCommands() throws IOException {
         String response = sendMessage("HSET myhash1 field1 \"Hello\"");
         assertEquals("1", response);
         response = sendMessage("HGET myhash1 field1");
@@ -55,7 +55,7 @@ public class HashCommandHandlerTest {
     }
 
     @Test
-    public void testHgetallCommand() throws IOException {
+    void testHgetallCommand() throws IOException {
         sendMessage("HSET myhash field1 \"Hello\" field2 \"World\"");
         String response = sendMessage("HGETALL myhash");
         Set<String> expectedFieldsAndValues = new HashSet<>(Arrays.asList("field1", "Hello", "field2", "World"));
@@ -64,7 +64,7 @@ public class HashCommandHandlerTest {
     }
 
     @Test
-    public void testHdelCommand() throws IOException {
+    void testHdelCommand() throws IOException {
         sendMessage("HSET myhash field1 \"foo\"");
         String response = sendMessage("HDEL myhash field1");
         assertEquals("1", response);
@@ -73,7 +73,7 @@ public class HashCommandHandlerTest {
     }
 
     @Test
-    public void testHexistsCommand() throws IOException {
+    void testHexistsCommand() throws IOException {
         sendMessage("HSET myhash field1 \"foo\"");
         String response = sendMessage("HEXISTS myhash field1");
         assertEquals("1", response);
