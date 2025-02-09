@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import me.wayne.daos.HyperLogLog;
+import me.wayne.daos.probabilistic.HyperLogLog;
 
 class HyperLogLogTest {
 

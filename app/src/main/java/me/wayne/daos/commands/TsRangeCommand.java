@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import me.wayne.InMemoryStore;
 import me.wayne.daos.Pair;
-import me.wayne.daos.TimeSeries;
-import me.wayne.daos.TimeSeriesAggregation;
+import me.wayne.daos.timeseries.TimeSeries;
+import me.wayne.daos.timeseries.TimeSeriesAggregation;
 
 public class TsRangeCommand extends AbstractCommand<List<Pair<Long, Double>>> {
 
@@ -17,6 +16,7 @@ public class TsRangeCommand extends AbstractCommand<List<Pair<Long, Double>>> {
         super("TS.RANGE", 3);
     }
 
+    @SuppressWarnings("all")
     @Override
     protected List<Pair<Long, Double>> processCommand(Thread thread, InMemoryStore store, List<String> args) {
         String key = args.get(0);
@@ -79,12 +79,12 @@ public class TsRangeCommand extends AbstractCommand<List<Pair<Long, Double>>> {
                     long bucketDuration = Long.parseLong(args.get(i + 2));
                     options.put("AGGREGATION", new Object[]{aggregator, bucketDuration});
                     i += 3;
-                    if (i < args.size() && args.get(i).toUpperCase().equals("BUCKETTIMESTAMP")) {
+                    if (i < args.size() && args.get(i).equalsIgnoreCase("BUCKETTIMESTAMP")) {
                         String bucketTimestamp = args.get(i + 1);
                         options.put("BUCKETTIMESTAMP", bucketTimestamp);
                         i += 2;
                     }
-                    if (i < args.size() && args.get(i).toUpperCase().equals("EMPTY")) {
+                    if (i < args.size() && args.get(i).equalsIgnoreCase("EMPTY")) {
                         options.put("EMPTY", true);
                         i++;
                     }

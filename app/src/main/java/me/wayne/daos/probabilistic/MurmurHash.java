@@ -1,4 +1,4 @@
-package me.wayne.daos;
+package me.wayne.daos.probabilistic;
 
 /** 
  * murmur hash 2.0.
@@ -16,6 +16,7 @@ package me.wayne.daos;
  * @version 1.0.2
  *
  */
+@SuppressWarnings("all")
 public final class MurmurHash {
     // all methods static; private constructor. 
     private MurmurHash() {}

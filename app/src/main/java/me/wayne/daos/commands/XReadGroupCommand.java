@@ -51,7 +51,7 @@ public class XReadGroupCommand extends AbstractCommand<Map<String, List<StreamEn
 
             AssertUtil.assertTrue(!consumerGroup.hasConsumer(consumer), "ERROR: Consumer already exists");
 
-            consumerGroup.addConsumer(consumer, thread);
+            consumerGroup.addConsumer(consumer, thread, noAck);
 
             try {
                 Thread.sleep(block);

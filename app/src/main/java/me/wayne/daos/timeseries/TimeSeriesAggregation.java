@@ -1,4 +1,4 @@
-package me.wayne.daos;
+package me.wayne.daos.timeseries;
 
 public enum TimeSeriesAggregation {
     AVG,    // Arithmetic mean of all values

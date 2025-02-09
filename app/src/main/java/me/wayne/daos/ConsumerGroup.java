@@ -23,7 +23,7 @@ public class ConsumerGroup {
 
     final ArrayList<StreamId> pendingEntries = new ArrayList<>();
 
-    final Map<String, Thread> consumers = new LinkedHashMap<>();
+    final Map<String, Pair<Thread, Boolean>> consumers = new LinkedHashMap<>();
 
     public ConsumerGroup(String groupName, String streamKey, StreamId lastDeliveredEntry) {
         this.groupName = groupName;
@@ -52,9 +52,9 @@ public class ConsumerGroup {
         return !consumers.isEmpty();
     }
 
-    public void addConsumer(String consumerName, Thread thread) {
+    public void addConsumer(String consumerName, Thread thread, boolean noAck) {
         LOGGER.log(Level.INFO, "Adding consumer {0} to group {1}", new Object[]{consumerName, groupName});
-        consumers.put(consumerName, thread);
+        consumers.put(consumerName, new Pair<>(thread, noAck));
     }
 
     public void removeConsumer(String consumerName) {
@@ -66,11 +66,13 @@ public class ConsumerGroup {
         LOGGER.log(Level.INFO, "Feeding entry {0} to group {1}", new Object[]{streamEntry.getId(), groupName});
         AssertUtil.assertTrue(!consumers.isEmpty(), "No consumers for group " + groupName);
         lastDeliveredEntryId = streamEntry.getId();
-        addToPEList(lastDeliveredEntryId);
         int randomIndex = random.nextInt(consumers.size());
         String randomConsumer = (String) consumers.keySet().toArray()[randomIndex];
-        Thread consumerThread = consumers.get(randomConsumer);
-        consumerThread.interrupt();
+        Pair<Thread, Boolean> consumerThread = consumers.get(randomConsumer);
+        consumerThread.getFirst().interrupt();
+        if (Boolean.FALSE.equals(consumerThread.getSecond())) {
+            addToPEList(streamEntry.getId());
+        }
     }
     
     public StreamId getLastDeliveredEntryId() {
@@ -90,7 +92,7 @@ public class ConsumerGroup {
         return groupName;
     }
 
-    public Map<String, Thread> getConsumers() {
+    public Map<String, Pair<Thread, Boolean>> getConsumers() {
         return new HashMap<>(consumers);
     }
     

@@ -1,9 +1,9 @@
-package me.wayne.daos;
+package me.wayne.daos.timeseries;
 
-import java.util.Comparator;
 import java.util.TreeMap;
 
 import me.wayne.AssertUtil;
+import me.wayne.daos.Pair;
 
 public class TimeSeriesBucket implements Comparable<TimeSeriesBucket> {
 

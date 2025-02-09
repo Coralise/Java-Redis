@@ -1,7 +1,8 @@
 package me.wayne;
 
-import me.wayne.daos.DuplicatePolicy;
-import me.wayne.daos.TimeSeries;
+import me.wayne.daos.timeseries.DuplicatePolicy;
+import me.wayne.daos.timeseries.TimeSeries;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -39,9 +40,7 @@ class TimeSeriesTest {
         AssertionError exception = assertThrows(AssertionError.class, () -> {
             timeSeries.add(timestamp, 10.0);
         });
-        assertEquals("ERROR: Timestamp is past the retention time", exception.getMessage());
+        assertEquals("ERROR: Timestamp is past the retention time: " + timestamp, exception.getMessage());
     }
-
-    // ...additional test methods...
 
 }

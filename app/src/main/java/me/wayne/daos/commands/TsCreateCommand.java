@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import me.wayne.InMemoryStore;
-import me.wayne.daos.TimeSeries;
-import me.wayne.daos.DuplicatePolicy;
+import me.wayne.daos.timeseries.DuplicatePolicy;
+import me.wayne.daos.timeseries.TimeSeries;
 
 public class TsCreateCommand extends AbstractCommand<String> {
 
@@ -14,6 +14,7 @@ public class TsCreateCommand extends AbstractCommand<String> {
         super("TS.CREATE", 1);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
         Map<String, Object> options = parseOptions(args);
@@ -28,6 +29,7 @@ public class TsCreateCommand extends AbstractCommand<String> {
         return OK_RESPONSE;
     }
 
+    @SuppressWarnings("all")
     private Map<String, Object> parseOptions(List<String> args) {
         Map<String, Object> options = new HashMap<>();
         options.put("key", args.get(0));

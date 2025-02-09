@@ -4,7 +4,7 @@ import java.util.List;
 
 import me.wayne.InMemoryStore;
 import me.wayne.daos.Pair;
-import me.wayne.daos.TimeSeries;
+import me.wayne.daos.timeseries.TimeSeries;
 
 public class TsGetCommand extends AbstractCommand<Pair<Long, Double>> {
 

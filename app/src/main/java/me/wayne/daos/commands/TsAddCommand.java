@@ -3,7 +3,7 @@ package me.wayne.daos.commands;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
-import me.wayne.daos.TimeSeries;
+import me.wayne.daos.timeseries.TimeSeries;
 
 public class TsAddCommand extends AbstractCommand<Object> {
 

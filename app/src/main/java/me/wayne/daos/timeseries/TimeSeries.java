@@ -1,4 +1,4 @@
-package me.wayne.daos;
+package me.wayne.daos.timeseries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import me.wayne.AssertUtil;
+import me.wayne.daos.Pair;
 
 public class TimeSeries {
 
@@ -22,8 +23,7 @@ public class TimeSeries {
         String key,
         DuplicatePolicy duplicatePolicy,
         long retentionTime,
-        Map<String,
-        String> labels,
+        Map<String, String> labels,
         long ignoreMaxTimeDiff,
         double ignoreMaxValDiff) {
         this.key = key;
@@ -164,6 +164,14 @@ public class TimeSeries {
 
     public Pair<Long, Double> get() {
         return !values.isEmpty() ? new Pair<>(values.lastKey(), values.lastEntry().getValue()) : new Pair<>(null, null);
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public Map<String, String> getLabels() {
+        return labels;
     }
 
 }

@@ -3,7 +3,7 @@ package me.wayne.daos.commands;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
-import me.wayne.daos.HyperLogLog;
+import me.wayne.daos.probabilistic.HyperLogLog;
 
 public class PfMergeCommand extends AbstractCommand<String> {
 

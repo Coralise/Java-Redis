@@ -1,4 +1,4 @@
-package me.wayne.daos;
+package me.wayne.daos.probabilistic;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
