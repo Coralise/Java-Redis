@@ -11,6 +11,17 @@ class HyperLogLogTest {
 
     @ParameterizedTest
     @ValueSource(ints = {
+        1,
+        2,
+        5,
+        7,
+        10,
+        15,
+        32,
+        40,
+        123,
+        195,
+        395,
         10000,
         20000,
         35000,
@@ -49,6 +60,15 @@ class HyperLogLogTest {
         8000000,
         9000000,
         10000000,
+        20000000,
+        30000000,
+        40000000,
+        50000000,
+        60000000,
+        70000000,
+        80000000,
+        90000000,
+        100000000
     })
     void hyperLogLogTest(int count) {
         HyperLogLog hyperLogLog = new HyperLogLog(15);
@@ -57,4 +77,5 @@ class HyperLogLogTest {
         }
         assertEquals(count, hyperLogLog.estimate(), count * 0.02);
     }
+    
 }

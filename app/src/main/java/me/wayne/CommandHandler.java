@@ -68,6 +68,9 @@ public class CommandHandler implements Runnable {
         commands.put("BITCOUNT", new BitCountCommand());
         commands.put("BITOP", new BitOpCommand());
         commands.put("EXISTS", new ExistsCommand());
+        commands.put("PFADD", new PfAddCommand());
+        commands.put("PFCOUNT", new PfCountCommand());
+        commands.put("PFMERGE", new PfMergeCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());

@@ -503,6 +503,47 @@ class CommandHandlerTest {
         assertEquals("goono~mnop", response);
     }
 
+    @Test
+    void testPfAddCommand() throws IOException {
+        String response = sendMessage("PFADD hll a b c d e f g");
+        assertEquals("1", response);
+        response = sendMessage("PFADD hll h i j k l m n o p q r s t u v w x y z");
+        assertEquals("1", response);
+        response = sendMessage("PFADD hll a b c");
+        assertEquals("0", response); // Elements already exist
+    }
+
+    @Test
+    void testPfCountCommand() throws IOException {
+        sendMessage("PFADD hll1 a b c d e f g");
+        String response = sendMessage("PFCOUNT hll1");
+        assertEquals("7", response);
+        sendMessage("PFADD hll1 h i j k l m n o p q r s t u v w x y z");
+        response = sendMessage("PFCOUNT hll1");
+        assertEquals("26", response);
+    }
+
+    @Test
+    void testPfMergeCommand() throws IOException {
+        sendMessage("PFADD hll1 a b c d e f g");
+        sendMessage("PFADD hll2 h i j k l m n o p q r s t u v w x y z");
+        String response = sendMessage("PFMERGE hllMerged hll1 hll2");
+        assertEquals("OK", response);
+        response = sendMessage("PFCOUNT hllMerged");
+        assertEquals("26", response);
+    }
+
+    @Test
+    void testPfComplexCommands() throws IOException {
+        sendMessage("PFADD hll1 a b c d e f g");
+        sendMessage("PFADD hll2 h i j k l m n o p q r s t u v w x y z");
+        sendMessage("PFADD hll3 1 2 3 4 5 6 7 8 9 10");
+        String response = sendMessage("PFMERGE hllMerged hll1 hll2 hll3");
+        assertEquals("OK", response);
+        response = sendMessage("PFCOUNT hllMerged");
+        assertEquals("36", response);
+    }
+
     @SuppressWarnings("squid:S2925")
     private void wait(int seconds) {
         try {

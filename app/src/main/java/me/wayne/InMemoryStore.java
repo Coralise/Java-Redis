@@ -42,6 +42,16 @@ public class InMemoryStore {
         return consumerGroups.containsKey(groupName);
     }
 
+    @SuppressWarnings("unchecked")
+    public <T> T getObject(String key, Class<T> clazz) {
+        Object obj = store.get(key);
+        if (obj == null) {
+            return null;
+        }
+        AssertUtil.assertTrue(clazz.isInstance(obj), "Value is not of the expected type (" + clazz.getSimpleName() + ")");
+        return (T) obj;
+    }
+
     // public void setJson(String key, JSONObject value) {
     //     store.put(key, value);
     // }

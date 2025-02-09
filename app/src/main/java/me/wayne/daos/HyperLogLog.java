@@ -15,6 +15,16 @@ public class HyperLogLog {
         registers = new byte[(int) Math.pow(2, precision)];
     }
 
+    public HyperLogLog(HyperLogLog... hyperLogLogs) {
+        this(hyperLogLogs[0].precision);
+        for (HyperLogLog hyperLogLog : hyperLogLogs) {
+            AssertUtil.assertTrue(hyperLogLog.precision == precision, "Precision must be the same");
+            for (int i = 0; i < registers.length; i++) {
+                registers[i] = (byte) Math.max(registers[i], hyperLogLog.registers[i]);
+            }
+        }
+    }
+
     public int add(String string) {
         int murmurHash = MurmurHash.hash32(string);
         int registerIndex = getRegisterIndex(murmurHash);
