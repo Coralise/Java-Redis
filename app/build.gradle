@@ -22,8 +22,8 @@ dependencies {
     // This dependency is used by the application.
     implementation libs.guava
 
-    // Add org.json dependency
-    implementation 'org.json:json:20210307'
+    // Replace org.json dependency with Jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 
     // Add Mockito for testing
     testImplementation 'org.mockito:mockito-core:4.0.0'

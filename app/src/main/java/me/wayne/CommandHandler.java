@@ -75,6 +75,10 @@ public class CommandHandler implements Runnable {
         commands.put("TS.ADD", new TsAddCommand());
         commands.put("TS.RANGE", new TsRangeCommand());
         commands.put("TS.GET", new TsGetCommand());
+        commands.put("JSON.SET", new JsonSetCommand());
+        commands.put("JSON.GET", new JsonGetCommand());
+        commands.put("JSON.DEL", new JsonDelCommand());
+        commands.put("JSON.ARRAPPEND", new JsonArrAppendCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());

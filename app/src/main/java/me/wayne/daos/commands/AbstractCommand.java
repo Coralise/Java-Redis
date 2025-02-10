@@ -62,14 +62,18 @@ public abstract class AbstractCommand<T> {
 
     private List<String> getArgs(String input) {
         List<String> result = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\"([^\"]*)\"|(\\S+)");
+        Pattern pattern = Pattern.compile("(?:[^\\s\"]+)|\"((?:\\\\.|[^\"\\\\])*)\"");
         Matcher matcher = pattern.matcher(input);
 
         while (matcher.find()) {
-            if (matcher.group(1) != null) {
-                result.add(matcher.group(1));
+            String group1 = matcher.group(1);
+            if (group1 != null) {
+                group1 = group1.replace("\\\"", "\"");
+                result.add(group1);
             } else {
-                result.add(matcher.group(2));
+                String group0 = matcher.group();
+                group0 = group0.replace("\\\"", "\"");
+                result.add(group0);
             }
         }
 

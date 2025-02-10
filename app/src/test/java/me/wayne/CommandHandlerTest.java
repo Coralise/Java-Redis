@@ -600,6 +600,39 @@ class CommandHandlerTest {
         assertEquals("[1548149186000, 30.0]", response);
     }
 
+    @Test
+    void testJsonSetCommand() throws IOException {
+        String response = sendMessage("JSON.SET doc $ \"{\\\"a\\\":2, \\\"b\\\":3, \\\"nested\\\":{\\\"a\\\":4, \\\"b\\\":null}}\"");
+        assertEquals("OK", response);
+    }
+
+    @Test
+    void testJsonGetCommand() throws IOException {
+        sendMessage("JSON.SET doc $ \"{\\\"a\\\":2, \\\"b\\\":3, \\\"nested\\\":{\\\"a\\\":4, \\\"b\\\":null}}\"");
+        String response = sendMessage("JSON.GET doc $..b");
+        assertEquals("[\"3\",\"null\"]", response);
+        response = sendMessage("JSON.GET doc $..a $..b");
+        assertEquals("{$..a=[\"2\",\"4\"], $..b=[\"3\",\"null\"]}", response);
+    }
+
+    @Test
+    void testJsonDelCommand() throws IOException {
+        sendMessage("JSON.SET doc $ \"{\\\"a\\\":1, \\\"nested\\\":{\\\"a\\\":2, \\\"b\\\":3}}\"");
+        String response = sendMessage("JSON.DEL doc $..a");
+        assertEquals("2", response);
+        response = sendMessage("JSON.GET doc $");
+        assertEquals("{\"nested\":{\"b\":3}}", response);
+    }
+
+    @Test
+    void testJsonArrAppendCommand() throws IOException {
+        sendMessage("JSON.SET item:1 $ \"{\\\"name\\\":\\\"Noise-cancelling Bluetooth headphones\\\",\\\"description\\\":\\\"Wireless Bluetooth headphones with noise-cancelling technology\\\",\\\"connection\\\":{\\\"wireless\\\":true,\\\"type\\\":\\\"Bluetooth\\\"},\\\"price\\\":99.98,\\\"stock\\\":25,\\\"colors\\\":[\\\"black\\\",\\\"silver\\\"]}\"");
+        String response = sendMessage("JSON.ARRAPPEND item:1 $.colors \"blue\" red");
+        assertEquals("4", response);
+        response = sendMessage("JSON.GET item:1 $");
+        assertEquals("{\"name\":\"Noise-cancelling Bluetooth headphones\",\"description\":\"Wireless Bluetooth headphones with noise-cancelling technology\",\"connection\":{\"wireless\":true,\"type\":\"Bluetooth\"},\"price\":99.98,\"stock\":25,\"colors\":[\"black\",\"silver\",\"blue\",\"red\"]}", response);
+    }
+
     @SuppressWarnings("squid:S2925")
     private void wait(int seconds) {
         try {
