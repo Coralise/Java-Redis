@@ -138,7 +138,6 @@ public class RedisJson {
             if (childNode == null && !keys[0].isEmpty()) throw new IllegalArgumentException("ERROR: Node " + keys[0] + " is null");
             
             if (keys.length == 1) {
-                System.out.println("Returning childNode: " + childNode);
                 return childNode;
             } else {
                 return getChildNode(childNode, String.join(".", Arrays.copyOfRange(keys, 1, keys.length)));
@@ -283,7 +282,6 @@ public class RedisJson {
         if (keys.length == 1 && path.equals("$")) {
             try {
                 jsonData = MAPPER.readTree(value);
-                System.out.println("jsonData: " + jsonData);
                 return true;
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
