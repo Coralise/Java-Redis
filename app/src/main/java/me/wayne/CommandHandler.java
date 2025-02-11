@@ -79,6 +79,7 @@ public class CommandHandler implements Runnable {
         commands.put("JSON.GET", new JsonGetCommand());
         commands.put("JSON.DEL", new JsonDelCommand());
         commands.put("JSON.ARRAPPEND", new JsonArrAppendCommand());
+        commands.put("BITFIELD", new BitFieldCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());

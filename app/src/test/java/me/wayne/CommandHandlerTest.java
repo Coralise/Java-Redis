@@ -633,6 +633,119 @@ class CommandHandlerTest {
         assertEquals("{\"name\":\"Noise-cancelling Bluetooth headphones\",\"description\":\"Wireless Bluetooth headphones with noise-cancelling technology\",\"connection\":{\"wireless\":true,\"type\":\"Bluetooth\"},\"price\":99.98,\"stock\":25,\"colors\":[\"black\",\"silver\",\"blue\",\"red\"]}", response);
     }
 
+    @Test
+    void testBitFieldCommandPart1() throws IOException {
+        String response;
+
+        sendMessage("BITFIELD bf SET i4 13 13");
+        response = sendMessage("BITFIELD bf GET i4 13");
+        assertEquals("[-3]", response);
+
+        sendMessage("BITFIELD bf SET i4 12 5");
+        response = sendMessage("BITFIELD bf GET i4 12");
+        assertEquals("[5]", response);
+
+        response = sendMessage("BITFIELD bf GET i4 13");
+        assertEquals("[-5]", response);
+
+        response = sendMessage("BITFIELD bf GET i4 15");
+        assertEquals("[-4]", response);
+
+        response = sendMessage("BITFIELD bf GET i8 12");
+        assertEquals("[88]", response);
+
+        sendMessage("BITFIELD bf OVERFLOW WRAP SET i4 0 20");
+        response = sendMessage("BITFIELD bf GET i4 0");
+        assertEquals("[4]", response);
+
+        sendMessage("BITFIELD bf OVERFLOW SAT SET i4 0 20");
+        response = sendMessage("BITFIELD bf GET i4 0");
+        assertEquals("[7]", response);
+
+        sendMessage("BITFIELD bf OVERFLOW FAIL SET i4 0 20");
+        response = sendMessage("BITFIELD bf GET i4 0");
+        assertEquals("[7]", response);
+
+        sendMessage("BITFIELD bf OVERFLOW SAT SET i4 0 7");
+        response = sendMessage("BITFIELD bf GET i4 0");
+        assertEquals("[7]", response);
+
+        sendMessage("BITFIELD bf OVERFLOW FAIL SET i4 0 8");
+        response = sendMessage("BITFIELD bf GET i4 0");
+        assertEquals("[7]", response);
+
+        sendMessage("BITFIELD bf OVERFLOW FAIL SET u4 0 7");
+        response = sendMessage("BITFIELD bf GET u4 0");
+        assertEquals("[7]", response);
+
+        sendMessage("BITFIELD bf OVERFLOW FAIL SET u4 0 15");
+        response = sendMessage("BITFIELD bf GET u4 0");
+        assertEquals("[15]", response);
+
+        sendMessage("BITFIELD bf OVERFLOW FAIL SET u4 0 20");
+        response = sendMessage("BITFIELD bf GET u4 0");
+        assertEquals("[15]", response);
+    }
+
+    @Test
+    void testBitFieldCommandPart2() throws IOException {
+        String response;
+
+        sendMessage("BITFIELD bf2 OVERFLOW FAIL SET u4 0 7");
+        response = sendMessage("BITFIELD bf2 GET u4 0");
+        assertEquals("[7]", response);
+
+        sendMessage("BITFIELD bf2 OVERFLOW FAIL SET u4 0 15");
+        response = sendMessage("BITFIELD bf2 GET u4 0");
+        assertEquals("[15]", response);
+
+        sendMessage("BITFIELD bf2 OVERFLOW FAIL SET u4 0 16");
+        response = sendMessage("BITFIELD bf2 GET u4 0");
+        assertEquals("[15]", response);
+
+        // Additional assertions
+        sendMessage("BITFIELD bf2 OVERFLOW SAT SET i4 0 -8");
+        response = sendMessage("BITFIELD bf2 GET i4 0");
+        assertEquals("[-8]", response);
+
+        sendMessage("BITFIELD bf2 OVERFLOW SAT INCRBY i4 0 -1");
+        response = sendMessage("BITFIELD bf2 GET i4 0");
+        assertEquals("[-8]", response);
+
+        sendMessage("BITFIELD bf2 OVERFLOW FAIL SET i4 0 -8");
+        response = sendMessage("BITFIELD bf2 GET i4 0");
+        assertEquals("[-8]", response);
+
+        sendMessage("BITFIELD bf2 OVERFLOW FAIL INCRBY i4 0 -1");
+        response = sendMessage("BITFIELD bf2 GET i4 0");
+        assertEquals("[-8]", response);
+
+        // Test multiple subcommands
+        sendMessage("BITFIELD mykey INCRBY u2 100 1 OVERFLOW SAT INCRBY u2 102 1");
+        response = sendMessage("BITFIELD mykey GET u2 100");
+        assertEquals("[1]", response);
+        response = sendMessage("BITFIELD mykey GET u2 102");
+        assertEquals("[1]", response);
+
+        sendMessage("BITFIELD mykey INCRBY u2 100 1 OVERFLOW SAT INCRBY u2 102 1");
+        response = sendMessage("BITFIELD mykey GET u2 100");
+        assertEquals("[2]", response);
+        response = sendMessage("BITFIELD mykey GET u2 102");
+        assertEquals("[2]", response);
+
+        sendMessage("BITFIELD mykey INCRBY u2 100 1 OVERFLOW SAT INCRBY u2 102 1");
+        response = sendMessage("BITFIELD mykey GET u2 100");
+        assertEquals("[3]", response);
+        response = sendMessage("BITFIELD mykey GET u2 102");
+        assertEquals("[3]", response);
+
+        sendMessage("BITFIELD mykey INCRBY u2 100 1 OVERFLOW SAT INCRBY u2 102 1");
+        response = sendMessage("BITFIELD mykey GET u2 100");
+        assertEquals("[0]", response);
+        response = sendMessage("BITFIELD mykey GET u2 102");
+        assertEquals("[3]", response);
+    }
+
     @SuppressWarnings("squid:S2925")
     private void wait(int seconds) {
         try {
