@@ -1,5 +1,6 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
@@ -13,10 +14,10 @@ public class TsGetCommand extends AbstractCommand<Pair<Long, Double>> {
     }
 
     @Override
-    protected Pair<Long, Double> processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Pair<Long, Double> processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
 
-        TimeSeries timeSeries = store.getObject(key, TimeSeries.class);
+        TimeSeries timeSeries = store.getStoreValue(key, TimeSeries.class);
         if (timeSeries == null) {
             return new Pair<>();
         }

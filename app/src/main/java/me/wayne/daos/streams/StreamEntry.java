@@ -1,8 +1,12 @@
-package me.wayne.daos;
+package me.wayne.daos.streams;
 
 import java.util.List;
 
-public class StreamEntry {
+import javax.annotation.Nonnull;
+
+public class StreamEntry implements Comparable<StreamEntry> {
+
+    @Nonnull
     private final StreamId id;
 
     private final List<String> fieldsAndValues;
@@ -10,6 +14,10 @@ public class StreamEntry {
     public StreamEntry(StreamId id, List<String> fields) {
         this.id = id;
         this.fieldsAndValues = fields;
+    }
+
+    public StreamEntry(StreamId id) {
+        this(id, null);
     }
 
     public List<String> getFieldsAndValues() {
@@ -25,7 +33,6 @@ public class StreamEntry {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((fieldsAndValues == null) ? 0 : fieldsAndValues.hashCode());
         return result;
     }
 
@@ -35,27 +42,20 @@ public class StreamEntry {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass()) {
-            return obj instanceof String && id.equals(obj);
-        }
+        if (getClass() != obj.getClass())
+            return false;
         StreamEntry other = (StreamEntry) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (fieldsAndValues == null) {
-            if (other.fieldsAndValues != null)
-                return false;
-        } else if (!fieldsAndValues.equals(other.fieldsAndValues))
-            return false;
-        return true;
+        return id.equals(other.id);
     }
 
     @Override
     public String toString() {
-        return "[" + id.getId() + ", " + fieldsAndValues + "]";
+        return "[" + id.toString() + ", " + fieldsAndValues + "]";
     }
 
-    
+    @Override
+    public int compareTo(StreamEntry o) {
+        return id.compareTo(o.id);
+    }
+
 }

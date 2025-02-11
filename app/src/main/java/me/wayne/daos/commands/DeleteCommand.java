@@ -1,8 +1,10 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreValue;
 
 public class DeleteCommand extends AbstractCommand<Object> {
 
@@ -11,11 +13,10 @@ public class DeleteCommand extends AbstractCommand<Object> {
     }
 
     @Override
-    protected Object processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Object processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
-        Object obj = store.getStore().remove(key);
-        store.getTreeSetMembers().remove(key);
-        return obj;
+        StoreValue storeValue = store.removeStoreValue(key);
+        return storeValue != null ? storeValue.getValue() : null;
     }
     
 }

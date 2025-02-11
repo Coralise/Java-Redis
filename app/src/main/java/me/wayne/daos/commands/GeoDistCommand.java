@@ -1,10 +1,11 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
-import java.util.TreeSet;
 
 import me.wayne.InMemoryStore;
 import me.wayne.daos.GeoMember;
+import me.wayne.daos.GeoSpace;
 
 public class GeoDistCommand extends AbstractCommand<String> {
 
@@ -13,24 +14,19 @@ public class GeoDistCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         String member1 = args.get(1);
         String member2 = args.get(2);
         String unit = args.get(3) != null ? args.get(3) : "m";
 
-        TreeSet<GeoMember> geoSet = getGeoSet(store, key);
+        GeoSpace geoSet = store.getStoreValue(key, true).getValue(GeoSpace.class);
 
-        GeoMember geoMember1 = null;
-        GeoMember geoMember2 = null;
-        for (GeoMember geoMember : geoSet) {
-            if (geoMember.getMember().equals(member1)) geoMember1 = geoMember;
-            if (geoMember.getMember().equals(member2)) geoMember2 = geoMember;
-            if (geoMember1 != null && geoMember2 != null) break;
-        }
+        GeoMember geoMember1 = geoSet.floor(member1);
+        GeoMember geoMember2 = geoSet.floor(member2);
 
-        if (geoMember1 == null) throw new AssertionError("ERROR: Member " + member1 + " not found");
-        if (geoMember2 == null) throw new AssertionError("ERROR: Member " + member2 + " not found");
+        if (geoMember1 == null || !geoMember1.getMember().equals(member1)) throw new AssertionError("ERROR: Member " + member1 + " not found");
+        if (geoMember2 == null || !geoMember2.getMember().equals(member2)) throw new AssertionError("ERROR: Member " + member2 + " not found");
 
         return String.valueOf(convertFromMeters(haversine(geoMember1.getLatitude(), geoMember1.getLongitude(),
         geoMember2.getLatitude(), geoMember2.getLongitude()), unit));

@@ -3,53 +3,63 @@ package me.wayne;
 import java.util.HashMap;
 import java.util.Map;
 
-import me.wayne.daos.ConsumerGroup;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import me.wayne.daos.StoreValue;
 
 public class InMemoryStore {
 
-    private final Map<String, Object> store = new HashMap<>();
+    private final Map<String, StoreValue> store = new HashMap<>();
 
-    // Key: Sorted set key, Value: Map of member to score
-    private final Map<String, Map<String, Integer>> treeSetMembers = new HashMap<>();
-
-    // Key: Consumer group name, Value: ConsumerGroup object
-    private final Map<String, ConsumerGroup> consumerGroups = new HashMap<>();
-    // Key: Stream key, Value: Consumer group name
-    private final Map<String, String> streamConsumerMap = new HashMap<>();
-
-    public Map<String, Object> getStore() {
-        return store;
+    public StoreValue getStoreValue(String key) {
+        return getStoreValue(key, false);
     }
 
-    public Map<String, Map<String, Integer>> getTreeSetMembers() {
-        return treeSetMembers;
-    }
-    
-    public void addConsumerGroup(ConsumerGroup consumerGroup) {
-        consumerGroups.put(consumerGroup.getGroupName(), consumerGroup);
-        streamConsumerMap.put(consumerGroup.getStreamKey(), consumerGroup.getGroupName());
-    }
-
-    public ConsumerGroup getConsumerGroupByGroupName(String groupName) {
-        return consumerGroups.get(groupName);
-    }
-
-    public ConsumerGroup getConsumerGroupByStreamKey(String streamKey) {
-        return consumerGroups.get(streamConsumerMap.get(streamKey));
-    }
-
-    public boolean hasCustomerGroup(String groupName) {
-        return consumerGroups.containsKey(groupName);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T getObject(String key, Class<T> clazz) {
-        Object obj = store.get(key);
-        if (obj == null) {
-            return null;
+    public StoreValue getStoreValue(String key, boolean failWhenNotExist) {
+        if (failWhenNotExist) {
+            AssertUtil.assertTrue(store.containsKey(key), "Value does not exist for key: " + key);
         }
-        AssertUtil.assertTrue(clazz.isInstance(obj), "Value is not of the expected type (" + clazz.getSimpleName() + ")");
-        return (T) obj;
+        return store.get(key);
     }
+
+    public <T> T getStoreValue(String key, Class<T> clazz, boolean failWhenNotExist) {
+        StoreValue storeValue = getStoreValue(key, failWhenNotExist);
+        return storeValue.getValue(clazz);
+    }
+
+    @Nullable
+    public <T> T getStoreValue(String key, Class<T> clazz) {
+        StoreValue storeValue = getStoreValue(key);
+        return storeValue == null ? null : storeValue.getValue(clazz);
+    }
+
+    @Nonnull
+    public <T> T getStoreValue(String key, Class<T> clazz, T defaultValue) {
+        StoreValue storeValue = getStoreValue(key);
+        return storeValue == null ? defaultValue : storeValue.getValue(clazz);
+    }
+
+    public boolean hasStoreValue(String key) {
+        return store.containsKey(key);
+    }
+
+    public StoreValue setStoreValue(String key, Object value) {
+        return store.put(key, new StoreValue(value));
+    }
+
+    public StoreValue removeStoreValue(String key) {
+        return store.remove(key);
+    }
+
+    // @SuppressWarnings("unchecked")
+    // public <T> T getObject(String key, Class<T> clazz) {
+    //     Object obj = store.get(key);
+    //     if (obj == null) {
+    //         return null;
+    //     }
+    //     AssertUtil.assertTrue(clazz.isInstance(obj), "Value is not of the expected type (" + clazz.getSimpleName() + ")");
+    //     return (T) obj;
+    // }
 
 }

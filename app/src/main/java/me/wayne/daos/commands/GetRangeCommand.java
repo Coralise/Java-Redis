@@ -1,8 +1,8 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
-import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
 
 public class GetRangeCommand extends AbstractCommand<String> {
@@ -12,14 +12,12 @@ public class GetRangeCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         int start = Integer.parseInt(args.get(1));
         int end = Integer.parseInt(args.get(2));
         
-        AssertUtil.assertTrue(store.getStore().containsKey(key), KEY_DOESNT_EXIST_MSG);
-        AssertUtil.assertTrue(store.getStore().get(key) instanceof String, NON_STRING_ERROR_MSG);
-        String value = (String) store.getStore().get(key);
+        String value = store.getStoreValue(key, true).getValue(String.class);
         return value.substring(start, end + 1);
     }
     

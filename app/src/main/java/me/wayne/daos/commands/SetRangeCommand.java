@@ -1,9 +1,10 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
-import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreValue;
 
 public class SetRangeCommand extends AbstractCommand<String> {
 
@@ -12,16 +13,15 @@ public class SetRangeCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         int offset = Integer.parseInt(args.get(1));
         String value = args.get(2);
-        AssertUtil.assertTrue(store.getStore().containsKey(key), KEY_DOESNT_EXIST_MSG);
-        AssertUtil.assertTrue(store.getStore().get(key) instanceof String, NON_STRING_ERROR_MSG);
-        String existingValue = (String) store.getStore().get(key);
+        StoreValue storeValue = store.getStoreValue(key, true);
+        String existingValue = storeValue.getValue(String.class);
         StringBuilder newValue = new StringBuilder(existingValue);
         newValue.replace(offset, offset + value.length(), value);
-        store.getStore().put(key, newValue.toString());
+        store.setStoreValue(key, newValue.toString());
         return newValue.toString();
     }
     

@@ -1,9 +1,11 @@
 package me.wayne.daos.commands;
 
-import java.util.ArrayList;
+import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreList;
+import me.wayne.daos.StoreValue;
 
 public class LPushCommand extends AbstractCommand<Integer> {
 
@@ -12,12 +14,13 @@ public class LPushCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         List<String> values = args.subList(1, args.size());
-        ArrayList<String> list = getList(store, key);
+        StoreValue storeValue = store.getStoreValue(key);
+        StoreList list = storeValue == null ? new StoreList() : storeValue.getValue(StoreList.class);
         for (String value : values) list.addFirst(value);
-        store.getStore().put(key, list);
+        store.setStoreValue(key, list);
         return list.size();
     }
     

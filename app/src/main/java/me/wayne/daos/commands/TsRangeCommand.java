@@ -1,5 +1,6 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,12 +19,12 @@ public class TsRangeCommand extends AbstractCommand<List<Pair<Long, Double>>> {
 
     @SuppressWarnings("all")
     @Override
-    protected List<Pair<Long, Double>> processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected List<Pair<Long, Double>> processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         long start = args.get(1).equals("-") ? 0 : Long.parseLong(args.get(1));
         long end = args.get(2).equals("+") ? Long.MAX_VALUE : Long.parseLong(args.get(2));
 
-        TimeSeries timeSeries = store.getObject(key, TimeSeries.class);
+        TimeSeries timeSeries = store.getStoreValue(key, TimeSeries.class);
         if (timeSeries == null) return new ArrayList<>();
 
         Map<String, Object> options = parseOptions(args.subList(3, args.size()));

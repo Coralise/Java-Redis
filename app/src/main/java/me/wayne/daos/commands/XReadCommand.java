@@ -1,65 +1,54 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 import me.wayne.InMemoryStore;
-import me.wayne.daos.StreamEntry;
+import me.wayne.daos.streams.StoreStream;
+import me.wayne.daos.streams.StreamEntry;
+import me.wayne.daos.streams.StreamId;
 
-public class XReadCommand extends AbstractCommand<Map<String, List<StreamEntry>>> {
+public class XReadCommand extends AbstractCommand<Map<String, SortedSet<StreamEntry>>> {
 
     XRangeCommand xRange = new XRangeCommand();
 
     public XReadCommand() {
-        super("XREAD", 3);
+        super("XREAD", 3, false);
     }
 
     @SuppressWarnings("all")
     @Override
-    protected Map<String, List<StreamEntry>> processCommand(Thread thread, InMemoryStore store, List<String> args) {
-        LinkedHashMap<String, List<StreamEntry>> streams = new LinkedHashMap<>();
+    protected Map<String, SortedSet<StreamEntry>> processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
 
         Map<String, Object> parsedCommand = parseXReadCommand(args);
         List<String> keys = (List<String>) parsedCommand.get("keys");
         List<String> ids = (List<String>) parsedCommand.get("ids");
         int count = (int) parsedCommand.get("count");
         long blockTimeout = (long) parsedCommand.get("block");
-        
-        if (blockTimeout <= 0) {
-            for (int i = 0;i < keys.size();i++) {
-                String key = keys.get(i);
-                String id = ids.get(i);
-                List<StreamEntry> range = xRange.processCommand(thread, store, List.of(key, "(" + id, "+", "COUNT", String.valueOf(count)));
-                streams.put(key, range);
-            }
-        } else {
-            long startTime = System.currentTimeMillis();
-            boolean entriesFound = false;
-            while (!entriesFound && (System.currentTimeMillis() - startTime) < blockTimeout) {
-                for (int i = 0; i < keys.size(); i++) {
-                    String key = keys.get(i);
-                    String id = ids.get(i);
-                    List<StreamEntry> range = xRange.processCommand(thread, store, List.of(key, "(" + id, "+", "COUNT", String.valueOf(count)));
-                    if (!range.isEmpty()) {
-                        streams.put(key, range);
-                        entriesFound = true;
-                    }
-                }
-        
-                if (!entriesFound) {
-                    try {
-                        Thread.sleep(100); 
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        break;
-                    }
-                }
+
+        LinkedHashMap<String, SortedSet<StreamEntry>> streams = new LinkedHashMap<>();
+        for (int i = 0;i < keys.size();i++) {
+            String key = keys.get(i);
+            String id = ids.get(i);
+
+            StoreStream storeStream = store.getStoreValue(key, StoreStream.class, true);
+
+            if (id.equals("$")) id = storeStream.isEmpty() ? "0-0" : storeStream.getLastEntry().getId().toString();
+
+            if (blockTimeout <= 0) {
+                streams.put(key, storeStream.read(out, id, count, null));
+            } else {
+                storeStream.read(out, id, count, blockTimeout);
             }
         }
-        return streams;
+
+        if (blockTimeout <= 0) out.println(streams);
+        return null;
     }
 
     public Map<String, Object> parseXReadCommand(List<String> tokens) {
@@ -81,7 +70,7 @@ public class XReadCommand extends AbstractCommand<Map<String, List<StreamEntry>>
                     break;
                 case "STREAMS":
                     index++;
-                    while (index < tokens.size() && !tokens.get(index).matches("\\d+-\\d+")) {
+                    while (index < tokens.size() && !StreamId.isValidId(tokens.get(index)) && !tokens.get(index).equals("$")) {
                         keys.add(tokens.get(index++));
                     }
                     while (index < tokens.size()) {

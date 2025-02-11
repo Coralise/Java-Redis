@@ -58,7 +58,7 @@ class CommandHandlerTest {
         response = sendMessage("SET key2 \"value 2\" anotherArg");
         assertEquals("Unknown option: ANOTHERARG", response);
         response = sendMessage("SET key2");
-        assertEquals("ERROR: Invalid number of arguments", response);
+        assertEquals("ERR Invalid number of arguments", response);
     }
 
     @Test
@@ -248,54 +248,52 @@ class CommandHandlerTest {
 
     @Test
     void testXaddAndXrangeComplexCommand() throws IOException {
-        String id1 = sendMessage("XADD mystream * field1 value1");
-        wait(1);
-        String id2 = sendMessage("XADD mystream * field2 value2");
-        wait(1);
-        String id3 = sendMessage("XADD mystream * field3 value3");
-        wait(1);
-        String id4 = sendMessage("XADD mystream * field4 value4");
+        String id1 = sendMessage("XADD mystream 1000 field1 value1");
+        String id2 = sendMessage("XADD mystream 1000 field2 value2");
+        String id3 = sendMessage("XADD mystream 2000 field3 value3");
+        String id4 = sendMessage("XADD mystream 3000 field4 value4");
+        String id5 = sendMessage("XADD mystream 4000 field5 value5");
 
-        String response = sendMessage("XRANGE mystream - + COUNT 2");
-        assertEquals(2, response.split("],").length);
+        String response = sendMessage("XRANGE mystream - + COUNT 3");
+        assertEquals("[[1000-0, [field1, value1]], [1000-1, [field2, value2]], [2000-0, [field3, value3]]]", response);
 
         response = sendMessage("XRANGE mystream - +");
-        assertEquals(4, response.split("],").length);
+        assertEquals(5, response.split("],").length);
 
         response = sendMessage("XRANGE mystream - + COUNT 1");
         assertEquals(1, response.split("],").length);
 
-        response = sendMessage("XRANGE mystream " + id1 + "-0 " + id2 + "-0");
+        response = sendMessage("XRANGE mystream " + id1 + " " + id2);
         assertEquals("[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]]]", response);
 
-        response = sendMessage("XRANGE mystream " + id3 + "-0 " + id4 + "-0");
+        response = sendMessage("XRANGE mystream " + id3 + " " + id4);
         assertEquals("[[" + id3 + ", [field3, value3]], [" + id4 + ", [field4, value4]]]", response);
         
-        response = sendMessage("XRANGE mystream " + id2 + "-0 " + id4 + "-0 COUNT 2");
+        response = sendMessage("XRANGE mystream " + id2 + " " + id4 + " COUNT 2");
         assertEquals("[[" + id2 + ", [field2, value2]], [" + id3 + ", [field3, value3]]]", response);
         assertEquals(2, response.split("],").length);
 
         // Interchange between -, +, IDs, and IDs not in the stream
-        response = sendMessage("XRANGE mystream - " + id2 + "-0");
+        response = sendMessage("XRANGE mystream - " + id2);
         assertEquals("[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]]]", response);
 
-        response = sendMessage("XRANGE mystream " + id3 + "-0 +");
-        assertEquals("[[" + id3 + ", [field3, value3]], [" + id4 + ", [field4, value4]]]", response);
+        response = sendMessage("XRANGE mystream " + id3 + " +");
+        assertEquals("[[" + id3 + ", [field3, value3]], [" + id4 + ", [field4, value4]], [" + id5 + ", [field5, value5]]]", response);
 
-        response = sendMessage("XRANGE mystream 0-0 " + id2 + "-0");
+        response = sendMessage("XRANGE mystream 0-0 " + id2);
         assertEquals("[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]]]", response);
 
-        response = sendMessage("XRANGE mystream " + id3 + "-0 9999999999999-0");
-        assertEquals("[[" + id3 + ", [field3, value3]], [" + id4 + ", [field4, value4]]]", response);
+        response = sendMessage("XRANGE mystream " + id3 + " 9999999999999-0");
+        assertEquals("[[" + id3 + ", [field3, value3]], [" + id4 + ", [field4, value4]], [" + id5 + ", [field5, value5]]]", response);
 
         response = sendMessage("XRANGE mystream 0-0 9999999999999-0");
-        assertEquals(4, response.split("],").length);
+        assertEquals(5, response.split("],").length);
 
         // Using IDs with (
-        response = sendMessage("XRANGE mystream (" + id1 + "-0 " + id3 + "-0");
+        response = sendMessage("XRANGE mystream (" + id1 + " " + id3);
         assertEquals("[[" + id2 + ", [field2, value2]], [" + id3 + ", [field3, value3]]]", response);
 
-        response = sendMessage("XRANGE mystream " + id1 + "-0 (" + id4 + "-0");
+        response = sendMessage("XRANGE mystream " + id1 + " (" + id4);
         assertEquals("[[" + id1 + ", [field1, value1]], [" + id2 + ", [field2, value2]], [" + id3 + ", [field3, value3]]]", response);
     }
 

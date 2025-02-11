@@ -1,13 +1,15 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import me.wayne.InMemoryStore;
 import me.wayne.daos.ScoreMember;
+import me.wayne.daos.StoreSortedSet;
+import me.wayne.daos.StoreValue;
 
 public class ZRangeCommand extends AbstractCommand<List<String>> {
 
@@ -16,7 +18,7 @@ public class ZRangeCommand extends AbstractCommand<List<String>> {
     }
 
     @Override
-    protected List<String> processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected List<String> processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         int start = Integer.parseInt(args.get(1));
         int stop = Integer.parseInt(args.get(2));
@@ -24,7 +26,8 @@ public class ZRangeCommand extends AbstractCommand<List<String>> {
         ZRangeArguments zRangeArguments = parseZRangeArguments(args);
         Set<String> options = zRangeArguments.options;
 
-        TreeSet<ScoreMember> treeSet = getTreeSet(store, key);
+        StoreValue storeValue = store.getStoreValue(key);
+        StoreSortedSet treeSet = storeValue != null ? storeValue.getValue(StoreSortedSet.class) : new StoreSortedSet();
         List<String> range = new ArrayList<>();
         int i = 0;
         while (start < 0) start += treeSet.size();

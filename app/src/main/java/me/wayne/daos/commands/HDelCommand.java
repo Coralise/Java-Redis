@@ -1,9 +1,10 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreMap;
 
 public class HDelCommand extends AbstractCommand<Integer> {
 
@@ -12,14 +13,14 @@ public class HDelCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         List<String> fields = args.subList(1, args.size());
-        if (!store.getStore().containsKey(key)) return 0;
-        Map<String, String> hashMap = getMap(store, key);
+        StoreMap hashMap = store.getStoreValue(key, StoreMap.class);
+        if (hashMap == null) return 0;
         int removed = 0;
         for (String field : fields) if (hashMap.remove(field) != null) removed++;
-        store.getStore().put(key, hashMap);
+        store.setStoreValue(key, hashMap);
         return removed;
     }
     

@@ -4,8 +4,8 @@ import me.wayne.AssertUtil;
 
 public class GeoMember implements Comparable<GeoMember> {
 
-    private final double longitude;
-    private final double latitude;
+    private final Double longitude;
+    private final Double latitude;
     private final String member;
 
     public GeoMember(Double longitude, Double latitude, String member) {
@@ -16,11 +16,17 @@ public class GeoMember implements Comparable<GeoMember> {
         this.member = member;
     }
 
-    public double getLongitude() {
+    public GeoMember(String member) {
+        longitude = null;
+        latitude = null;
+        this.member = member;
+    }
+
+    public Double getLongitude() {
         return longitude;
     }
 
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
@@ -64,11 +70,15 @@ public class GeoMember implements Comparable<GeoMember> {
 
     @Override
     public int compareTo(GeoMember o) {
-        int latCompare = Double.compare(this.latitude, o.latitude);
-        if (latCompare != 0) return latCompare;
+        if (latitude != null && o.latitude != null) {
+            int latCompare = Double.compare(this.latitude, o.latitude);
+            if (latCompare != 0) return latCompare;
+        }
 
-        int lonCompare = Double.compare(this.longitude, o.longitude);
-        if (lonCompare != 0) return lonCompare;
+        if (longitude != null && o.longitude != null) {
+            int lonCompare = Double.compare(this.longitude, o.longitude);
+            if (lonCompare != 0) return lonCompare;
+        }
 
         return this.member.compareTo(o.member);
     }

@@ -1,10 +1,11 @@
 package me.wayne.daos.commands;
 
-import java.util.ArrayList;
+import java.io.PrintWriter;
 import java.util.List;
 
-import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreList;
+import me.wayne.daos.StoreValue;
 
 public class LSetCommand extends AbstractCommand<String> {
 
@@ -12,19 +13,17 @@ public class LSetCommand extends AbstractCommand<String> {
         super("LSET", 3, 3);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         int index = Integer.parseInt(args.get(1));
         String value = args.get(2);
-        AssertUtil.assertTrue(store.getStore().containsKey(key), KEY_DOESNT_EXIST_MSG);
-        AssertUtil.assertTrue(store.getStore().get(key) instanceof List, NON_LIST_ERROR_MSG);
-        ArrayList<String> list = new ArrayList<>((List<String>) store.getStore().get(key));
+        StoreValue storeValue = store.getStoreValue(key, true);
+        StoreList list = storeValue.getValue(StoreList.class);
         while (index < 0) index += list.size();
         if (index >= list.size()) return INDEX_OUT_OF_RANGE_MSG;
         list.set(index, value); 
-        store.getStore().put(key, list);
+        store.setStoreValue(key, list);
         return OK_RESPONSE;
     }
     

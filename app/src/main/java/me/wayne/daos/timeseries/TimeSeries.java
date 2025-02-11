@@ -144,9 +144,7 @@ public class TimeSeries {
                     double value = entry.getValue();
                     bucket.add(timestamp, value);
                 }
-                if (bucket.hasEntries()) {
-                    aggregated.add(bucket);
-                } else if (includeEmptyBuckets) {
+                if (bucket.hasEntries() || includeEmptyBuckets) {
                     aggregated.add(bucket);
                 }
 

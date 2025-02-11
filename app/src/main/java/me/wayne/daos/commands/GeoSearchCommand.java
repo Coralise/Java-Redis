@@ -1,5 +1,6 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.logging.Level;
 
 import me.wayne.InMemoryStore;
 import me.wayne.daos.GeoMember;
+import me.wayne.daos.GeoSpace;
 
 public class GeoSearchCommand extends AbstractCommand<List<List<Object>>> {
 
@@ -17,7 +19,7 @@ public class GeoSearchCommand extends AbstractCommand<List<List<Object>>> {
     }
 
     @Override
-    protected List<List<Object>> processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected List<List<Object>> processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         logger.log(Level.INFO, "Processing GEOSEARCH command with arguments: {0}", args);
 
         Map<String, Object> parsedArgs = parseArgs(args);
@@ -36,17 +38,14 @@ public class GeoSearchCommand extends AbstractCommand<List<List<Object>>> {
         boolean withDist = (boolean) parsedArgs.getOrDefault("withDist", false);
         boolean withHash = (boolean) parsedArgs.getOrDefault("withHash", false);
 
-        TreeSet<GeoMember> geoSet = getGeoSet(store, key);
+        GeoSpace geoSet = store.getStoreValue(key, true).getValue(GeoSpace.class);
 
         double fromLongitude;
         double fromLatitude;
         if (fromMember != null) { // FROMMEMBER
             logger.log(Level.INFO, "Using FROMMEMBER: {0}", fromMember);
-            GeoMember fromGeoMember = geoSet.stream()
-                .filter(geoMember -> geoMember.getMember().equals(fromMember))
-                .findFirst()
-                .orElse(null);
-            if (fromGeoMember == null) throw new AssertionError("ERR: Specified member not found");
+            GeoMember fromGeoMember = geoSet.floor(fromMember);
+            if (fromGeoMember == null || !fromGeoMember.getMember().equals(fromMember)) throw new AssertionError("ERR: Specified member not found: " + fromMember);
             fromLongitude = fromGeoMember.getLongitude();
             fromLatitude = fromGeoMember.getLatitude();
         } else { // FROMLONLAT

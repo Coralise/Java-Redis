@@ -1,11 +1,13 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 
 import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreValue;
 
 public class SetBitCommand extends AbstractCommand<Integer> {
 
@@ -14,7 +16,7 @@ public class SetBitCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         int offset = Integer.parseInt(args.get(1));
         int bitValue = Integer.parseInt(args.get(2));
@@ -22,10 +24,8 @@ public class SetBitCommand extends AbstractCommand<Integer> {
         AssertUtil.assertTrue(bitValue == 0 || bitValue == 1, "ERROR: bit value must be 0 or 1");
 
         byte[] bytes;
-        Object value = store.getStore().get(key);
-        if (value == null) bytes = new byte[(offset / 8) + 1];
-        else if (value instanceof String val) bytes = val.getBytes();
-        else throw new AssertionError("ERROR: value is not a valid bitset");
+        StoreValue storeValue = store.getStoreValue(key);
+        bytes = storeValue == null ? new byte[(offset / 8) + 1] : storeValue.getValue(String.class).getBytes();
 
         logger.log(Level.INFO, "BitSet String: {0}", new String(bytes));
         logger.log(Level.INFO, "BitSet: {0}", bitSetToBinaryString(bytes));
@@ -33,7 +33,7 @@ public class SetBitCommand extends AbstractCommand<Integer> {
         bytes = setBit(bytes, offset, bitValue);
         logger.log(Level.INFO, "BitSet: {0}", bitSetToBinaryString(bytes));
 
-        store.getStore().put(key, new String(bytes));
+        store.setStoreValue(key, new String(bytes));
         return previousBit;
     }
     

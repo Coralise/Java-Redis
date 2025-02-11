@@ -1,8 +1,8 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
-import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
 
 public class StrLenCommand extends AbstractCommand<Integer> {
@@ -12,11 +12,9 @@ public class StrLenCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
-        AssertUtil.assertTrue(store.getStore().containsKey(key), KEY_DOESNT_EXIST_MSG);
-        AssertUtil.assertTrue(store.getStore().get(key) instanceof CharSequence, "Value is not of type CharSequence");
-        return ((CharSequence) store.getStore().get(key)).length();
+        return store.getStoreValue(key, true).getValue(String.class).length();
     }
     
 }

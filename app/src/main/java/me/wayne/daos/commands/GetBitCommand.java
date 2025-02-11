@@ -1,5 +1,6 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
@@ -11,11 +12,11 @@ public class GetBitCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         int offset = Integer.parseInt(args.get(1));
 
-        String value = (String) store.getStore().get(key);
+        String value = store.getStoreValue(key, String.class);
         if (value == null) return 0;
 
         int byteIndex = offset / 8;

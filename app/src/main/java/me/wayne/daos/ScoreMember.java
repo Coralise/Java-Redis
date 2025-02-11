@@ -10,6 +10,10 @@ public class ScoreMember implements Comparable<ScoreMember> {
         this.member = member;
     }
 
+    public ScoreMember(String member) {
+        this(null, member);
+    }
+
     public Integer getScore() {
         return score;
     }
@@ -51,11 +55,8 @@ public class ScoreMember implements Comparable<ScoreMember> {
 
     @Override
     public int compareTo(ScoreMember o) {
-        int result = this.score.compareTo(o.score);
-        if (result == 0) {
-            result = this.member.compareTo(o.member);
-        }
-        return result;
+        if (o.score != null && score != null && score.compareTo(o.score) != 0) return score.compareTo(o.score);
+        return member.compareTo(o.member);
     }
 
 }

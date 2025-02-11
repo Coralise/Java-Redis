@@ -1,9 +1,10 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
-import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreValue;
 
 public class AppendCommand extends AbstractCommand<String> {
 
@@ -12,13 +13,12 @@ public class AppendCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         String value = args.get(1);
-        AssertUtil.assertTrue(store.getStore().containsKey(key), KEY_DOESNT_EXIST_MSG);
-        AssertUtil.assertTrue(store.getStore().get(key) instanceof CharSequence, "Existing value is not of type CharSequence");
-        AssertUtil.assertTrue(value instanceof CharSequence, "Value to append is not of type CharSequence");
-        store.getStore().put(key, store.getStore().get(key) + value);
+        StoreValue storeValue = store.getStoreValue(key, true);
+        String newValue = storeValue.getValue(String.class) + value;
+        store.setStoreValue(key, newValue);
         return OK_RESPONSE;
     }
     

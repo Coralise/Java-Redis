@@ -1,5 +1,6 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
@@ -12,21 +13,18 @@ public class JsonSetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         String path = args.get(1);
         String value = args.get(2);
         boolean nx = args.size() == 4 && args.get(3).equalsIgnoreCase("NX");
         boolean xx = args.size() == 4 && args.get(3).equalsIgnoreCase("XX");
 
-        RedisJson redisJson = store.getObject(key, RedisJson.class);
-        if (redisJson == null) {
-            redisJson = new RedisJson();
-        }
+        RedisJson redisJson = store.getStoreValue(key, RedisJson.class, new RedisJson());
 
         String response = redisJson.set(path, value, xx, nx) ? OK_RESPONSE : null;
 
-        store.getStore().put(key, redisJson);
+        store.setStoreValue(key, redisJson);
         return response;
     }
     

@@ -1,10 +1,12 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreValue;
 
 public class BitOpCommand extends AbstractCommand<Integer> {
 
@@ -13,7 +15,7 @@ public class BitOpCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
 
         String operation = args.get(0).toUpperCase();
         String destKey = args.get(1);
@@ -22,13 +24,13 @@ public class BitOpCommand extends AbstractCommand<Integer> {
         if (operation.equals("NOT")) {
             if (keys.size() != 1) throw new IllegalArgumentException("ERROR: BITOP NOT takes only one input key");
             String key = keys.get(0);
-            if (!store.getStore().containsKey(key) || !(store.getStore().get(key) instanceof String)) throw new AssertionError("ERROR: Key not found or value is not a string");
-            byte[] bytes = ((String) store.getStore().get(key)).getBytes();
+            StoreValue storeValue = store.getStoreValue(key, true);
+            byte[] bytes = storeValue.getValue(String.class).getBytes();
             int[] bits = toBitArray(bytes);
             int[] reversedBits = new int[bits.length];
             for (int i = 0; i < bits.length; i++) reversedBits[i] = bits[i] == 0 ? 1 : 0;
             byte[] reversedBytes = bitsToBytes(reversedBits);
-            store.getStore().put(destKey, new String(reversedBytes));
+            store.setStoreValue(destKey, new String(reversedBytes));
             return reversedBytes.length;
         }
 
@@ -36,8 +38,9 @@ public class BitOpCommand extends AbstractCommand<Integer> {
         ArrayList<int[]> bitArrays = new ArrayList<>();
 
         for (String key : keys) {
-            if (!store.getStore().containsKey(key) || !(store.getStore().get(key) instanceof String)) continue;
-            byte[] bytes = ((String) store.getStore().get(key)).getBytes();
+            StoreValue storeValue = store.getStoreValue(key);
+            if (storeValue == null || !storeValue.isInstanceOfClass(String.class)) continue;
+            byte[] bytes = storeValue.getValue(String.class).getBytes();
             int[] bits = toBitArray(bytes);
             if (bits.length > combinedBits.length) {
                 combinedBits = Arrays.copyOf(combinedBits, bits.length);
@@ -70,9 +73,8 @@ public class BitOpCommand extends AbstractCommand<Integer> {
         }
 
         byte[] combinedBytes = bitsToBytes(combinedBits);
-        store.getStore().put(destKey, new String(combinedBytes));
+        store.setStoreValue(destKey, new String(combinedBytes));
         return combinedBytes.length;
-
     }
 
     public int[] toBitArray(byte[] byteArray) {

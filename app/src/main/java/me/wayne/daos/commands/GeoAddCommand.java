@@ -1,13 +1,14 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.logging.Level;
 
 import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
 import me.wayne.daos.GeoMember;
+import me.wayne.daos.GeoSpace;
 
 public class GeoAddCommand extends AbstractCommand<Integer> {
 
@@ -16,7 +17,7 @@ public class GeoAddCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
 
         GeoAddOptions options = parseArgs(args);
         String key = options.getKey();
@@ -27,7 +28,7 @@ public class GeoAddCommand extends AbstractCommand<Integer> {
         
         AssertUtil.assertTrue(!(nx && xx), "ERROR: NX and XX options are mutually exclusive");
 
-        TreeSet<GeoMember> geoSet = getGeoSet(store, key);
+        GeoSpace geoSet = store.getStoreValue(key, GeoSpace.class, new GeoSpace());
         logger.log(Level.INFO, "GeoSet Size: {0}", geoSet.size());
 
         int updated = 0;
@@ -51,7 +52,7 @@ public class GeoAddCommand extends AbstractCommand<Integer> {
             }
         }
 
-        store.getStore().put(key, geoSet);
+        store.setStoreValue(key, geoSet);
         
         return updated;
     }

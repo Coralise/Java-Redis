@@ -1,9 +1,10 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreMap;
 
 public class HGetCommand extends AbstractCommand<String> {
 
@@ -12,11 +13,11 @@ public class HGetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         String field = args.get(1);
-        if (!store.getStore().containsKey(key)) return null;
-        Map<String, String> hashMap = getMap(store, key);
+        StoreMap hashMap = store.getStoreValue(key, StoreMap.class);
+        if (hashMap == null) return null;
         return hashMap.get(field);
     }
     

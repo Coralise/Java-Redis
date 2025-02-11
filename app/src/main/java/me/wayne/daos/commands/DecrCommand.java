@@ -1,8 +1,8 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
-import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
 
 public class DecrCommand extends AbstractCommand<String> {
@@ -12,11 +12,10 @@ public class DecrCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
-        AssertUtil.assertTrue(store.getStore().containsKey(key), KEY_DOESNT_EXIST_MSG);
-        int intValue = getValueAsInteger(store.getStore().get(key));
-        store.getStore().put(key, intValue - 1);
+        int intValue = getValueAsInteger(store.getStoreValue(key, Object.class));
+        store.setStoreValue(key, intValue - 1);
         return OK_RESPONSE;
     }
     

@@ -83,7 +83,7 @@ public class CommandHandler implements Runnable {
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());
-    private static final String ERROR_UNKOWN_COMMAND = "ERROR: Unkown Command";
+    private static final String ERROR_UNKOWN_COMMAND = "ERR Unkown Command";
     private Socket clientSocket;
     private InMemoryStore dataStore;
 
@@ -101,14 +101,20 @@ public class CommandHandler implements Runnable {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
 
+            // out.println("----------------------------");
+            // out.println("Connected to Jedis. Welcome!");
+            // out.println("----------------------------");
+            // out.println();
+            // out.print(">> ");
+            // out.flush();
+
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 AbstractCommand<?> command = commands.get(inputLine.split(" ")[0].toUpperCase());
                 if (command != null) {
                     final String fInputLine = inputLine;
                     try {
-                        Object result = command.executeCommand(Thread.currentThread(), dataStore, fInputLine);
-                        out.println(result);
+                        command.executeCommand(out, dataStore, fInputLine);
                     } catch (AssertionError | Exception e) {
                         logger.log(Level.WARNING, e.getMessage());
                         out.println(e.getMessage());
@@ -117,6 +123,8 @@ public class CommandHandler implements Runnable {
                 } else {
                     out.println(ERROR_UNKOWN_COMMAND);
                 }
+                // out.print(">> ");
+                // out.flush();
             }
         } catch (IOException e) {
             e.printStackTrace();

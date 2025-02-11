@@ -1,5 +1,6 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ public class SetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
 
         Map<String, Object> parsedArgs = parseArgs(args);
         String key = (String) parsedArgs.get("key");
@@ -37,11 +38,11 @@ public class SetCommand extends AbstractCommand<String> {
         if (pxat != null) ttlOptionsCount++;
         AssertUtil.assertTrue(ttlOptionsCount <= 1, "ERROR: Only one of KEEPTTL, EX, PX, EXAT, or PXAT can be specified");
 
-        Object oldValue = store.getStore().get(key);
+        Object oldValue = store.getStoreValue(key, Object.class);
         if (oldValue != null && nx) return null;
         if (oldValue == null && xx) return null;
 
-        store.getStore().put(key, value);
+        store.setStoreValue(key, value);
         return get ? (String) oldValue : OK_RESPONSE;
     }
 

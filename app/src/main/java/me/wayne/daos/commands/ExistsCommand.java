@@ -1,5 +1,6 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
@@ -11,9 +12,9 @@ public class ExistsCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         int count = 0;
-        for (String key : args) if (store.getStore().containsKey(key)) count++;
+        for (String key : args) if (store.hasStoreValue(key)) count++;
         return count;
     }
     

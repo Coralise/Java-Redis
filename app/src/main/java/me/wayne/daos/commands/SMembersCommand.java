@@ -1,8 +1,10 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreSet;
 
 public class SMembersCommand extends AbstractCommand<String> {
 
@@ -11,9 +13,11 @@ public class SMembersCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
-        return getHashSet(store, key).toString();
+        StoreSet storeValue = store.getStoreValue(key, StoreSet.class);
+        if (storeValue == null) return null;
+        return storeValue.toString();
     }
     
 }

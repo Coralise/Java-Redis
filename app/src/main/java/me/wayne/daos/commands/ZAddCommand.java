@@ -1,14 +1,16 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
 import me.wayne.daos.ScoreMember;
+import me.wayne.daos.StoreSortedSet;
+import me.wayne.daos.StoreValue;
 
 public class ZAddCommand extends AbstractCommand<Integer> {
 
@@ -17,11 +19,12 @@ public class ZAddCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         ZAddArguments zAddArguments = parseZAddArguments(args.subList(1, args.size()));
 
-        TreeSet<ScoreMember> treeSet = getTreeSet(store, key);
+        StoreValue storeValue = store.getStoreValue(key);
+        StoreSortedSet treeSet = storeValue != null ? storeValue.getValue(StoreSortedSet.class) : new StoreSortedSet();
 
         boolean nx = zAddArguments.options.contains("NX");
         boolean xx = zAddArguments.options.contains("XX");
@@ -41,17 +44,17 @@ public class ZAddCommand extends AbstractCommand<Integer> {
         for (int i = 1; i < scoresAndMembers.size(); i += 2) {
             int score = parseScore(scoresAndMembers.get(i-1));
             ScoreMember scoreMember = new ScoreMember(score, scoresAndMembers.get(i));
-            updated += processScoreMember(store, key, treeSet, nx, xx, gt, lt, ch, incr, scoreMember);
+            updated += processScoreMember(treeSet, nx, xx, gt, lt, ch, incr, scoreMember);
         }
 
-        store.getStore().put(key, treeSet);
+        store.setStoreValue(key, treeSet);
 
         return updated;
     }
 
-    private int processScoreMember(InMemoryStore store, String key, TreeSet<ScoreMember> treeSet, boolean nx, boolean xx, boolean gt, boolean lt, boolean ch, boolean incr, ScoreMember scoreMember) {
-        ScoreMember existingScoreMember = getScoreMember(store, key, scoreMember.getMember());
-        if (existingScoreMember != null) {
+    private int processScoreMember(StoreSortedSet treeSet, boolean nx, boolean xx, boolean gt, boolean lt, boolean ch, boolean incr, ScoreMember scoreMember) {
+        if (treeSet.contains(new ScoreMember(scoreMember.getMember()))) {
+            ScoreMember existingScoreMember = treeSet.floor(new ScoreMember(scoreMember.getMember()));
             if (nx) return 0;
             if (gt && scoreMember.getScore() <= existingScoreMember.getScore()) return 0;
             if (lt && scoreMember.getScore() >= existingScoreMember.getScore()) return 0;
@@ -61,12 +64,10 @@ public class ZAddCommand extends AbstractCommand<Integer> {
 
             treeSet.remove(existingScoreMember);
             treeSet.add(scoreMember);
-            addToTreeSetMembers(store, key, scoreMember);
             return ch ? 1 : 0;
         } else {
             if (xx) return 0;
             treeSet.add(scoreMember);
-            addToTreeSetMembers(store, key, scoreMember);
             return 1;
         }
     }

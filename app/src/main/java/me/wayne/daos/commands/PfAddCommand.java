@@ -1,8 +1,10 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreValue;
 import me.wayne.daos.probabilistic.HyperLogLog;
 
 public class PfAddCommand extends AbstractCommand<Integer> {
@@ -12,12 +14,12 @@ public class PfAddCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         List<String> values = args.subList(1, args.size());
 
-        HyperLogLog hyperLogLog = store.getObject(key, HyperLogLog.class);
-        if (hyperLogLog == null) hyperLogLog = new HyperLogLog(15);
+        StoreValue storeValue = store.getStoreValue(key);
+        HyperLogLog hyperLogLog = storeValue == null ? new HyperLogLog(15) : storeValue.getValue(HyperLogLog.class);
 
         boolean updated = false;
         double oldEstimate = hyperLogLog.estimate();
@@ -26,7 +28,7 @@ public class PfAddCommand extends AbstractCommand<Integer> {
             if (!updated) updated = oldEstimate != hyperLogLog.estimate();
         }
 
-        store.getStore().put(key, hyperLogLog);
+        store.setStoreValue(key, hyperLogLog);
         return updated ? 1 : 0;
     }
     

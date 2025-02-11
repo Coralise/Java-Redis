@@ -1,8 +1,10 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
+import me.wayne.daos.StoreValue;
 import me.wayne.daos.probabilistic.HyperLogLog;
 
 public class PfCountCommand extends AbstractCommand<Integer> {
@@ -12,8 +14,11 @@ public class PfCountCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
-        List<HyperLogLog> hyperLogLogs = args.subList(0, args.size()).stream().map(key -> store.getObject(key, HyperLogLog.class)).toList();
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+        List<HyperLogLog> hyperLogLogs = args.subList(0, args.size()).stream().map(key -> {
+            StoreValue storeValue = store.getStoreValue(key);
+            return storeValue == null ? new HyperLogLog(15) : storeValue.getValue(HyperLogLog.class);
+        }).toList();
 
         if (hyperLogLogs.size() == 1) return (int) hyperLogLogs.get(0).estimate();
         

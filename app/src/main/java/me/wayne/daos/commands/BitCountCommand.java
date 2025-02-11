@@ -1,5 +1,6 @@
 package me.wayne.daos.commands;
 
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,9 +13,9 @@ public class BitCountCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(Thread thread, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
-        String value = (String) store.getStore().get(key);
+        String value = store.getStoreValue(key, String.class);
         if (value == null || value.isEmpty()) return 0;
         int start = 0;
         int end = value.length() - 1;
