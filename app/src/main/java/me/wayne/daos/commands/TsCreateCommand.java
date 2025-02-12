@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.timeseries.DuplicatePolicy;
 import me.wayne.daos.timeseries.TimeSeries;
@@ -17,7 +16,7 @@ public class TsCreateCommand extends AbstractCommand<String> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected String processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected String processCommand(StorePrintWriter out, List<String> args) {
         Map<String, Object> options = parseOptions(args);
         String key = (String) options.get("key");
         long retentionPeriod = (long) options.getOrDefault("retentionPeriod", 0L);

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import me.wayne.AssertUtil;
-import me.wayne.InMemoryStore;
 import me.wayne.daos.io.StorePrintWriter;
 
 public class SetCommand extends AbstractCommand<String> {
@@ -15,7 +14,7 @@ public class SetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected String processCommand(StorePrintWriter out, List<String> args) {
 
         Map<String, Object> parsedArgs = parseArgs(args);
         String key = (String) parsedArgs.get("key");

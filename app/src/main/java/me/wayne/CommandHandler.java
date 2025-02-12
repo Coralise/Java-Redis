@@ -82,22 +82,17 @@ public class CommandHandler implements Runnable {
         commands.put("JSON.DEL", new JsonDelCommand());
         commands.put("JSON.ARRAPPEND", new JsonArrAppendCommand());
         commands.put("BITFIELD", new BitFieldCommand());
+        commands.put("EXPIRE", new ExpireCommand());
+        commands.put("EXPIREAT", new ExpireAtCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());
     private static final String INPUT_PREFIX = ">> ";
 
     private Socket clientSocket;
-    private InMemoryStore dataStore;
 
-
-    public InMemoryStore getDataStore() {
-        return dataStore;
-    }
-
-    public CommandHandler(Socket clientSocket, InMemoryStore dataStore) {
+    public CommandHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
-        this.dataStore = dataStore;
     }
 
     @Override
@@ -114,7 +109,7 @@ public class CommandHandler implements Runnable {
 
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                System.out.println("CommandHandler received: " + inputLine);
+                logger.log(Level.INFO, "Received command: {0}", inputLine);
 
                 UUID requestUuid = null;
                 String[] inputLineSplit = inputLine.split(":");
@@ -129,7 +124,7 @@ public class CommandHandler implements Runnable {
 
                 AbstractCommand<?> command = commands.get(inputLine.split(" ")[0].toUpperCase());
                 if (command != null) {
-                    executeCommandSafely(command, out, requestUuid, dataStore, inputLine);
+                    executeCommandSafely(command, out, requestUuid, inputLine);
                 } else {
                     out.println(requestUuid, "ERR Unknown Command");
                 }
@@ -142,9 +137,9 @@ public class CommandHandler implements Runnable {
         }
     }
 
-    private void executeCommandSafely(AbstractCommand<?> command, StorePrintWriter out, UUID requestUuid, InMemoryStore dataStore, String inputLine) {
+    private void executeCommandSafely(AbstractCommand<?> command, StorePrintWriter out, UUID requestUuid, String inputLine) {
         try {
-            command.executeCommand(out, requestUuid, dataStore, inputLine);
+            command.executeCommand(out, requestUuid, inputLine);
         } catch (AssertionError | Exception e) {
             logger.log(Level.WARNING, e.getMessage());
             out.println(requestUuid, e.getMessage());

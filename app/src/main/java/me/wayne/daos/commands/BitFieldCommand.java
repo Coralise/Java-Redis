@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreValue;
 import me.wayne.daos.bitfields.BitField;
 import me.wayne.daos.bitfields.OverflowMode;
@@ -18,7 +17,7 @@ public class BitFieldCommand extends AbstractCommand<List<Integer>> {
         }
     
         @Override
-    protected List<Integer> processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected List<Integer> processCommand(StorePrintWriter out, List<String> args) {
         
         String key = args.get(0);
         List<String> subcommands = extractSubcommands(args.subList(1, args.size()));

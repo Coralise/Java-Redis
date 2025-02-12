@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import me.wayne.AssertUtil;
 import me.wayne.daos.io.StorePrintWriter;
 
 public class StoreStream {
@@ -162,24 +161,10 @@ public class StoreStream {
 
     }
 
-
-
-
-    public void acknowledgeEntry(StreamId entryId) {
-        for (ConsumerGroup consumerGroup : consumerGroups) consumerGroup.acknowledgeEntry(entryId);
-    }
-    
-    public void addConsumerGroup(ConsumerGroup consumerGroup) {
-        AssertUtil.assertTrue(consumerGroups.add(consumerGroup), "ERR Consumer group already exists");
-    }
-
+    @Nullable
     public ConsumerGroup getConsumerGroupByGroupName(String groupName) {
         ConsumerGroup floor = consumerGroups.floor(new ConsumerGroup(groupName, null));
         return floor != null && floor.getGroupName().equals(groupName) ? floor : null;
-    }
-
-    public boolean hasCustomerGroup(String groupName) {
-        return consumerGroups.contains(new ConsumerGroup(groupName, null));
     }
 
 }

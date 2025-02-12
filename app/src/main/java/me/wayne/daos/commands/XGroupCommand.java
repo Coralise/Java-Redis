@@ -1,16 +1,10 @@
 package me.wayne.daos.commands;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import me.wayne.AssertUtil;
-import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.streams.ConsumerGroup;
 import me.wayne.daos.streams.StoreStream;
-import me.wayne.daos.streams.StreamEntry;
-import me.wayne.daos.streams.StreamId;
 
 public class XGroupCommand extends AbstractCommand<String> {
 
@@ -19,7 +13,7 @@ public class XGroupCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected String processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(1);
         String group = args.get(2);
         String id = args.get(3);

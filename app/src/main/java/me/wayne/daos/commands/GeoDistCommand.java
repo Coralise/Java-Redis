@@ -2,7 +2,6 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.GeoMember;
 import me.wayne.daos.GeoSpace;
 import me.wayne.daos.io.StorePrintWriter;
@@ -14,7 +13,7 @@ public class GeoDistCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected String processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(0);
         String member1 = args.get(1);
         String member2 = args.get(2);

@@ -2,7 +2,6 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.io.StorePrintWriter;
 
 public class GetCommand extends AbstractCommand<Object> {
@@ -12,7 +11,7 @@ public class GetCommand extends AbstractCommand<Object> {
     }
 
     @Override
-    protected Object processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected Object processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(0);
         return store.getStoreValue(key, Object.class);
     }

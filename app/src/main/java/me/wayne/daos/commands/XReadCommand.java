@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.streams.StoreStream;
 import me.wayne.daos.streams.StreamEntry;
@@ -23,7 +22,7 @@ public class XReadCommand extends AbstractCommand<Map<String, SortedSet<StreamEn
 
     @SuppressWarnings("all")
     @Override
-    protected Map<String, SortedSet<StreamEntry>> processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected Map<String, SortedSet<StreamEntry>> processCommand(StorePrintWriter out, List<String> args) {
 
         Map<String, Object> parsedCommand = parseXReadCommand(args);
         List<String> keys = (List<String>) parsedCommand.get("keys");

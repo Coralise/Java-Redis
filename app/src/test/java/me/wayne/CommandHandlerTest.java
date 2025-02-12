@@ -42,7 +42,7 @@ class CommandHandlerTest {
     @Test
     void getArgsTest() {
         String inputLine = "arg1 arg2 \"arg3 arg3 arg3\" arg4 \"arg5 arg5\" arg6";
-        CommandHandler commandHandler = new CommandHandler(socket, null);
+        CommandHandler commandHandler = new CommandHandler(socket);
         List<String> args = commandHandler.getArgs(inputLine);
         assertEquals("arg1", args.get(0));
         assertEquals("arg2", args.get(1));

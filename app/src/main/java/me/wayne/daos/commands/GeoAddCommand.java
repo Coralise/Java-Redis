@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.logging.Level;
 
 import me.wayne.AssertUtil;
-import me.wayne.InMemoryStore;
 import me.wayne.daos.GeoMember;
 import me.wayne.daos.GeoSpace;
 import me.wayne.daos.io.StorePrintWriter;
@@ -17,7 +16,7 @@ public class GeoAddCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, List<String> args) {
 
         GeoAddOptions options = parseArgs(args);
         String key = options.getKey();

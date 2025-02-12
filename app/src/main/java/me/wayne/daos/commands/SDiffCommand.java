@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreSet;
 import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
@@ -16,7 +15,7 @@ public class SDiffCommand extends AbstractCommand<List<String>> {
     }
 
     @Override
-    protected List<String> processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected List<String> processCommand(StorePrintWriter out, List<String> args) {
         List<String> keys = args;
         List<StoreSet> hashSets = new ArrayList<>();
         for (String key : keys) {

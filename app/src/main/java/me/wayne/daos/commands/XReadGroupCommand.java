@@ -3,15 +3,9 @@ package me.wayne.daos.commands;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 
-import me.wayne.AssertUtil;
-import me.wayne.InMemoryStore;
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.streams.ConsumerGroup;
 import me.wayne.daos.streams.StoreStream;
-import me.wayne.daos.streams.StreamEntry;
-import me.wayne.daos.streams.StreamId;
 
 public class XReadGroupCommand extends AbstractCommand<String> {
 
@@ -20,7 +14,7 @@ public class XReadGroupCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected String processCommand(StorePrintWriter out, List<String> args) {
 
         Map<String, Object> extractedArgs = extractArgsAndOptions(args);
         String group = (String) extractedArgs.get("group");

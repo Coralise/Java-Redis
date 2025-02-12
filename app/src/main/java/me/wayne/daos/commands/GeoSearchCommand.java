@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.GeoMember;
 import me.wayne.daos.GeoSpace;
 import me.wayne.daos.io.StorePrintWriter;
@@ -19,7 +18,7 @@ public class GeoSearchCommand extends AbstractCommand<List<List<Object>>> {
     }
 
     @Override
-    protected List<List<Object>> processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected List<List<Object>> processCommand(StorePrintWriter out, List<String> args) {
         logger.log(Level.INFO, "Processing GEOSEARCH command with arguments: {0}", args);
 
         Map<String, Object> parsedArgs = parseArgs(args);

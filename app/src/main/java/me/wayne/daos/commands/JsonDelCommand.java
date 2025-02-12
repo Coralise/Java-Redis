@@ -2,7 +2,6 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.RedisJson;
 import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
@@ -14,7 +13,7 @@ public class JsonDelCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(0);
         String path = args.get(1);
 

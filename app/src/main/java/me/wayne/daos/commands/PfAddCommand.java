@@ -2,7 +2,6 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.probabilistic.HyperLogLog;
@@ -14,7 +13,7 @@ public class PfAddCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(0);
         List<String> values = args.subList(1, args.size());
 

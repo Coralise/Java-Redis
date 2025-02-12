@@ -2,7 +2,6 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreList;
 import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
@@ -14,7 +13,7 @@ public class LIndexCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected String processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(0);
         int index = Integer.parseInt(args.get(1));
         StoreValue storeValue = store.getStoreValue(key, true);

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.logging.Level;
 
 import me.wayne.AssertUtil;
-import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
 
@@ -16,7 +15,7 @@ public class SetBitCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(0);
         int offset = Integer.parseInt(args.get(1));
         int bitValue = Integer.parseInt(args.get(2));

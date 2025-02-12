@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 public class App {
     private static final int PORT = 3000;
     private final Logger logger = Logger.getLogger(App.class.getName());
-    private final InMemoryStore dataStore = new InMemoryStore();
 
     public static void main(String[] args) {
         new App();
@@ -23,7 +22,7 @@ public class App {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 logger.info("Accepted connection from " + clientSocket.getInetAddress());
-                CommandHandler commandHandler = new CommandHandler(clientSocket, dataStore);
+                CommandHandler commandHandler = new CommandHandler(clientSocket);
                 new Thread(commandHandler).start();
                 if (clientSocket.isClosed()) {
                     logger.info("Connection closed");

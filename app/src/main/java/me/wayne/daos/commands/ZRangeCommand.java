@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.ScoreMember;
 import me.wayne.daos.StoreSortedSet;
 import me.wayne.daos.StoreValue;
@@ -18,7 +17,7 @@ public class ZRangeCommand extends AbstractCommand<List<String>> {
     }
 
     @Override
-    protected List<String> processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected List<String> processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(0);
         int start = Integer.parseInt(args.get(1));
         int stop = Integer.parseInt(args.get(2));

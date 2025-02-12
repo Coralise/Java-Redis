@@ -3,7 +3,6 @@ package me.wayne.daos.commands;
 import java.util.List;
 import java.util.SortedSet;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.streams.StoreStream;
 import me.wayne.daos.streams.StreamEntry;
@@ -16,7 +15,7 @@ public class XRangeCommand extends AbstractCommand<SortedSet<StreamEntry>> {
 
     @SuppressWarnings("all")
     @Override
-    protected SortedSet<StreamEntry> processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected SortedSet<StreamEntry> processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(0);
         String start = args.get(1);
         String end = args.get(2);

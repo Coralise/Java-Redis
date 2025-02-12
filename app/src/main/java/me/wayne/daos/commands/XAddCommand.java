@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.streams.StoreStream;
 import me.wayne.daos.streams.StreamId;
@@ -19,7 +17,7 @@ public class XAddCommand extends AbstractCommand<String> {
 
     @SuppressWarnings("all")
     @Override
-    protected String processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected String processCommand(StorePrintWriter out, List<String> args) {
 
         String key = args.get(0);
         XAddArguments xAddArguments = parseXAddArguments(args);

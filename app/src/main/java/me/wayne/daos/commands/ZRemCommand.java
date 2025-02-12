@@ -2,7 +2,6 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.InMemoryStore;
 import me.wayne.daos.ScoreMember;
 import me.wayne.daos.StoreSortedSet;
 import me.wayne.daos.StoreValue;
@@ -15,7 +14,7 @@ public class ZRemCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(0);
         List<String> members = args.subList(1, args.size());
         StoreValue storeValue = store.getStoreValue(key);

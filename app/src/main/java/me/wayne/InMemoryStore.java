@@ -10,6 +10,20 @@ import me.wayne.daos.StoreValue;
 
 public class InMemoryStore {
 
+    // Private static instance of the same class
+    private static InMemoryStore instance;
+
+    // Private constructor to prevent instantiation
+    private InMemoryStore() {}
+
+    // Public method to provide access to the instance
+    public static synchronized InMemoryStore getInstance() {
+        if (instance == null) {
+            instance = new InMemoryStore();
+        }
+        return instance;
+    }
+
     private final Map<String, StoreValue> store = new HashMap<>();
 
     public StoreValue getStoreValue(String key) {
