@@ -54,13 +54,18 @@ public abstract class AbstractCommand<T> {
     public String getCommand() {
         return command;
     }
+
+    public boolean isArgumentCountValid(String command) {
+        List<String> args = getArgs(command);
+        return args.size() >= minArgs && (maxArgs == -1 || args.size() <= maxArgs);
+    }
     
     protected UUID requestUuid = null;
-    public void executeCommand(StorePrintWriter out, String inputLine) {
-        executeCommand(out, null, inputLine);
+    public T executeCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine) {
+        return executeCommand(out, requestUuid, inputLine, null);
     }
 
-    public void executeCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine) {
+    public T executeCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, Boolean overridePrintOutput) {
         this.requestUuid = requestUuid;
 
         List<String> args = getArgs(inputLine);
@@ -68,11 +73,14 @@ public abstract class AbstractCommand<T> {
             throw new IllegalArgumentException(INVALID_ARGS_RESPONSE);
         }
         T res = processCommand(out, args);
-        if (printOutput) {
-            out.println(requestUuid, res);
+        if (overridePrintOutput == null) {
+            if (printOutput) out.println(requestUuid, res);
+        } else {
+            if (overridePrintOutput) out.println(requestUuid, res);
         }
 
         this.requestUuid = null;
+        return res;
     }
 
     protected abstract T processCommand(StorePrintWriter out, List<String> args);

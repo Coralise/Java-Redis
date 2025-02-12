@@ -836,6 +836,33 @@ class CommandHandlerTest {
         assertEquals("5", response); // Expiration should stay
     }
 
+    @Test
+    void testMultiExecTransaction() throws IOException {
+        sendMessage("MULTI");
+        sendMessage("SET key1 \"value 1\"");
+        sendMessage("SET key2 \"value 2\"");
+        String response = sendMessage("EXEC");
+        assertEquals("[OK, OK]", response);
+
+        response = sendMessage("GET key1");
+        assertEquals("value 1", response);
+
+        response = sendMessage("GET key2");
+        assertEquals("value 2", response);
+    }
+
+    @Test
+    void testMultiExecTransactionWithError() throws IOException {
+        sendMessage("MULTI");
+        sendMessage("SET key1 \"value 1\"");
+        sendMessage("INVALIDCOMMAND"); // Command ignored
+        sendMessage("SET key2 Invalid Command");
+        sendMessage("SET key3 \"value 3\"");
+        sendMessage("SET key4 Invalid 2");
+        String response = sendMessage("EXEC");
+        assertEquals("[OK, -Unknown option: COMMAND, OK, -Unknown option: 2]", response);
+    }
+
     @SuppressWarnings("squid:S2925")
     private void wait(int seconds) {
         try {

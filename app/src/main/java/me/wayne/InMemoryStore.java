@@ -1,12 +1,17 @@
 package me.wayne;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import me.wayne.daos.StoreValue;
+import me.wayne.daos.Transaction;
+import me.wayne.daos.commands.AbstractCommand;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class InMemoryStore {
 
@@ -25,6 +30,34 @@ public class InMemoryStore {
     }
 
     private final Map<String, StoreValue> store = new HashMap<>();
+    private final Map<Thread, Transaction> transactions = new HashMap<>();
+
+    public synchronized int executeTransaction(Thread thread, StorePrintWriter out, @Nullable UUID requestUuid) {
+        Transaction transaction = transactions.get(thread);
+        if (transaction == null) return -1;
+        transaction.execute(out, requestUuid);
+        return 1;
+    }
+
+    public void removeTransaction(Thread thread) {
+        transactions.remove(thread);
+    }
+
+    public boolean createTransaction(Thread thread) {
+        if (transactions.containsKey(thread)) return false;
+        transactions.put(thread, new Transaction());
+        return true;
+    }
+
+    public String addCommandToTransaction(Thread thread, String commandString) {
+        Transaction transaction = transactions.get(thread);
+        if (transaction == null) return "-ERR No transaction in progress";
+        return transaction.addCommand(commandString);
+    }
+
+    public boolean hasTransaction(Thread thread) {
+        return transactions.containsKey(thread);
+    }
 
     public StoreValue getStoreValue(String key) {
         return getStoreValue(key, false);

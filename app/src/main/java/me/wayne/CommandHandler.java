@@ -5,87 +5,19 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.wayne.daos.Commands;
 import me.wayne.daos.commands.*;
 import me.wayne.daos.io.StoreBufferedReader;
 import me.wayne.daos.io.StorePrintWriter;
 
 public class CommandHandler implements Runnable {
-
-    private static final Map<String, AbstractCommand<?>> commands = new HashMap<>();
-    static {
-        commands.put("APPEND", new AppendCommand());
-        commands.put("DECRBY", new DecrByCommand());
-        commands.put("DECR", new DecrCommand());
-        commands.put("DELETE", new DeleteCommand());
-        commands.put("GET", new GetCommand());
-        commands.put("GETRANGE", new GetRangeCommand());
-        commands.put("HDEL", new HDelCommand());
-        commands.put("HEXISTS", new HExistsCommand());
-        commands.put("HGETALL", new HGetAllCommand());
-        commands.put("HGET", new HGetCommand());
-        commands.put("HSET", new HSetCommand());
-        commands.put("INCRBY", new IncrByCommand());
-        commands.put("INCR", new IncrCommand());
-        commands.put("LINDEX", new LIndexCommand());
-        commands.put("LPOP", new LPopCommand());
-        commands.put("LPUSH", new LPushCommand());
-        commands.put("LRANGE", new LRangeCommand());
-        commands.put("LSET", new LSetCommand());
-        commands.put("RPOP", new RPopCommand());
-        commands.put("RPUSH", new RPushCommand());
-        commands.put("SADD", new SAddCommand());
-        commands.put("SDIFF", new SDiffCommand());
-        commands.put("SET", new SetCommand());
-        commands.put("SETRANGE", new SetRangeCommand());
-        commands.put("SINTER", new SInterCommand());
-        commands.put("SISMEMBER", new SIsMemberCommand());
-        commands.put("SMEMBERS", new SMembersCommand());
-        commands.put("SREM", new SRemCommand());
-        commands.put("STRLEN", new StrLenCommand());
-        commands.put("SUNION", new SUnionCommand());
-        commands.put("XADD", new XAddCommand());
-        commands.put("XRANGE", new XRangeCommand());
-        commands.put("XREAD", new XReadCommand());
-        commands.put("ZADD", new ZAddCommand());
-        commands.put("ZRANGE", new ZRangeCommand());
-        commands.put("ZRANK", new ZRankCommand());
-        commands.put("ZREM", new ZRemCommand());
-        commands.put("XGROUP", new XGroupCommand());
-        commands.put("XREADGROUP", new XReadGroupCommand());
-        commands.put("XACK", new XAckCommand());
-        commands.put("GEOADD", new GeoAddCommand());
-        commands.put("GEOSEARCH", new GeoSearchCommand());
-        commands.put("GEODIST", new GeoDistCommand());
-        commands.put("SETBIT", new SetBitCommand());
-        commands.put("GETBIT", new GetBitCommand());
-        commands.put("BITCOUNT", new BitCountCommand());
-        commands.put("BITOP", new BitOpCommand());
-        commands.put("EXISTS", new ExistsCommand());
-        commands.put("PFADD", new PfAddCommand());
-        commands.put("PFCOUNT", new PfCountCommand());
-        commands.put("PFMERGE", new PfMergeCommand());
-        commands.put("TS.CREATE", new TsCreateCommand());
-        commands.put("TS.ADD", new TsAddCommand());
-        commands.put("TS.RANGE", new TsRangeCommand());
-        commands.put("TS.GET", new TsGetCommand());
-        commands.put("JSON.SET", new JsonSetCommand());
-        commands.put("JSON.GET", new JsonGetCommand());
-        commands.put("JSON.DEL", new JsonDelCommand());
-        commands.put("JSON.ARRAPPEND", new JsonArrAppendCommand());
-        commands.put("BITFIELD", new BitFieldCommand());
-        commands.put("EXPIRE", new ExpireCommand());
-        commands.put("EXPIREAT", new ExpireAtCommand());
-        commands.put("TTL", new TtlCommand());
-    }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());
     private static final String INPUT_PREFIX = ">> ";
@@ -123,11 +55,26 @@ public class CommandHandler implements Runnable {
                     }
                 }
 
-                AbstractCommand<?> command = commands.get(inputLine.split(" ")[0].toUpperCase());
-                if (command != null) {
-                    executeCommandSafely(command, out, requestUuid, inputLine);
+                if (!InMemoryStore.getInstance().hasTransaction(Thread.currentThread())) {
+                    AbstractCommand<?> command = Commands.getCommand(inputLine.split(" ")[0]);
+                    if (command != null) {
+                        executeCommandSafely(command, out, requestUuid, inputLine);
+                    } else {
+                        out.println(requestUuid, "ERR Unknown Command");
+                    }
                 } else {
-                    out.println(requestUuid, "ERR Unknown Command");
+                    if (inputLine.equals("MULTI")) {
+                        out.println(requestUuid, "-ERR MULTI calls can't be nested");
+                    } else if (inputLine.equals("DISCARD")) {
+                        InMemoryStore.getInstance().removeTransaction(Thread.currentThread());
+                        out.println(requestUuid, "+OK");
+                    } else if (inputLine.equals("EXEC")) {
+                        InMemoryStore.getInstance().executeTransaction(Thread.currentThread(), out, requestUuid);
+                        InMemoryStore.getInstance().removeTransaction(Thread.currentThread());
+                    } else {
+                        String res = InMemoryStore.getInstance().addCommandToTransaction(Thread.currentThread(), inputLine);
+                        out.println(requestUuid, res);
+                    }
                 }
 
                 out.print(">> ");
