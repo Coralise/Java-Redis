@@ -1,12 +1,12 @@
 package me.wayne.daos.commands;
 
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class SetCommand extends AbstractCommand<String> {
 
@@ -15,7 +15,7 @@ public class SetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+    protected String processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
 
         Map<String, Object> parsedArgs = parseArgs(args);
         String key = (String) parsedArgs.get("key");

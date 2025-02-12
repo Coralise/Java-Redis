@@ -1,6 +1,5 @@
 package me.wayne.daos.commands;
 
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -9,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import me.wayne.InMemoryStore;
 import me.wayne.daos.RedisJson;
 import me.wayne.daos.StoreValue;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class JsonGetCommand extends AbstractCommand<String> {
 
@@ -17,7 +17,7 @@ public class JsonGetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+    protected String processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         List<String> paths = args.subList(1, args.size());
 

@@ -3,11 +3,15 @@ package me.wayne.daos.commands;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
+
 import me.wayne.InMemoryStore;
+import me.wayne.daos.io.StorePrintWriter;
 
 public abstract class AbstractCommand<T> {
     
@@ -49,19 +53,28 @@ public abstract class AbstractCommand<T> {
     public String getCommand() {
         return command;
     }
+    
+    protected UUID requestUuid = null;
+    public void executeCommand(StorePrintWriter out, InMemoryStore store, String inputLine) {
+        executeCommand(out, null, store, inputLine);
+    }
 
-    public void executeCommand(PrintWriter out, InMemoryStore store, String inputLine) {
+    public void executeCommand(StorePrintWriter out, @Nullable UUID requestUuid, InMemoryStore store, String inputLine) {
+        this.requestUuid = requestUuid;
+
         List<String> args = getArgs(inputLine);
         if (args.size() < minArgs || (maxArgs != -1 && args.size() > maxArgs)) {
             throw new IllegalArgumentException(INVALID_ARGS_RESPONSE);
         }
         T res = processCommand(out, store, args);
         if (printOutput) {
-            out.println(res);
+            out.println(requestUuid, res);
         }
+
+        this.requestUuid = null;
     }
 
-    protected abstract T processCommand(PrintWriter out, InMemoryStore store, List<String> args);
+    protected abstract T processCommand(StorePrintWriter out, InMemoryStore store, List<String> args);
 
     private List<String> getArgs(String input) {
         List<String> result = new ArrayList<>();

@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.NavigableSet;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 import me.wayne.AssertUtil;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class StoreStream {
 
@@ -54,13 +56,13 @@ public class StoreStream {
         return entries.size();
     }
 
-    public SortedSet<StreamEntry> read(PrintWriter out, String lastReadId, int count, Long block) {
+    public SortedSet<StreamEntry> read(StorePrintWriter out, UUID requestUuid, String lastReadId, int count, Long block) {
 
         if (block == null) {
             return range(lastReadId, false, "+", true, count);
         } else {
             
-            out.println("Waiting for streams for " + block + " milliseconds...");
+            out.println(requestUuid, "Waiting for streams for " + block + " milliseconds...");
             addReader(Thread.currentThread());
             int currentCount = 0;
             while (currentCount < (count <= 0 ? 1 : count)) {
@@ -68,7 +70,7 @@ public class StoreStream {
                     Thread.sleep(block);
                     break;
                 } catch (InterruptedException e) {
-                    out.println(getLastEntry());
+                    out.println(requestUuid, getLastEntry());
                     currentCount++;
                 }
             }

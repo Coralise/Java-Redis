@@ -1,10 +1,10 @@
 package me.wayne.daos.commands;
 
-import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreList;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class RPushCommand extends AbstractCommand<Integer> {
 
@@ -13,7 +13,7 @@ public class RPushCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         List<String> values = args.subList(1, args.size());
         StoreList list = store.getStoreValue(key, StoreList.class, new StoreList());

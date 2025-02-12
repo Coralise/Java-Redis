@@ -1,12 +1,12 @@
 package me.wayne.daos.commands;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreMap;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class HGetAllCommand extends AbstractCommand<List<String>> {
 
@@ -15,7 +15,7 @@ public class HGetAllCommand extends AbstractCommand<List<String>> {
     }
 
     @Override
-    protected List<String> processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+    protected List<String> processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         StoreMap hashMap = store.getStoreValue(key, StoreMap.class);
         if (hashMap == null) return new ArrayList<>();

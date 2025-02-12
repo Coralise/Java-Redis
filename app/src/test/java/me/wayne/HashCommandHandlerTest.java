@@ -3,30 +3,32 @@ package me.wayne;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import me.wayne.daos.io.StoreBufferedReader;
+import me.wayne.daos.io.StorePrintWriter;
+
 class HashCommandHandlerTest {
 
     Socket socket;
-    BufferedReader in = mock(BufferedReader.class);
-    PrintWriter out = mock(PrintWriter.class);
-
+    StoreBufferedReader in = mock(StoreBufferedReader.class);
+    StorePrintWriter out = mock(StorePrintWriter.class);
+                
     @BeforeEach
     void setUp() throws IOException {
         socket = new Socket("127.0.0.1", 3000);
-        out = new PrintWriter(socket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        out = new StorePrintWriter(socket.getOutputStream());
+        in = new StoreBufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
     @BeforeAll
@@ -35,8 +37,8 @@ class HashCommandHandlerTest {
     }
 
     String sendMessage(String msg) throws IOException {
-        out.println(msg);
-        return in.readLine();
+        UUID requestUuid = out.sendCommand(msg);
+        return in.waitResponse(requestUuid);
     }
 
     @Test

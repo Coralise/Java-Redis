@@ -1,6 +1,5 @@
 package me.wayne.daos.commands;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.List;
 import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreSet;
 import me.wayne.daos.StoreValue;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class SUnionCommand extends AbstractCommand<Object> {
 
@@ -16,7 +16,7 @@ public class SUnionCommand extends AbstractCommand<Object> {
     }
 
     @Override
-    protected Object processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+    protected Object processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
         List<String> keys = args;
         List<StoreSet> hashSets = new ArrayList<>();
         for (String key : keys) {

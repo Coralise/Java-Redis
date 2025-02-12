@@ -1,10 +1,10 @@
 package me.wayne.daos.commands;
 
-import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.AssertUtil;
 import me.wayne.InMemoryStore;
+import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.streams.ConsumerGroup;
 import me.wayne.daos.streams.StreamId;
 
@@ -15,7 +15,7 @@ public class XAckCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
         
         String key = args.get(0);
         String group = args.get(1);

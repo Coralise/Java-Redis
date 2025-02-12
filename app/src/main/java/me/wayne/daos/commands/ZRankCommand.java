@@ -1,11 +1,11 @@
 package me.wayne.daos.commands;
 
-import java.io.PrintWriter;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
 import me.wayne.daos.ScoreMember;
 import me.wayne.daos.StoreSortedSet;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class ZRankCommand extends AbstractCommand<Object> {
 
@@ -14,7 +14,7 @@ public class ZRankCommand extends AbstractCommand<Object> {
     }
 
     @Override
-    protected Object processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+    protected Object processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
         String key = args.get(0);
         String member = args.get(1);
         boolean withScore = args.size() == 3 && args.get(2).equals("WITHSCORE");

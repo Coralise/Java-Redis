@@ -1,12 +1,12 @@
 package me.wayne.daos.commands;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreValue;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class BitOpCommand extends AbstractCommand<Integer> {
 
@@ -15,7 +15,7 @@ public class BitOpCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
 
         String operation = args.get(0).toUpperCase();
         String destKey = args.get(1);

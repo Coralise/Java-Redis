@@ -1,20 +1,22 @@
 package me.wayne;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.wayne.daos.commands.*;
+import me.wayne.daos.io.StoreBufferedReader;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class CommandHandler implements Runnable {
 
@@ -83,9 +85,11 @@ public class CommandHandler implements Runnable {
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());
-    private static final String ERROR_UNKOWN_COMMAND = "ERR Unkown Command";
+    private static final String INPUT_PREFIX = ">> ";
+
     private Socket clientSocket;
     private InMemoryStore dataStore;
+
 
     public InMemoryStore getDataStore() {
         return dataStore;
@@ -98,35 +102,52 @@ public class CommandHandler implements Runnable {
 
     @Override
     public void run() {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
+        try (StoreBufferedReader in = new StoreBufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             StorePrintWriter out = new StorePrintWriter(clientSocket.getOutputStream())) {
 
-            // out.println("----------------------------");
-            // out.println("Connected to Jedis. Welcome!");
-            // out.println("----------------------------");
-            // out.println();
-            // out.print(">> ");
-            // out.flush();
+            out.println("----------------------------");
+            out.println("Connected to Jedis. Welcome!");
+            out.println("----------------------------");
+            out.println();
+            out.print(INPUT_PREFIX);
+            out.flush();
 
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
+                System.out.println("CommandHandler received: " + inputLine);
+
+                UUID requestUuid = null;
+                String[] inputLineSplit = inputLine.split(":");
+                if (inputLineSplit.length > 1) {
+                    try {
+                        requestUuid = UUID.fromString(inputLineSplit[0]);
+                        inputLine = String.join(":", Arrays.copyOfRange(inputLineSplit, 1, inputLineSplit.length));
+                    } catch (IllegalArgumentException e) {
+                        // Invalid UUID, treat as no UUID
+                    }
+                }
+
                 AbstractCommand<?> command = commands.get(inputLine.split(" ")[0].toUpperCase());
                 if (command != null) {
-                    final String fInputLine = inputLine;
-                    try {
-                        command.executeCommand(out, dataStore, fInputLine);
-                    } catch (AssertionError | Exception e) {
-                        logger.log(Level.WARNING, e.getMessage());
-                        out.println(e.getMessage());
-                        e.printStackTrace();
-                    } 
+                    executeCommandSafely(command, out, requestUuid, dataStore, inputLine);
                 } else {
-                    out.println(ERROR_UNKOWN_COMMAND);
+                    out.println(requestUuid, "ERR Unknown Command");
                 }
-                // out.print(">> ");
-                // out.flush();
+
+                out.print(">> ");
+                out.flush();
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void executeCommandSafely(AbstractCommand<?> command, StorePrintWriter out, UUID requestUuid, InMemoryStore dataStore, String inputLine) {
+        try {
+            command.executeCommand(out, requestUuid, dataStore, inputLine);
+        } catch (AssertionError | Exception e) {
+            logger.log(Level.WARNING, e.getMessage());
+            out.println(requestUuid, e.getMessage());
             e.printStackTrace();
         }
     }

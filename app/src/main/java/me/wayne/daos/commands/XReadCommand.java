@@ -1,6 +1,5 @@
 package me.wayne.daos.commands;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -9,6 +8,7 @@ import java.util.Map;
 import java.util.SortedSet;
 
 import me.wayne.InMemoryStore;
+import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.streams.StoreStream;
 import me.wayne.daos.streams.StreamEntry;
 import me.wayne.daos.streams.StreamId;
@@ -23,7 +23,7 @@ public class XReadCommand extends AbstractCommand<Map<String, SortedSet<StreamEn
 
     @SuppressWarnings("all")
     @Override
-    protected Map<String, SortedSet<StreamEntry>> processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+    protected Map<String, SortedSet<StreamEntry>> processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
 
         Map<String, Object> parsedCommand = parseXReadCommand(args);
         List<String> keys = (List<String>) parsedCommand.get("keys");
@@ -41,13 +41,13 @@ public class XReadCommand extends AbstractCommand<Map<String, SortedSet<StreamEn
             if (id.equals("$")) id = storeStream.isEmpty() ? "0-0" : storeStream.getLastEntry().getId().toString();
 
             if (blockTimeout <= 0) {
-                streams.put(key, storeStream.read(out, id, count, null));
+                streams.put(key, storeStream.read(out, requestUuid, id, count, null));
             } else {
-                storeStream.read(out, id, count, blockTimeout);
+                storeStream.read(out, requestUuid, id, count, blockTimeout);
             }
         }
 
-        if (blockTimeout <= 0) out.println(streams);
+        if (blockTimeout <= 0) out.println(requestUuid, streams);
         return null;
     }
 

@@ -1,6 +1,5 @@
 package me.wayne.daos.commands;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -10,6 +9,7 @@ import me.wayne.InMemoryStore;
 import me.wayne.daos.StoreValue;
 import me.wayne.daos.bitfields.BitField;
 import me.wayne.daos.bitfields.OverflowMode;
+import me.wayne.daos.io.StorePrintWriter;
 
 public class BitFieldCommand extends AbstractCommand<List<Integer>> {
 
@@ -18,7 +18,7 @@ public class BitFieldCommand extends AbstractCommand<List<Integer>> {
         }
     
         @Override
-    protected List<Integer> processCommand(PrintWriter out, InMemoryStore store, List<String> args) {
+    protected List<Integer> processCommand(StorePrintWriter out, InMemoryStore store, List<String> args) {
         
         String key = args.get(0);
         List<String> subcommands = extractSubcommands(args.subList(1, args.size()));
