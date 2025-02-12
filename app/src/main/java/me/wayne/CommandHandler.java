@@ -84,6 +84,7 @@ public class CommandHandler implements Runnable {
         commands.put("BITFIELD", new BitFieldCommand());
         commands.put("EXPIRE", new ExpireCommand());
         commands.put("EXPIREAT", new ExpireAtCommand());
+        commands.put("TTL", new TtlCommand());
     }
 
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());

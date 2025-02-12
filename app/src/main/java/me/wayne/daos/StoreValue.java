@@ -24,6 +24,33 @@ public class StoreValue {
         this.expiryThread = null;
     }
 
+    public boolean hasExpiration() {
+        return expiryThread != null;
+    }
+
+    public boolean stopExpirationThread() {
+        if (expiryThread == null) return false;
+        expiryThread.getSecond().interrupt();
+        return true;
+    }
+
+    public boolean startExpirationThread(String keyToDelete) {
+        if (expiryThread == null) return false;
+        if (expiryThread.getFirst() < System.currentTimeMillis()) {
+            InMemoryStore.getInstance().removeStoreValue(keyToDelete);
+            return true;
+        }
+        expiryThread.getSecond().start();
+        return true;
+    }
+
+    public int getTimeToLive() {
+        if (expiryThread == null) return -1;
+        long currentTimestamp = System.currentTimeMillis();
+        long timeInMillis = expiryThread.getFirst() - currentTimestamp;
+        return (int) Math.ceil((double) timeInMillis / 1000);
+    }
+
     public int setExpiryInMillis(Long timeInMillis, boolean nx, boolean xx, boolean gt, boolean lt, String key) {
         long currentTimestamp = System.currentTimeMillis();
         long timestamp = currentTimestamp + timeInMillis;

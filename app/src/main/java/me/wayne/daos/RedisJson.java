@@ -414,5 +414,32 @@ public class RedisJson {
             return true; // Not valid JSON
         }
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((jsonData == null) ? 0 : jsonData.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RedisJson other = (RedisJson) obj;
+        if (jsonData == null) {
+            if (other.jsonData != null)
+                return false;
+        } else if (!jsonData.equals(other.jsonData))
+            return false;
+        return true;
+    }
+
+    
     
 }

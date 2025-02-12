@@ -746,6 +746,96 @@ class CommandHandlerTest {
         assertEquals("[3]", response);
     }
 
+    @Test
+    void testExpireCommand() throws IOException {
+        sendMessage("SET key1 \"value 1\"");
+        String response = sendMessage("EXPIRE key1 1");
+        assertEquals("1", response);
+        response = sendMessage("GET key1");
+        assertEquals("value 1", response);
+        wait(2);
+        response = sendMessage("GET key1");
+        assertEquals("null", response);
+
+        sendMessage("SET key2 \"value 2\"");
+        response = sendMessage("EXPIRE key2 5");
+        assertEquals("1", response);
+        response = sendMessage("GET key2");
+        assertEquals("value 2", response);
+        wait(3);
+        response = sendMessage("GET key2");
+        assertEquals("value 2", response);
+        wait(3);
+        response = sendMessage("GET key2");
+        assertEquals("null", response);
+
+        sendMessage("SET key3 \"value 3\"");
+        response = sendMessage("EXPIRE key3 0");
+        assertEquals("1", response);
+        response = sendMessage("GET key3");
+        assertEquals("null", response);
+    }
+
+    @Test
+    void testExpireJson() throws IOException {
+        sendMessage("JSON.SET doc $ \"{\\\"a\\\":1, \\\"b\\\":2}\"");
+        String response = sendMessage("EXPIRE doc 1");
+        assertEquals("1", response);
+        wait(2);
+        response = sendMessage("GET doc");
+        assertEquals("null", response);
+
+        sendMessage("JSON.SET doc $ \"{\\\"a\\\":1, \\\"b\\\":2}\"");
+        sendMessage("EXPIRE doc 5");
+        sendMessage("JSON.SET doc $ \"{\\\"a\\\":3, \\\"b\\\":4}\"");
+        response = sendMessage("TTL doc");
+        assertEquals("5", response);
+    }
+
+    @Test
+    void testExpireHashTable() throws IOException {
+        sendMessage("HSET myhash field1 \"Hello\"");
+        String response = sendMessage("EXPIRE myhash 1");
+        assertEquals("1", response);
+        response = sendMessage("HGET myhash field1");
+        assertEquals("Hello", response);
+        wait(2);
+        response = sendMessage("HGET myhash field1");
+        assertEquals("null", response);
+
+        sendMessage("HSET myhash field1 \"Hello\"");
+        sendMessage("EXPIRE myhash 5");
+        sendMessage("HSET myhash field1 \"World\"");
+        response = sendMessage("TTL myhash");
+        assertEquals("-1", response); // Expiration should be removed
+    }
+
+    @Test
+    void testExpireSet() throws IOException {
+        sendMessage("SADD mysetExpire member1");
+        String response = sendMessage("EXPIRE mysetExpire 1");
+        assertEquals("1", response);
+        response = sendMessage("SMEMBERS mysetExpire");
+        assertEquals("[member1]", response);
+        wait(2);
+        response = sendMessage("SMEMBERS mysetExpire");
+        assertEquals("[]", response);
+
+        sendMessage("SADD mysetExpire member1");
+        sendMessage("EXPIRE mysetExpire 5");
+        sendMessage("SADD mysetExpire member2");
+        response = sendMessage("TTL mysetExpire");
+        assertEquals("5", response); // Expiration should stay
+
+        sendMessage("SREM mysetExpire member1");
+        response = sendMessage("TTL mysetExpire");
+        assertEquals("5", response); // Expiration should stay
+
+        sendMessage("SADD mysetExpire member3");
+        response = sendMessage("TTL mysetExpire");
+        assertEquals("5", response); // Expiration should stay
+    }
+
     @SuppressWarnings("squid:S2925")
     private void wait(int seconds) {
         try {

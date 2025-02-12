@@ -59,21 +59,16 @@ public class InMemoryStore {
     }
 
     public StoreValue setStoreValue(String key, Object value) {
+        if (hasStoreValue(key)) {
+            StoreValue oldStoreValue = getStoreValue(key);
+            if (oldStoreValue.getValue().equals(value)) return oldStoreValue;
+            if (oldStoreValue.hasExpiration()) oldStoreValue.stopExpirationThread();
+        }
         return store.put(key, new StoreValue(value));
     }
 
     public StoreValue removeStoreValue(String key) {
         return store.remove(key);
     }
-
-    // @SuppressWarnings("unchecked")
-    // public <T> T getObject(String key, Class<T> clazz) {
-    //     Object obj = store.get(key);
-    //     if (obj == null) {
-    //         return null;
-    //     }
-    //     AssertUtil.assertTrue(clazz.isInstance(obj), "Value is not of the expected type (" + clazz.getSimpleName() + ")");
-    //     return (T) obj;
-    // }
 
 }

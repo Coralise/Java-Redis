@@ -15,7 +15,7 @@ public class SMembersCommand extends AbstractCommand<String> {
     protected String processCommand(StorePrintWriter out, List<String> args) {
         String key = args.get(0);
         StoreSet storeValue = store.getStoreValue(key, StoreSet.class);
-        if (storeValue == null) return null;
+        if (storeValue == null) return "[]";
         return storeValue.toString();
     }
     
