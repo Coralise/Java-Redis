@@ -19,8 +19,8 @@ import me.wayne.daos.io.StorePrintWriter;
 
 public class CommandHandler implements Runnable {
 
+    public static final String INPUT_PREFIX = ">> ";
     private static final Logger logger = Logger.getLogger(CommandHandler.class.getName());
-    private static final String INPUT_PREFIX = ">> ";
 
     private Socket clientSocket;
 

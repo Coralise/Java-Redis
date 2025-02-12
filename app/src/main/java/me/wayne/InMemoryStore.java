@@ -12,6 +12,7 @@ import me.wayne.daos.StoreValue;
 import me.wayne.daos.Transaction;
 import me.wayne.daos.commands.AbstractCommand;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.pubsub.Channel;
 
 public class InMemoryStore {
 
@@ -31,6 +32,19 @@ public class InMemoryStore {
 
     private final Map<String, StoreValue> store = new HashMap<>();
     private final Map<Thread, Transaction> transactions = new HashMap<>();
+    private final Map<String, Channel> channels = new HashMap<>();
+
+    public Channel getChannel(String name) {
+        return channels.get(name);
+    }
+
+    public Channel createOrGetChannel(String name) {
+        return channels.computeIfAbsent(name, Channel::new);
+    }
+
+    public Channel removeChannel(String name) {
+        return channels.remove(name);
+    }
 
     public synchronized int executeTransaction(Thread thread, StorePrintWriter out, @Nullable UUID requestUuid) {
         Transaction transaction = transactions.get(thread);

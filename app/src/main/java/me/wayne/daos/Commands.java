@@ -73,6 +73,9 @@ public abstract class Commands {
         commandMap.put("EXPIREAT", new ExpireAtCommand());
         commandMap.put("TTL", new TtlCommand());
         commandMap.put("MULTI", new MultiCommand());
+        commandMap.put("SUBSCRIBE", new SubscribeCommand());
+        commandMap.put("UNSUBSCRIBE", new UnsubscribeCommand());
+        commandMap.put("PUBLISH", new PublishCommand());
     }
 
     private Commands() {}
