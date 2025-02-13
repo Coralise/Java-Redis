@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +18,14 @@ public class LPopCommand extends AbstractCommand<List<String>> {
     }
 
     @Override
-    protected List<String> processCommand(StorePrintWriter out, List<String> args) {
+    protected List<String> processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         int count = args.size() > 1 ? Integer.parseInt(args.get(1)) : 1;
         StoreValue storeValue = store.getStoreValue(key, true);
         StoreList list = storeValue.getValue(StoreList.class);
         ArrayList<String> removeds = new ArrayList<>();
         for (int i = 0;i < count;i++) removeds.add(list.removeFirst());
-        store.setStoreValue(key, list);
+        store.setStoreValue(key, list, inputLine);
         return removeds;
     }
     

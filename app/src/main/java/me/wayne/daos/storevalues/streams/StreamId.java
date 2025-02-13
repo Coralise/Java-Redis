@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import me.wayne.AssertUtil;
 
 public class StreamId implements Comparable<StreamId>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Nonnull
     private final Long timeStamp;

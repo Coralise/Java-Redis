@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
@@ -13,7 +17,7 @@ public class XGroupCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, List<String> args) {
+    protected String processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(1);
         String group = args.get(2);
         String id = args.get(3);
@@ -23,7 +27,7 @@ public class XGroupCommand extends AbstractCommand<String> {
         if (storeValue == null) {
             if (!mkStream) return "ERR Stream does not exist";
             storeValue = new StoreValue(new StoreStream());
-            store.setStoreValue(key, storeValue.getValue());
+            store.setStoreValue(key, storeValue.getValue(), inputLine);
         }
         StoreStream stream = storeValue.getValue(StoreStream.class);
 

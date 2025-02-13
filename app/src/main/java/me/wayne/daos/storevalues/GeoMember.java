@@ -1,8 +1,11 @@
 package me.wayne.daos.storevalues;
 
+import java.io.Serializable;
+
 import me.wayne.AssertUtil;
 
-public class GeoMember implements Comparable<GeoMember> {
+public class GeoMember implements Comparable<GeoMember>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final Double longitude;
     private final Double latitude;

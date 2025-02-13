@@ -6,6 +6,7 @@ import java.util.Arrays;
 import me.wayne.AssertUtil;
 
 public class BitField implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private int[] bitArray;
 

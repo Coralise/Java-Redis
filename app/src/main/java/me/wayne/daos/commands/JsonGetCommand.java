@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 import java.util.SortedMap;
 
@@ -16,7 +20,7 @@ public class JsonGetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, List<String> args) {
+    protected String processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         List<String> paths = args.subList(1, args.size());
 

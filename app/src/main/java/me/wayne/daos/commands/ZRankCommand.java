@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
@@ -13,7 +17,7 @@ public class ZRankCommand extends AbstractCommand<Object> {
     }
 
     @Override
-    protected Object processCommand(StorePrintWriter out, List<String> args) {
+    protected Object processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         String member = args.get(1);
         boolean withScore = args.size() == 3 && args.get(2).equals("WITHSCORE");

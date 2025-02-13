@@ -2,6 +2,9 @@ package me.wayne.daos.commands;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 import me.wayne.daos.io.StorePrintWriter;
 
@@ -12,7 +15,7 @@ public class BitCountCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         String value = store.getStoreValue(key, String.class);
         if (value == null || value.isEmpty()) return 0;

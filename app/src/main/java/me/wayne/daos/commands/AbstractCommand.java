@@ -24,7 +24,7 @@ public abstract class AbstractCommand<T> {
     protected static final String NON_JSON_ERROR_MSG = "ERR Value is not of type JSONObject or JSONArray";
     protected static final String INDEX_OUT_OF_RANGE_MSG = "ERR Index out of range";
 
-    private final String command;
+    protected final String command;
 
     private final int minArgs;
     private final int maxArgs;
@@ -60,30 +60,27 @@ public abstract class AbstractCommand<T> {
         return args.size() >= minArgs && (maxArgs == -1 || args.size() <= maxArgs);
     }
     
-    protected UUID requestUuid = null;
     public T executeCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine) {
         return executeCommand(out, requestUuid, inputLine, null);
     }
 
     public T executeCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, Boolean overridePrintOutput) {
-        this.requestUuid = requestUuid;
 
         List<String> args = getArgs(inputLine);
         if (args.size() < minArgs || (maxArgs != -1 && args.size() > maxArgs)) {
             throw new IllegalArgumentException(INVALID_ARGS_RESPONSE);
         }
-        T res = processCommand(out, args);
+        T res = processCommand(out, requestUuid, inputLine, args);
         if (overridePrintOutput == null) {
             if (printOutput) out.println(requestUuid, res);
         } else {
             if (overridePrintOutput) out.println(requestUuid, res);
         }
 
-        this.requestUuid = null;
         return res;
     }
 
-    protected abstract T processCommand(StorePrintWriter out, List<String> args);
+    protected abstract T processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args);
 
     private List<String> getArgs(String input) {
         List<String> result = new ArrayList<>();

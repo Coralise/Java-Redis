@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -16,7 +20,7 @@ public class GeoAddCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
 
         GeoAddOptions options = parseArgs(args);
         String key = options.getKey();
@@ -51,7 +55,7 @@ public class GeoAddCommand extends AbstractCommand<Integer> {
             }
         }
 
-        store.setStoreValue(key, geoSet);
+        store.setStoreValue(key, geoSet, inputLine);
         
         return updated;
     }

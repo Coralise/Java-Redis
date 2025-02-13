@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
@@ -12,7 +16,7 @@ public class JsonSetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, List<String> args) {
+    protected String processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         String path = args.get(1);
         String value = args.get(2);
@@ -23,7 +27,7 @@ public class JsonSetCommand extends AbstractCommand<String> {
 
         String response = redisJson.set(path, value, xx, nx) ? OK_RESPONSE : null;
 
-        store.setStoreValue(key, redisJson);
+        store.setStoreValue(key, redisJson, inputLine);
         return response;
     }
     

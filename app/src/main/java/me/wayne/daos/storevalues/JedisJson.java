@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import me.wayne.AssertUtil;
 
 public class JedisJson implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private JsonNode jsonData;

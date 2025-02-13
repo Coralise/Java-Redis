@@ -8,6 +8,8 @@ import java.math.MathContext;
 import me.wayne.AssertUtil;
 
 public class HyperLogLog implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private transient int precision;
     private final byte[] registers;
 

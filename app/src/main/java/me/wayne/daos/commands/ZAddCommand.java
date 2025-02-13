@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +22,7 @@ public class ZAddCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         ZAddArguments zAddArguments = parseZAddArguments(args.subList(1, args.size()));
 
@@ -46,7 +50,7 @@ public class ZAddCommand extends AbstractCommand<Integer> {
             updated += processScoreMember(treeSet, nx, xx, gt, lt, ch, incr, scoreMember);
         }
 
-        store.setStoreValue(key, treeSet);
+        store.setStoreValue(key, treeSet, inputLine);
 
         return updated;
     }

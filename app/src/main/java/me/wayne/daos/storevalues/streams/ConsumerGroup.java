@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 import me.wayne.daos.Pair;
 
 public class ConsumerGroup implements Comparable<ConsumerGroup>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Random random = new Random();
     private static final Logger LOGGER = Logger.getLogger(ConsumerGroup.class.getName());

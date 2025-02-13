@@ -12,8 +12,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.wayne.daos.Commands;
-import me.wayne.daos.commands.*;
 import me.wayne.daos.io.StoreBufferedReader;
 import me.wayne.daos.io.StorePrintWriter;
 
@@ -56,12 +54,9 @@ public class CommandHandler implements Runnable {
                 }
 
                 if (!InMemoryStore.getInstance().hasTransaction(Thread.currentThread())) {
-                    AbstractCommand<?> command = Commands.getCommand(inputLine.split(" ")[0]);
-                    if (command != null) {
-                        executeCommandSafely(command, out, requestUuid, inputLine);
-                    } else {
-                        out.println(requestUuid, "ERR Unknown Command");
-                    }
+                    
+                    InMemoryStore.getInstance().executeCommand(inputLine, out, requestUuid);
+                    
                 } else {
                     if (inputLine.equals("MULTI")) {
                         out.println(requestUuid, "-ERR MULTI calls can't be nested");
@@ -81,16 +76,6 @@ public class CommandHandler implements Runnable {
                 out.flush();
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void executeCommandSafely(AbstractCommand<?> command, StorePrintWriter out, UUID requestUuid, String inputLine) {
-        try {
-            command.executeCommand(out, requestUuid, inputLine);
-        } catch (AssertionError | Exception e) {
-            logger.log(Level.WARNING, e.getMessage());
-            out.println(requestUuid, e.getMessage());
             e.printStackTrace();
         }
     }

@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
@@ -12,7 +16,7 @@ public class TtlCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         StoreValue storeValue = store.getStoreValue(key, false);
         if (storeValue == null) return -2;

@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 import java.util.SortedSet;
 
@@ -15,7 +19,7 @@ public class XRangeCommand extends AbstractCommand<SortedSet<StreamEntry>> {
 
     @SuppressWarnings("all")
     @Override
-    protected SortedSet<StreamEntry> processCommand(StorePrintWriter out, List<String> args) {
+    protected SortedSet<StreamEntry> processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         String start = args.get(1);
         String end = args.get(2);

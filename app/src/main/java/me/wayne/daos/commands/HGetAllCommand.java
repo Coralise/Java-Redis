@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +18,7 @@ public class HGetAllCommand extends AbstractCommand<List<String>> {
     }
 
     @Override
-    protected List<String> processCommand(StorePrintWriter out, List<String> args) {
+    protected List<String> processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         StoreMap hashMap = store.getStoreValue(key, StoreMap.class);
         if (hashMap == null) return new ArrayList<>();

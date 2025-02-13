@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +18,7 @@ public class BitOpCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
 
         String operation = args.get(0).toUpperCase();
         String destKey = args.get(1);
@@ -29,7 +33,7 @@ public class BitOpCommand extends AbstractCommand<Integer> {
             int[] reversedBits = new int[bits.length];
             for (int i = 0; i < bits.length; i++) reversedBits[i] = bits[i] == 0 ? 1 : 0;
             byte[] reversedBytes = bitsToBytes(reversedBits);
-            store.setStoreValue(destKey, new String(reversedBytes));
+            store.setStoreValue(destKey, new String(reversedBytes), inputLine);
             return reversedBytes.length;
         }
 
@@ -72,7 +76,7 @@ public class BitOpCommand extends AbstractCommand<Integer> {
         }
 
         byte[] combinedBytes = bitsToBytes(combinedBits);
-        store.setStoreValue(destKey, new String(combinedBytes));
+        store.setStoreValue(destKey, new String(combinedBytes), inputLine);
         return combinedBytes.length;
     }
 

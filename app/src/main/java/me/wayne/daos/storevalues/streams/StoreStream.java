@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 import me.wayne.daos.io.StorePrintWriter;
 
 public class StoreStream implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final TreeSet<StreamEntry> entries = new TreeSet<>();
     private final TreeSet<ConsumerGroup> consumerGroups = new TreeSet<>();

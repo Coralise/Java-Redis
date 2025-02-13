@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +18,7 @@ public class LRangeCommand extends AbstractCommand<List<String>> {
     }
 
     @Override
-    protected List<String> processCommand(StorePrintWriter out, List<String> args) {
+    protected List<String> processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         int start = Integer.parseInt(args.get(1));
         int stop = Integer.parseInt(args.get(2));

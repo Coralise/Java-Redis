@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import me.wayne.InMemoryStore;
 
 public class Expiry implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(Expiry.class.getName());
 
@@ -29,16 +30,19 @@ public class Expiry implements Serializable {
     }
 
     private Runnable getThreadRunnable(long timestamp, String keyToDelete) {
+        long timeInMillis = timestamp - System.currentTimeMillis();
+        if (timeInMillis <= 0) {
+            InMemoryStore.getInstance().removeStoreValue(keyToDelete, null);
+            LOGGER.log(Level.INFO, "Key {0} has expired", keyToDelete);
+            return () -> {};
+        }
         return () -> {
-            long timeInMillis = timestamp - System.currentTimeMillis();
-            if (timeInMillis > 0) {
-                try {
-                    Thread.sleep(timeInMillis);
-                } catch (InterruptedException e) {
-                    return;
-                }
+            try {
+                Thread.sleep(timeInMillis);
+            } catch (InterruptedException e) {
+                return;
             }
-            InMemoryStore.getInstance().removeStoreValue(keyToDelete);
+            InMemoryStore.getInstance().removeStoreValue(keyToDelete, null);
             LOGGER.log(Level.INFO, "Key {0} has expired", keyToDelete);
         };
     }

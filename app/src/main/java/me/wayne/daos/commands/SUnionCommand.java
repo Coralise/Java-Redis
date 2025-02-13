@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +19,7 @@ public class SUnionCommand extends AbstractCommand<Object> {
     }
 
     @Override
-    protected Object processCommand(StorePrintWriter out, List<String> args) {
+    protected Object processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         List<String> keys = args;
         List<StoreSet> hashSets = new ArrayList<>();
         for (String key : keys) {

@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -15,7 +19,7 @@ public class SetBitCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         int offset = Integer.parseInt(args.get(1));
         int bitValue = Integer.parseInt(args.get(2));
@@ -32,7 +36,7 @@ public class SetBitCommand extends AbstractCommand<Integer> {
         bytes = setBit(bytes, offset, bitValue);
         logger.log(Level.INFO, "BitSet: {0}", bitSetToBinaryString(bytes));
 
-        store.setStoreValue(key, new String(bytes));
+        store.setStoreValue(key, new String(bytes), inputLine);
         return previousBit;
     }
     

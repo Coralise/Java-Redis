@@ -1,6 +1,9 @@
 package me.wayne.daos.storevalues;
 
-public class ScoreMember implements Comparable<ScoreMember> {
+import java.io.Serializable;
+
+public class ScoreMember implements Comparable<ScoreMember>, Serializable {
+    private static final long serialVersionUID = 1L;
     
     private final Integer score;
     private final String member;

@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +21,7 @@ public class XAddCommand extends AbstractCommand<String> {
 
     @SuppressWarnings("all")
     @Override
-    protected String processCommand(StorePrintWriter out, List<String> args) {
+    protected String processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
 
         String key = args.get(0);
         XAddArguments xAddArguments = parseXAddArguments(args);
@@ -27,7 +31,7 @@ public class XAddCommand extends AbstractCommand<String> {
         StoreStream streamList = store.getStoreValue(key, StoreStream.class, new StoreStream());
 
         String res = streamList.add(id, fieldsAndValues);
-        store.setStoreValue(key, streamList);
+        store.setStoreValue(key, streamList, inputLine);
         return res;
     }
 

@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
@@ -12,7 +16,7 @@ public class SetRangeCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, List<String> args) {
+    protected String processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         int offset = Integer.parseInt(args.get(1));
         String value = args.get(2);
@@ -20,7 +24,7 @@ public class SetRangeCommand extends AbstractCommand<String> {
         String existingValue = storeValue.getValue(String.class);
         StringBuilder newValue = new StringBuilder(existingValue);
         newValue.replace(offset, offset + value.length(), value);
-        store.setStoreValue(key, newValue.toString());
+        store.setStoreValue(key, newValue.toString(), inputLine);
         return newValue.toString();
     }
     

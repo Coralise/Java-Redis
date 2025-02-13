@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +20,7 @@ public class TsCreateCommand extends AbstractCommand<String> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected String processCommand(StorePrintWriter out, List<String> args) {
+    protected String processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         Map<String, Object> options = parseOptions(args);
         String key = (String) options.get("key");
         long retentionPeriod = (long) options.getOrDefault("retentionPeriod", 0L);
@@ -25,7 +29,7 @@ public class TsCreateCommand extends AbstractCommand<String> {
         double ignoreMaxValDiff = (double) options.getOrDefault("ignoreMaxValDiff", 0.0);
         Map<String, String> labels = (Map<String, String>) options.getOrDefault("labels", new HashMap<>());
 
-        store.setStoreValue(key, new TimeSeries(key, duplicatePolicy, retentionPeriod, labels, ignoreMaxTimeDiff, ignoreMaxValDiff));
+        store.setStoreValue(key, new TimeSeries(key, duplicatePolicy, retentionPeriod, labels, ignoreMaxTimeDiff, ignoreMaxValDiff), inputLine);
         return OK_RESPONSE;
     }
 

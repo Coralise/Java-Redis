@@ -11,6 +11,7 @@ import me.wayne.AssertUtil;
 import me.wayne.daos.Pair;
 
 public class TimeSeries implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final String key;
     private final DuplicatePolicy duplicatePolicy;

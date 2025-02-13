@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 public class StreamEntry implements Comparable<StreamEntry>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Nonnull
     private final StreamId id;

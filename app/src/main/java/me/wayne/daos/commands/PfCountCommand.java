@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
@@ -13,7 +17,7 @@ public class PfCountCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         List<HyperLogLog> hyperLogLogs = args.subList(0, args.size()).stream().map(key -> {
             StoreValue storeValue = store.getStoreValue(key);
             return storeValue == null ? new HyperLogLog() : storeValue.getValue(HyperLogLog.class);

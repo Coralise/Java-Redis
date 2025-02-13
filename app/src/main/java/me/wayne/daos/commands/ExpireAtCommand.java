@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
@@ -12,7 +16,7 @@ public class ExpireAtCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         long timestamp = Long.parseLong(args.get(1));
         boolean nx = false;
@@ -32,7 +36,7 @@ public class ExpireAtCommand extends AbstractCommand<Integer> {
             return 0;
         }
         
-        return storeValue.setExpiryAtDate(timestamp, nx, xx, gt, lt, key);
+        return store.setExpiryAtDate(storeValue, timestamp, nx, xx, gt, lt, key, inputLine);
     }
     
 }

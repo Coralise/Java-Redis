@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
@@ -12,7 +16,7 @@ public class HSetCommand extends AbstractCommand<Integer> {
     }
 
     @Override
-    protected Integer processCommand(StorePrintWriter out, List<String> args) {
+    protected Integer processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         List<String> fieldsAndValues = args.subList(1, args.size());
         StoreMap hashMap = new StoreMap();
@@ -21,7 +25,7 @@ public class HSetCommand extends AbstractCommand<Integer> {
             hashMap.put(fieldsAndValues.get(i-1), fieldsAndValues.get(i));
             added++;
         }
-        store.setStoreValue(key, hashMap);
+        store.setStoreValue(key, hashMap, inputLine);
         return added;
     }
     

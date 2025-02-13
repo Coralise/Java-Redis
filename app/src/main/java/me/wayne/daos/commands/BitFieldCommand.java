@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -17,7 +21,7 @@ public class BitFieldCommand extends AbstractCommand<List<Integer>> {
         }
     
         @Override
-    protected List<Integer> processCommand(StorePrintWriter out, List<String> args) {
+    protected List<Integer> processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         
         String key = args.get(0);
         List<String> subcommands = extractSubcommands(args.subList(1, args.size()));
@@ -28,7 +32,7 @@ public class BitFieldCommand extends AbstractCommand<List<Integer>> {
             bitField = storeValue.getValue(BitField.class);
         } else {
             bitField = new BitField();
-            store.setStoreValue(key, bitField);
+            store.setStoreValue(key, bitField, inputLine);
         }
 
         List<Integer> results = new ArrayList<>();

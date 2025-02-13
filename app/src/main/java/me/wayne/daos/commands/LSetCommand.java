@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
@@ -13,7 +17,7 @@ public class LSetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, List<String> args) {
+    protected String processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         int index = Integer.parseInt(args.get(1));
         String value = args.get(2);
@@ -22,7 +26,7 @@ public class LSetCommand extends AbstractCommand<String> {
         while (index < 0) index += list.size();
         if (index >= list.size()) return INDEX_OUT_OF_RANGE_MSG;
         list.set(index, value); 
-        store.setStoreValue(key, list);
+        store.setStoreValue(key, list, inputLine);
         return OK_RESPONSE;
     }
     

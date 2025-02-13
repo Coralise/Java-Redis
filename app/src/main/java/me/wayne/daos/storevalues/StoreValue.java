@@ -9,6 +9,7 @@ import me.wayne.daos.Expiry;
 
 
 public class StoreValue implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Nonnull
     private final Serializable value;
@@ -55,7 +56,7 @@ public class StoreValue implements Serializable {
         long currentTimestamp = System.currentTimeMillis();
         long timeInMillis = timestamp - currentTimestamp;
         if (timeInMillis <= 0) {
-            InMemoryStore.getInstance().removeStoreValue(key);
+            InMemoryStore.getInstance().removeStoreValue(key, null);
         }
         if (nx && xx) throw new IllegalArgumentException("NX and XX are mutually exclusive");
         if (gt && lt) throw new IllegalArgumentException("GT and LT are mutually exclusive");

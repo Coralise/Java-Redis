@@ -1,11 +1,13 @@
 package me.wayne.daos.storevalues.timeseries;
 
+import java.io.Serializable;
 import java.util.TreeMap;
 
 import me.wayne.AssertUtil;
 import me.wayne.daos.Pair;
 
-public class TimeSeriesBucket implements Comparable<TimeSeriesBucket> {
+public class TimeSeriesBucket implements Comparable<TimeSeriesBucket>, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final Long bucketStart;
     private final Long bucketDuration;

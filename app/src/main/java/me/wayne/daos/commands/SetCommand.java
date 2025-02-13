@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +18,7 @@ public class SetCommand extends AbstractCommand<String> {
     }
 
     @Override
-    protected String processCommand(StorePrintWriter out, List<String> args) {
+    protected String processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
 
         Map<String, Object> parsedArgs = parseArgs(args);
         String key = (String) parsedArgs.get("key");
@@ -41,7 +45,7 @@ public class SetCommand extends AbstractCommand<String> {
         if (oldValue != null && nx) return null;
         if (oldValue == null && xx) return null;
 
-        store.setStoreValue(key, value);
+        store.setStoreValue(key, value, inputLine);
         return get ? (String) oldValue : OK_RESPONSE;
     }
 

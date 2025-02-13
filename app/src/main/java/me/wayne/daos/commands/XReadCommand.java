@@ -1,5 +1,9 @@
 package me.wayne.daos.commands;
 
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -22,7 +26,7 @@ public class XReadCommand extends AbstractCommand<Map<String, SortedSet<StreamEn
 
     @SuppressWarnings("all")
     @Override
-    protected Map<String, SortedSet<StreamEntry>> processCommand(StorePrintWriter out, List<String> args) {
+    protected Map<String, SortedSet<StreamEntry>> processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
 
         Map<String, Object> parsedCommand = parseXReadCommand(args);
         List<String> keys = (List<String>) parsedCommand.get("keys");
