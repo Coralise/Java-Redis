@@ -76,6 +76,7 @@ public abstract class Commands {
         commandMap.put("SUBSCRIBE", new SubscribeCommand());
         commandMap.put("UNSUBSCRIBE", new UnsubscribeCommand());
         commandMap.put("PUBLISH", new PublishCommand());
+        commandMap.put("SAVE", new SaveCommand());
     }
 
     private Commands() {}

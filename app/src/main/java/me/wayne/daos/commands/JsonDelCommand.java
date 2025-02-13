@@ -3,7 +3,7 @@ package me.wayne.daos.commands;
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.storevalues.RedisJson;
+import me.wayne.daos.storevalues.JedisJson;
 import me.wayne.daos.storevalues.StoreValue;
 
 public class JsonDelCommand extends AbstractCommand<Integer> {
@@ -18,7 +18,7 @@ public class JsonDelCommand extends AbstractCommand<Integer> {
         String path = args.get(1);
 
         StoreValue storeValue = store.getStoreValue(key, true);
-        RedisJson redisJson = storeValue.getValue(RedisJson.class);
+        JedisJson redisJson = storeValue.getValue(JedisJson.class);
 
         return redisJson.delete(path);
     }

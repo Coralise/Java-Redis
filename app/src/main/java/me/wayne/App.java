@@ -17,6 +17,7 @@ public class App {
     }
 
     App() {
+        InMemoryStore.getInstance();
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             logger.info("Server started on port " + PORT);
             while (true) {

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import me.wayne.AssertUtil;
 
-public class RedisJson implements Serializable {
+public class JedisJson implements Serializable {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private JsonNode jsonData;
@@ -34,7 +34,7 @@ public class RedisJson implements Serializable {
         jsonData = MAPPER.readTree(jsonString);
     }
 
-    public RedisJson() {
+    public JedisJson() {
         this.jsonData = MAPPER.createArrayNode();
     }
 
@@ -442,7 +442,7 @@ public class RedisJson implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        RedisJson other = (RedisJson) obj;
+        JedisJson other = (JedisJson) obj;
         if (jsonData == null) {
             if (other.jsonData != null)
                 return false;

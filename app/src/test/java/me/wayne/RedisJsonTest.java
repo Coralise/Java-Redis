@@ -13,13 +13,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import me.wayne.daos.storevalues.RedisJson;
+import me.wayne.daos.storevalues.JedisJson;
 
 class RedisJsonTest {
     
     @Test
     void redisJsonTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"users\": [\"Alice\", \"Bob\"]}", false, false);
@@ -46,7 +46,7 @@ class RedisJsonTest {
 
     @Test
     void complexJsonTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"users\": [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}], \"active\": true}", false, false);
@@ -74,7 +74,7 @@ class RedisJsonTest {
 
     @Test
     void jsonMultiTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"users\": [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}], \"active\": true, \"multiline\": {\"a\": {\"a\": \"Value1\"}, \"b\": {\"a\": \"Value1\"}, \"c\": {\"a\": \"Value1\"}}}", false, false);
@@ -86,7 +86,7 @@ class RedisJsonTest {
 
     @Test
     void getChildNodeTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"users\": [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}], \"active\": true}", false, false);
@@ -104,7 +104,7 @@ class RedisJsonTest {
 
     @Test
     void getChildNodeNestedTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"users\": [{\"name\": \"Alice\", \"age\": 30, \"address\": {\"city\": \"Wonderland\"}}, {\"name\": \"Bob\", \"age\": 25, \"address\": {\"city\": \"Builderland\"}}], \"active\": true}", false, false);
@@ -120,7 +120,7 @@ class RedisJsonTest {
 
     @Test
     void nestedArraysTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"matrix\": [[1, 2, 3], [4, 5, 6], [7, 8, 9]]}", false, false);
@@ -148,7 +148,7 @@ class RedisJsonTest {
 
     @Test
     void getNonExistentPathTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"users\": [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}], \"active\": true}", false, false);
@@ -160,7 +160,7 @@ class RedisJsonTest {
 
     @Test
     void getMultiPathTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"users\": [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}], \"active\": true, \"multiline\": {\"a\": {\"a\": \"Value1\"}, \"b\": {\"a\": \"Value1\"}, \"c\": {\"a\": \"Value1\"}}}", false, false);
@@ -171,7 +171,7 @@ class RedisJsonTest {
 
     @Test
     void deleteTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"users\": [\"Alice\", \"Bob\"], \"active\": true}", false, false);
@@ -196,7 +196,7 @@ class RedisJsonTest {
         "{\"users\": [{\"name\": \"Alice\", \"age\": 30, \"address\": {\"city\": \"Wonderland\", \"zip\": \"12345\"}}, {\"name\": \"Bob\", \"age\": 25, \"address\": {\"city\": \"Builderland\", \"zip\": \"67890\"}}], \"active\": true}"
     })
     void multiDeleteTest(String json) {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", json, false, false);
@@ -213,7 +213,7 @@ class RedisJsonTest {
 
     @Test
     void getMultiTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"a\":2, \"b\": 3, \"nested\": {\"a\": 4, \"b\": null}}", false, false);
@@ -229,7 +229,7 @@ class RedisJsonTest {
 
     @Test
     void arrayAppendTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"users\": [\"Alice\", \"Bob\"]}", false, false);
@@ -245,7 +245,7 @@ class RedisJsonTest {
 
     @Test
     void arrayAppendNestedTest() {
-        RedisJson redisJson = new RedisJson();
+        JedisJson redisJson = new JedisJson();
 
         // Set root ($)
         redisJson.set("$", "{\"groups\": [{\"name\": \"Group1\", \"members\": [\"Alice\"]}, {\"name\": \"Group2\", \"members\": [\"Bob\"]}]}", false, false);

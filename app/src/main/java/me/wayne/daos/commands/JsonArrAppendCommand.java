@@ -3,7 +3,7 @@ package me.wayne.daos.commands;
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.storevalues.RedisJson;
+import me.wayne.daos.storevalues.JedisJson;
 import me.wayne.daos.storevalues.StoreValue;
 
 public class JsonArrAppendCommand extends AbstractCommand<Integer> {
@@ -19,7 +19,7 @@ public class JsonArrAppendCommand extends AbstractCommand<Integer> {
         List<String> values = args.subList(2, args.size());
 
         StoreValue storeValue = store.getStoreValue(key, true);
-        RedisJson redisJson = storeValue.getValue(RedisJson.class);
+        JedisJson redisJson = storeValue.getValue(JedisJson.class);
 
         return redisJson.arrayAppend(path, values.toArray(new String[0]));
     }

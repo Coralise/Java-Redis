@@ -1,5 +1,6 @@
 package me.wayne.daos.storevalues.probabilistic;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -7,7 +8,7 @@ import java.math.MathContext;
 import me.wayne.AssertUtil;
 
 public class HyperLogLog implements Serializable {
-    private final transient int precision;
+    private transient int precision;
     private final byte[] registers;
 
     public HyperLogLog() {
@@ -23,6 +24,11 @@ public class HyperLogLog implements Serializable {
                 registers[i] = (byte) Math.max(registers[i], hyperLogLog.registers[i]);
             }
         }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.precision = 15;
     }
 
     public int add(String string) {

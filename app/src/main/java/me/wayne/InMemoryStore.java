@@ -1,10 +1,13 @@
 package me.wayne;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,11 +20,27 @@ import me.wayne.daos.storevalues.StoreValue;
 
 public class InMemoryStore implements Serializable {
 
+    private static final Logger LOGGER = Logger.getLogger(InMemoryStore.class.getName());
     // Private static instance of the same class
     private static InMemoryStore instance;
 
-    // Private constructor to prevent instantiation
-    private InMemoryStore() {}
+    static {
+        LOGGER.log(Level.INFO, "Loading store from disk");
+        instance = PersistenceManager.loadStore();
+    }
+
+    private final Map<String, StoreValue> store = new HashMap<>();
+    private transient Map<Thread, Transaction> transactions = new HashMap<>();
+    private transient Map<String, Channel> channels = new HashMap<>();
+
+    private InMemoryStore() {
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        transactions = new HashMap<>();
+        channels = new HashMap<>();
+    }
 
     // Public method to provide access to the instance
     public static synchronized InMemoryStore getInstance() {
@@ -30,10 +49,6 @@ public class InMemoryStore implements Serializable {
         }
         return instance;
     }
-
-    private final Map<String, StoreValue> store = new HashMap<>();
-    private final transient Map<Thread, Transaction> transactions = new HashMap<>();
-    private final transient Map<String, Channel> channels = new HashMap<>();
 
     public Channel getChannel(String name) {
         return channels.get(name);

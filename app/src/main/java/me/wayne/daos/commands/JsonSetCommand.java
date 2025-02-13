@@ -3,7 +3,7 @@ package me.wayne.daos.commands;
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.storevalues.RedisJson;
+import me.wayne.daos.storevalues.JedisJson;
 
 public class JsonSetCommand extends AbstractCommand<String> {
 
@@ -19,7 +19,7 @@ public class JsonSetCommand extends AbstractCommand<String> {
         boolean nx = args.size() == 4 && args.get(3).equalsIgnoreCase("NX");
         boolean xx = args.size() == 4 && args.get(3).equalsIgnoreCase("XX");
 
-        RedisJson redisJson = store.getStoreValue(key, RedisJson.class, new RedisJson());
+        JedisJson redisJson = store.getStoreValue(key, JedisJson.class, new JedisJson());
 
         String response = redisJson.set(path, value, xx, nx) ? OK_RESPONSE : null;
 

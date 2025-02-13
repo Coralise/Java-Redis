@@ -1,5 +1,6 @@
 package me.wayne.daos.storevalues.streams;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -18,7 +19,16 @@ public class StoreStream implements Serializable {
 
     private final TreeSet<StreamEntry> entries = new TreeSet<>();
     private final TreeSet<ConsumerGroup> consumerGroups = new TreeSet<>();
-    private final transient ArrayList<Thread> readers = new ArrayList<>();
+    private transient ArrayList<Thread> readers;
+
+    public StoreStream() {
+        readers = new ArrayList<>();
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        readers = new ArrayList<>();
+    }
 
     public void addReader(Thread reader) {
         readers.add(reader);
