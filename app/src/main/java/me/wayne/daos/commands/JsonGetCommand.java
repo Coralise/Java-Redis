@@ -5,9 +5,9 @@ import java.util.SortedMap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import me.wayne.daos.RedisJson;
-import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.RedisJson;
+import me.wayne.daos.storevalues.StoreValue;
 
 public class JsonGetCommand extends AbstractCommand<String> {
 

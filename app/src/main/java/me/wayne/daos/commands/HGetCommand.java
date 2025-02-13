@@ -2,8 +2,8 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.daos.StoreMap;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.StoreMap;
 
 public class HGetCommand extends AbstractCommand<String> {
 

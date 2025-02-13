@@ -25,6 +25,9 @@ dependencies {
     // Replace org.json dependency with Jackson
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 
+    // Add snakeyaml for YAML parsing
+    implementation 'org.yaml:snakeyaml:2.3'
+
     // Add Mockito for testing
     testImplementation 'org.mockito:mockito-core:4.0.0'
 }

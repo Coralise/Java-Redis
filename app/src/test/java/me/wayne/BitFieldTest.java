@@ -3,8 +3,8 @@ package me.wayne;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import me.wayne.daos.bitfields.BitField;
-import me.wayne.daos.bitfields.OverflowMode;
+import me.wayne.daos.storevalues.bitfields.BitField;
+import me.wayne.daos.storevalues.bitfields.OverflowMode;
 
 class BitFieldTest {
     

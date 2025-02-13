@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.logging.Level;
 
 import me.wayne.AssertUtil;
-import me.wayne.daos.GeoMember;
-import me.wayne.daos.GeoSpace;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.GeoMember;
+import me.wayne.daos.storevalues.GeoSpace;
 
 public class GeoAddCommand extends AbstractCommand<Integer> {
 

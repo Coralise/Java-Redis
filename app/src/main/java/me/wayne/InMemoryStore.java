@@ -1,5 +1,6 @@
 package me.wayne;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,13 +9,13 @@ import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import me.wayne.daos.StoreValue;
 import me.wayne.daos.Transaction;
 import me.wayne.daos.commands.AbstractCommand;
 import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.pubsub.Channel;
+import me.wayne.daos.storevalues.StoreValue;
 
-public class InMemoryStore {
+public class InMemoryStore implements Serializable {
 
     // Private static instance of the same class
     private static InMemoryStore instance;
@@ -31,8 +32,8 @@ public class InMemoryStore {
     }
 
     private final Map<String, StoreValue> store = new HashMap<>();
-    private final Map<Thread, Transaction> transactions = new HashMap<>();
-    private final Map<String, Channel> channels = new HashMap<>();
+    private final transient Map<Thread, Transaction> transactions = new HashMap<>();
+    private final transient Map<String, Channel> channels = new HashMap<>();
 
     public Channel getChannel(String name) {
         return channels.get(name);
@@ -105,13 +106,17 @@ public class InMemoryStore {
         return store.containsKey(key);
     }
 
-    public StoreValue setStoreValue(String key, Object value) {
+    public StoreValue setStoreValue(String key, Serializable value) {
         if (hasStoreValue(key)) {
             StoreValue oldStoreValue = getStoreValue(key);
             if (oldStoreValue.getValue().equals(value)) return oldStoreValue;
             if (oldStoreValue.hasExpiration()) oldStoreValue.stopExpirationThread();
         }
-        return store.put(key, new StoreValue(value));
+        StoreValue put = store.put(key, new StoreValue(value));
+        
+        // Save to AOF
+
+        return put;
     }
 
     public StoreValue removeStoreValue(String key) {

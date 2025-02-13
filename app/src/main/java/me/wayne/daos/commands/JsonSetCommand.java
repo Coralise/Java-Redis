@@ -2,8 +2,8 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.daos.RedisJson;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.RedisJson;
 
 public class JsonSetCommand extends AbstractCommand<String> {
 

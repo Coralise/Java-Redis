@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import me.wayne.daos.probabilistic.HyperLogLog;
+import me.wayne.daos.storevalues.probabilistic.HyperLogLog;
 
 class HyperLogLogTest {
 
@@ -71,7 +71,7 @@ class HyperLogLogTest {
         100000000
     })
     void hyperLogLogTest(int count) {
-        HyperLogLog hyperLogLog = new HyperLogLog(15);
+        HyperLogLog hyperLogLog = new HyperLogLog();
         for (int i = 0; i < count; i++) {
             hyperLogLog.add("Test-" + i);
         }

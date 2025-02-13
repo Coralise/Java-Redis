@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.SortedSet;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.streams.StoreStream;
-import me.wayne.daos.streams.StreamEntry;
+import me.wayne.daos.storevalues.streams.StoreStream;
+import me.wayne.daos.storevalues.streams.StreamEntry;
 
 public class XRangeCommand extends AbstractCommand<SortedSet<StreamEntry>> {
 

@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import me.wayne.daos.RedisJson;
+import me.wayne.daos.storevalues.RedisJson;
 
 class RedisJsonTest {
     

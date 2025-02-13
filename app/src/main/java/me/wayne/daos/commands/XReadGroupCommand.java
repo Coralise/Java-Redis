@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.streams.StoreStream;
+import me.wayne.daos.storevalues.streams.StoreStream;
 
 public class XReadGroupCommand extends AbstractCommand<String> {
 

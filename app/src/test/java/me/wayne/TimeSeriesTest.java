@@ -1,7 +1,7 @@
 package me.wayne;
 
-import me.wayne.daos.timeseries.DuplicatePolicy;
-import me.wayne.daos.timeseries.TimeSeries;
+import me.wayne.daos.storevalues.timeseries.DuplicatePolicy;
+import me.wayne.daos.storevalues.timeseries.TimeSeries;
 
 import org.junit.jupiter.api.Test;
 

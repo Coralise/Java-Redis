@@ -2,9 +2,9 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.daos.StoreSet;
-import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.StoreSet;
+import me.wayne.daos.storevalues.StoreValue;
 
 public class SAddCommand extends AbstractCommand<Integer> {
 

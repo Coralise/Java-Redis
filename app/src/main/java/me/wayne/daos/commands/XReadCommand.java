@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.SortedSet;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.streams.StoreStream;
-import me.wayne.daos.streams.StreamEntry;
-import me.wayne.daos.streams.StreamId;
+import me.wayne.daos.storevalues.streams.StoreStream;
+import me.wayne.daos.storevalues.streams.StreamEntry;
+import me.wayne.daos.storevalues.streams.StreamId;
 
 public class XReadCommand extends AbstractCommand<Map<String, SortedSet<StreamEntry>>> {
 

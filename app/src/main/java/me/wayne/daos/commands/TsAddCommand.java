@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.timeseries.DuplicatePolicy;
-import me.wayne.daos.timeseries.TimeSeries;
+import me.wayne.daos.storevalues.timeseries.DuplicatePolicy;
+import me.wayne.daos.storevalues.timeseries.TimeSeries;
 
 public class TsAddCommand extends AbstractCommand<Object> {
 

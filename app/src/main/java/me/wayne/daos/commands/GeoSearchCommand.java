@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
-import me.wayne.daos.GeoMember;
-import me.wayne.daos.GeoSpace;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.GeoMember;
+import me.wayne.daos.storevalues.GeoSpace;
 
 public class GeoSearchCommand extends AbstractCommand<List<List<Object>>> {
 

@@ -2,9 +2,9 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.probabilistic.HyperLogLog;
+import me.wayne.daos.storevalues.probabilistic.HyperLogLog;
+import me.wayne.daos.storevalues.StoreValue;
 
 public class PfAddCommand extends AbstractCommand<Integer> {
 
@@ -18,7 +18,7 @@ public class PfAddCommand extends AbstractCommand<Integer> {
         List<String> values = args.subList(1, args.size());
 
         StoreValue storeValue = store.getStoreValue(key);
-        HyperLogLog hyperLogLog = storeValue == null ? new HyperLogLog(15) : storeValue.getValue(HyperLogLog.class);
+        HyperLogLog hyperLogLog = storeValue == null ? new HyperLogLog() : storeValue.getValue(HyperLogLog.class);
 
         boolean updated = false;
         double oldEstimate = hyperLogLog.estimate();

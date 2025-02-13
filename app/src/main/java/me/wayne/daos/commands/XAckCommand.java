@@ -3,9 +3,9 @@ package me.wayne.daos.commands;
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.streams.ConsumerGroup;
-import me.wayne.daos.streams.StoreStream;
-import me.wayne.daos.streams.StreamId;
+import me.wayne.daos.storevalues.streams.ConsumerGroup;
+import me.wayne.daos.storevalues.streams.StoreStream;
+import me.wayne.daos.storevalues.streams.StreamId;
 
 public class XAckCommand extends AbstractCommand<Integer> {
 

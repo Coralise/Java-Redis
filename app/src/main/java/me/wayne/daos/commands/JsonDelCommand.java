@@ -2,9 +2,9 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.daos.RedisJson;
-import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.RedisJson;
+import me.wayne.daos.storevalues.StoreValue;
 
 public class JsonDelCommand extends AbstractCommand<Integer> {
 

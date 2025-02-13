@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import me.wayne.daos.StoreMap;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.StoreMap;
 
 public class HGetAllCommand extends AbstractCommand<List<String>> {
 

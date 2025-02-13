@@ -1,0 +1,7 @@
+Persistence:
+  Snapshots:
+    Enabled: true
+    Save-Interval-In-Minutes: 5
+    Least-Keys-Changed-Per-Snapshot: 10
+  Append-Only-File:
+    Enabled: true

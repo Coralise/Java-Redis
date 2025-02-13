@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import me.wayne.daos.StoreSet;
-import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.StoreSet;
+import me.wayne.daos.storevalues.StoreValue;
 
 public class SUnionCommand extends AbstractCommand<Object> {
 

@@ -5,10 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import me.wayne.daos.ScoreMember;
-import me.wayne.daos.StoreSortedSet;
-import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.ScoreMember;
+import me.wayne.daos.storevalues.StoreSortedSet;
+import me.wayne.daos.storevalues.StoreValue;
 
 public class ZRangeCommand extends AbstractCommand<List<String>> {
 

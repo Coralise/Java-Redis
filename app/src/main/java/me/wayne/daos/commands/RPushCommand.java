@@ -2,8 +2,8 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.daos.StoreList;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.StoreList;
 
 public class RPushCommand extends AbstractCommand<Integer> {
 

@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.wayne.daos.StoreValue;
-import me.wayne.daos.bitfields.BitField;
-import me.wayne.daos.bitfields.OverflowMode;
+import me.wayne.daos.storevalues.bitfields.BitField;
+import me.wayne.daos.storevalues.bitfields.OverflowMode;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.StoreValue;
 
 public class BitFieldCommand extends AbstractCommand<List<Integer>> {
 

@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.logging.Level;
 
 import me.wayne.AssertUtil;
-import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.StoreValue;
 
 public class SetBitCommand extends AbstractCommand<Integer> {
 

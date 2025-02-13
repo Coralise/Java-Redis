@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.streams.StoreStream;
-import me.wayne.daos.streams.StreamId;
+import me.wayne.daos.storevalues.streams.StoreStream;
+import me.wayne.daos.storevalues.streams.StreamId;
 
 public class XAddCommand extends AbstractCommand<String> {
 

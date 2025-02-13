@@ -7,8 +7,8 @@ import java.util.Map;
 
 import me.wayne.daos.Pair;
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.timeseries.TimeSeries;
-import me.wayne.daos.timeseries.TimeSeriesAggregation;
+import me.wayne.daos.storevalues.timeseries.TimeSeries;
+import me.wayne.daos.storevalues.timeseries.TimeSeriesAggregation;
 
 public class TsRangeCommand extends AbstractCommand<List<Pair<Long, Double>>> {
 

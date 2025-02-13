@@ -4,7 +4,7 @@ import java.util.List;
 
 import me.wayne.daos.Pair;
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.timeseries.TimeSeries;
+import me.wayne.daos.storevalues.timeseries.TimeSeries;
 
 public class TsGetCommand extends AbstractCommand<Pair<Long, Double>> {
 

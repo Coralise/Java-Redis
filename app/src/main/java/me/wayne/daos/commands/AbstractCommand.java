@@ -87,7 +87,7 @@ public abstract class AbstractCommand<T> {
 
     private List<String> getArgs(String input) {
         List<String> result = new ArrayList<>();
-        Pattern pattern = Pattern.compile("(?:[^\\s\"]+)|\"((?:\\\\.|[^\"\\\\])*)\"");
+        Pattern pattern = Pattern.compile("[^\\s\"]+|\"((?:\\\\.|[^\"\\\\])*)\"");
         Matcher matcher = pattern.matcher(input);
 
         while (matcher.find()) {

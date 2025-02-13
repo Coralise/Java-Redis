@@ -2,10 +2,10 @@ package me.wayne.daos.commands;
 
 import java.util.List;
 
-import me.wayne.daos.ScoreMember;
-import me.wayne.daos.StoreSortedSet;
-import me.wayne.daos.StoreValue;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.ScoreMember;
+import me.wayne.daos.storevalues.StoreSortedSet;
+import me.wayne.daos.storevalues.StoreValue;
 
 public class ZRemCommand extends AbstractCommand<Integer> {
 
