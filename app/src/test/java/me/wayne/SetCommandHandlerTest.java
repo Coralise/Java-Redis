@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.Test;
 
 import me.wayne.daos.io.StoreBufferedReader;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.PrintableList;
+import me.wayne.daos.storevalues.StoreSet;
 
 class SetCommandHandlerTest {
 
@@ -42,31 +45,39 @@ class SetCommandHandlerTest {
     }
 
     @Test
-    void testSaddCommand() throws IOException {
-        String response = sendMessage("SADD set1 member1 member2 member3");
-        assertEquals("3", response);
-        response = sendMessage("SMEMBERS set1");
-        Set<String> expectedMembers = new HashSet<>(Arrays.asList("member1", "member2", "member3"));
-        assertEquals(expectedMembers, new HashSet<>(Arrays.asList(response.replace("[", "").replace("]", "").split(", "))));
-        response = sendMessage("SADD set1 member2 member4");
-        assertEquals("1", response);
+    void testSaddCommand() {
+        StoreSet storeSet = new StoreSet();
+        storeSet.add("member1");
+        storeSet.add("member2");
+        storeSet.add("member3");
+        assertEquals(3, storeSet.size());
+        assertEquals("""
+                1) member1
+                2) member2
+                3) member3""", new PrintableList<>(storeSet).toString());
+        storeSet.add("member2");
+        storeSet.add("member4");
+        assertEquals("""
+                1) member1
+                2) member2
+                3) member3
+                4) member4""", new PrintableList<>(storeSet).toString());
     }
 
     @Test
-    void testSremCommand() throws IOException {
-        String response = sendMessage("SADD myset \"one\"");
-        assertEquals("1", response);
-        response = sendMessage("SADD myset \"two\"");
-        assertEquals("1", response);
-        response = sendMessage("SADD myset \"three\"");
-        assertEquals("1", response);
-        response = sendMessage("SREM myset \"one\"");
-        assertEquals("1", response);
-        response = sendMessage("SREM myset \"four\"");
-        assertEquals("0", response);
-        response = sendMessage("SMEMBERS myset");
-        Set<String> expectedMembers = new HashSet<>(Arrays.asList("two", "three"));
-        assertEquals(expectedMembers, new HashSet<>(Arrays.asList(response.replace("[", "").replace("]", "").split(", "))));
+    void testSremCommand() {
+        StoreSet storeSet = new StoreSet();
+        storeSet.add("one");
+        storeSet.add("two");
+        storeSet.add("three");
+        assertEquals(3, storeSet.size());
+        storeSet.remove("one");
+        assertEquals(2, storeSet.size());
+        storeSet.remove("four");
+        assertEquals(2, storeSet.size());
+        assertEquals("""
+                1) two
+                2) three""", new PrintableList<>(storeSet).toString());
     }
 
     @Test
@@ -83,23 +94,34 @@ class SetCommandHandlerTest {
     }
 
     @Test
-    void testSunionCommand() throws IOException {
-        sendMessage("SADD sUnion1 a b c d");
-        sendMessage("SADD sUnion2 c");
-        sendMessage("SADD sUnion3 a c e");
-        String response = sendMessage("SUNION sUnion1 sUnion2 sUnion3");
-        Set<String> expectedMembers = new HashSet<>(Arrays.asList("a", "b", "c", "d", "e"));
-        assertEquals(expectedMembers, new HashSet<>(Arrays.asList(response.replace("[", "").replace("]", "").split(", "))));
+    void testSunionCommand() {
+        StoreSet set1 = new StoreSet();
+        StoreSet set2 = new StoreSet();
+        StoreSet set3 = new StoreSet();
+        set1.addAll(List.of("a", "b", "c", "d"));
+        set2.add("c");
+        set3.addAll(List.of("a", "c", "e"));
+        StoreSet unionSet = StoreSet.union(set1, set2, set3);
+        assertEquals("""
+                1) a
+                2) b
+                3) c
+                4) d
+                5) e""", new PrintableList<>(unionSet).toString());
     }
 
     @Test
-    void testSdiffCommand() throws IOException {
-        sendMessage("SADD sDiff1 a b c d");
-        sendMessage("SADD sDiff2 c");
-        sendMessage("SADD sDiff3 a c e");
-        String response = sendMessage("SDIFF sDiff1 sDiff2 sDiff3");
-        Set<String> expectedMembers = new HashSet<>(Arrays.asList("b", "d"));
-        assertEquals(expectedMembers, new HashSet<>(Arrays.asList(response.replace("[", "").replace("]", "").split(", "))));
+    void testSdiffCommand() {
+        StoreSet set1 = new StoreSet();
+        StoreSet set2 = new StoreSet();
+        StoreSet set3 = new StoreSet();
+        set1.addAll(List.of("a", "b", "c", "d"));
+        set2.add("c");
+        set3.addAll(List.of("a", "c", "e"));
+        StoreSet diffSet = StoreSet.difference(set1, set2, set3);
+        assertEquals("""
+                1) b
+                2) d""", new PrintableList<>(diffSet).toString());
     }
 
     @Test

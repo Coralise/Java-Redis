@@ -20,7 +20,7 @@ public class RPushCommand extends AbstractCommand<Integer> {
         String key = args.get(0);
         List<String> values = args.subList(1, args.size());
         StoreList list = store.getStoreValue(key, StoreList.class, new StoreList());
-        for (String value : values) list.addLast(value);
+        list.rPush(values);
         store.setStoreValue(key, list, inputLine);
         return list.size();
     }

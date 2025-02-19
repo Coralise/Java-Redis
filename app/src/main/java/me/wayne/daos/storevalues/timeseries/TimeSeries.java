@@ -1,7 +1,6 @@
 package me.wayne.daos.storevalues.timeseries;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -9,6 +8,7 @@ import java.util.TreeSet;
 
 import me.wayne.AssertUtil;
 import me.wayne.daos.Pair;
+import me.wayne.daos.storevalues.PrintableList;
 
 public class TimeSeries implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -99,7 +99,7 @@ public class TimeSeries implements Serializable {
         String bucketTimestamp,
         boolean includeEmptyBuckets) {
 
-        ArrayList<Pair<Long, Double>> range = new ArrayList<>();
+        PrintableList<Pair<Long, Double>> range = new PrintableList<>();
 
         if (from <= 0) from = values.firstKey();
         if (to <= 0) to = values.lastKey();
@@ -155,7 +155,7 @@ public class TimeSeries implements Serializable {
 
             final String fBucketTimestamp = bucketTimestamp;
             
-            return aggregated.stream().map(bucket -> bucket.getEntry(aggregation, fBucketTimestamp)).toList();
+            return new PrintableList<>(aggregated.stream().map(bucket -> bucket.getEntry(aggregation, fBucketTimestamp)).toList());
         } else {
             return range;
         }

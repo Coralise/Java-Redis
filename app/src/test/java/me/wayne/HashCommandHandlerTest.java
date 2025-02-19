@@ -6,9 +6,6 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -17,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import me.wayne.daos.io.StoreBufferedReader;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.StoreMap;
 
 class HashCommandHandlerTest {
 
@@ -57,12 +55,15 @@ class HashCommandHandlerTest {
     }
 
     @Test
-    void testHgetallCommand() throws IOException {
-        sendMessage("HSET myhash field1 \"Hello\" field2 \"World\"");
-        String response = sendMessage("HGETALL myhash");
-        Set<String> expectedFieldsAndValues = new HashSet<>(Arrays.asList("field1", "Hello", "field2", "World"));
-        Set<String> actualFieldsAndValues = new HashSet<>(Arrays.asList(response.replace("[", "").replace("]", "").split(", ")));
-        assertEquals(expectedFieldsAndValues, actualFieldsAndValues);
+    void testHgetallCommand() {
+        StoreMap storeMap = new StoreMap();
+        storeMap.put("field1", "Hello");
+        storeMap.put("field2", "World");
+        assertEquals("""
+                1) field1
+                2) Hello
+                3) field2
+                4) World""", storeMap.getFieldsAndValues().toString());
     }
 
     @Test

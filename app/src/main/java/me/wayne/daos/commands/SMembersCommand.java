@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.PrintableList;
 import me.wayne.daos.storevalues.StoreSet;
 
 public class SMembersCommand extends AbstractCommand<String> {
@@ -20,7 +21,7 @@ public class SMembersCommand extends AbstractCommand<String> {
         String key = args.get(0);
         StoreSet storeValue = store.getStoreValue(key, StoreSet.class);
         if (storeValue == null) return "[]";
-        return storeValue.toString();
+        return new PrintableList<>(storeValue).toString();
     }
     
 }

@@ -152,8 +152,8 @@ public class InMemoryStore implements Serializable {
         PersistenceManager.snapshotSaveChecker(1);
         if (hasStoreValue(key)) {
             StoreValue oldStoreValue = getStoreValue(key);
+            if (oldStoreValue.hasExpiration()) oldStoreValue.removeExpiration();
             if (oldStoreValue.getValue().equals(value)) return oldStoreValue;
-            if (oldStoreValue.hasExpiration()) oldStoreValue.stopExpirationThread();
         }
         return store.put(key, new StoreValue(value));
     }

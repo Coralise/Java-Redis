@@ -1,6 +1,6 @@
 package me.wayne.daos;
 
-public class Pair<T, U> {
+public class Pair<T, U> implements Printable {
     private final T first;
     private final U second;
 
@@ -24,9 +24,16 @@ public class Pair<T, U> {
 
     @Override
     public String toString() {
-        return "[" + first + ", " + second + "]";
+        return toPrint(0);
     }
 
-    
+    @Override
+    public String toPrint(int indent) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("1) " + first + "\n");
+        for (int i = 0; i < indent*3; i++) sb.append(" ");
+        sb.append("2) " + second);
+        return sb.toString();
+    }
     
 }

@@ -4,13 +4,11 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.storevalues.ScoreMember;
 import me.wayne.daos.storevalues.StoreSortedSet;
 import me.wayne.daos.storevalues.StoreValue;
 
@@ -31,8 +29,6 @@ public class ZRangeCommand extends AbstractCommand<List<String>> {
 
         StoreValue storeValue = store.getStoreValue(key);
         StoreSortedSet treeSet = storeValue != null ? storeValue.getValue(StoreSortedSet.class) : new StoreSortedSet();
-        List<String> range = new ArrayList<>();
-        int i = 0;
         while (start < 0) start += treeSet.size();
         while (stop < 0) stop += treeSet.size();
 
@@ -40,25 +36,7 @@ public class ZRangeCommand extends AbstractCommand<List<String>> {
         boolean rev = options.contains("REV");
         boolean byScore = options.contains("BYSCORE");
 
-        if (!byScore) {
-            for (ScoreMember scoreMember : treeSet) {
-                if (i >= start && i <= stop) {
-                    range.add(scoreMember.getMember());
-                    if (withScores) range.add(scoreMember.getScore().toString());
-                }
-                i++;
-            }
-            return !rev ? range : range.reversed();
-        } else {
-            List<ScoreMember> scoreMembers = new ArrayList<>(treeSet);
-            for (int j = 0; j < scoreMembers.size(); j++) {
-                if (scoreMembers.get(j).getScore() >= start && scoreMembers.get(j).getScore() <= stop) {
-                    range.add(scoreMembers.get(j).getMember());
-                    if (withScores) range.add(scoreMembers.get(j).getScore().toString());
-                }
-            }
-            return !rev ? range : range.reversed();
-        }
+        return treeSet.range(start, stop, withScores, rev, byScore);
     }
 
     private ZRangeArguments parseZRangeArguments(List<String> args) {

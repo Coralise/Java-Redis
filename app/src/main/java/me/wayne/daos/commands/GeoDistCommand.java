@@ -21,7 +21,7 @@ public class GeoDistCommand extends AbstractCommand<String> {
         String key = args.get(0);
         String member1 = args.get(1);
         String member2 = args.get(2);
-        String unit = args.get(3) != null ? args.get(3) : "m";
+        String unit = args.size() > 3 ? args.get(3) : "m";
 
         GeoSpace geoSet = store.getStoreValue(key, true).getValue(GeoSpace.class);
 

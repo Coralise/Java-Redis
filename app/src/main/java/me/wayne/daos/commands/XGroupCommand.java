@@ -26,7 +26,7 @@ public class XGroupCommand extends AbstractCommand<String> {
         StoreValue storeValue = store.getStoreValue(key);
         if (storeValue == null) {
             if (!mkStream) return "ERR Stream does not exist";
-            storeValue = new StoreValue(new StoreStream());
+            storeValue = new StoreValue(new StoreStream(key));
             store.setStoreValue(key, storeValue.getValue(), inputLine);
         }
         StoreStream stream = storeValue.getValue(StoreStream.class);

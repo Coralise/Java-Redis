@@ -47,32 +47,12 @@ public class ZAddCommand extends AbstractCommand<Integer> {
         for (int i = 1; i < scoresAndMembers.size(); i += 2) {
             int score = parseScore(scoresAndMembers.get(i-1));
             ScoreMember scoreMember = new ScoreMember(score, scoresAndMembers.get(i));
-            updated += processScoreMember(treeSet, nx, xx, gt, lt, ch, incr, scoreMember);
+            updated += treeSet.add(nx, xx, gt, lt, ch, incr, scoreMember);
         }
 
         store.setStoreValue(key, treeSet, inputLine);
 
         return updated;
-    }
-
-    private int processScoreMember(StoreSortedSet treeSet, boolean nx, boolean xx, boolean gt, boolean lt, boolean ch, boolean incr, ScoreMember scoreMember) {
-        if (treeSet.contains(new ScoreMember(scoreMember.getMember()))) {
-            ScoreMember existingScoreMember = treeSet.floor(new ScoreMember(scoreMember.getMember()));
-            if (nx) return 0;
-            if (gt && scoreMember.getScore() <= existingScoreMember.getScore()) return 0;
-            if (lt && scoreMember.getScore() >= existingScoreMember.getScore()) return 0;
-
-            if (incr) scoreMember = new ScoreMember(scoreMember.getScore() + existingScoreMember.getScore(), scoreMember.getMember());
-            else if (scoreMember.getScore().equals(existingScoreMember.getScore())) return 0;
-
-            treeSet.remove(existingScoreMember);
-            treeSet.add(scoreMember);
-            return ch ? 1 : 0;
-        } else {
-            if (xx) return 0;
-            treeSet.add(scoreMember);
-            return 1;
-        }
     }
 
     private int parseScore(String scoreStr) {

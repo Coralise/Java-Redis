@@ -28,10 +28,10 @@ public class XAddCommand extends AbstractCommand<String> {
         String id = StreamId.parseStreamId(xAddArguments.id);
         List<String> fieldsAndValues = xAddArguments.fieldsAndValues;
 
-        StoreStream streamList = store.getStoreValue(key, StoreStream.class, new StoreStream());
+        StoreStream streamList = store.getStoreValue(key, StoreStream.class, new StoreStream(key));
 
         String res = streamList.add(id, fieldsAndValues);
-        store.setStoreValue(key, streamList, inputLine);
+        store.setStoreValue(key, streamList, "XADD " + key + " " + id + " " + String.join(" ", fieldsAndValues));
         return res;
     }
 

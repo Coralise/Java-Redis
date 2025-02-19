@@ -31,6 +31,7 @@ public class CommandHandler implements Runnable {
         try (StoreBufferedReader in = new StoreBufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              StorePrintWriter out = new StorePrintWriter(clientSocket.getOutputStream())) {
 
+            out.println();
             out.println("----------------------------");
             out.println("Connected to Jedis. Welcome!");
             out.println("----------------------------");

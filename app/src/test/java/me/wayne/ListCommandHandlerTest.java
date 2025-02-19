@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import me.wayne.daos.io.StoreBufferedReader;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.StoreList;
 
 class ListCommandHandlerTest {
 
@@ -39,60 +41,85 @@ class ListCommandHandlerTest {
     }
 
     @Test
-    void testLpushCommand() throws IOException {
-        String response = sendMessage("LPUSH list1 value1 value1.2 value1.3");
-        assertEquals("3", response);
-        response = sendMessage("LPUSH list1 value2");
-        assertEquals("4", response);
-        response = sendMessage("LPUSH list1 value3");
-        assertEquals("5", response);
-        response = sendMessage("LRANGE list1 0 -1");
-        assertEquals("[value3, value2, value1.3, value1.2, value1]", response);
+    void testLpushCommand() {
+        StoreList storeList = new StoreList();
+        storeList.lPush(List.of("value1", "value1.2", "value1.3"));
+        assertEquals("""
+                1) value1.3
+                2) value1.2
+                3) value1""", storeList.range(0, -1).toString());
+        storeList.lPush("value2");
+        assertEquals("""
+                1) value2
+                2) value1.3
+                3) value1.2
+                4) value1""", storeList.range(0, -1).toString());
+        storeList.lPush("value3");
+        assertEquals("""
+                1) value3
+                2) value2
+                3) value1.3
+                4) value1.2
+                5) value1""", storeList.range(0, -1).toString());
     }
 
     @Test
-    void testRpushCommand() throws IOException {
-        String response = sendMessage("RPUSH list2 value1 value1.2 value1.3");
-        assertEquals("3", response);
-        response = sendMessage("RPUSH list2 value2");
-        assertEquals("4", response);
-        response = sendMessage("RPUSH list2 value3");
-        assertEquals("5", response);
-        response = sendMessage("LRANGE list2 0 -1");
-        assertEquals("[value1, value1.2, value1.3, value2, value3]", response);
+    void testRpushCommand() {
+        StoreList storeList = new StoreList();
+        storeList.rPush(List.of("value1", "value1.2", "value1.3"));
+        assertEquals("""
+                1) value1
+                2) value1.2
+                3) value1.3""", storeList.range(0, -1).toString());
+        storeList.rPush("value2");
+        assertEquals("""
+                1) value1
+                2) value1.2
+                3) value1.3
+                4) value2""", storeList.range(0, -1).toString());
+        storeList.rPush("value3");
+        assertEquals("""
+                1) value1
+                2) value1.2
+                3) value1.3
+                4) value2
+                5) value3""", storeList.range(0, -1).toString());
     }
 
     @Test
-    void testLpopCommand() throws IOException {
-        sendMessage("LPUSH list1 value1 value1.2 value1.3");
-        String response = sendMessage("LPOP list1");
-        assertEquals("[value1.3]", response);
-        response = sendMessage("LPOP list1 2");
-        assertEquals("[value1.2, value1]", response);
+    void testLpopCommand() {
+        StoreList storeList = new StoreList();
+        storeList.lPush(List.of("value1", "value1.2", "value1.3"));
+        assertEquals("value1.3", storeList.lPop(1).toString());
+        assertEquals("""
+                1) value1.2
+                2) value1""", storeList.lPop(2).toString());
     }
 
     @Test
-    void testRpopCommand() throws IOException {
-        sendMessage("RPUSH list2 value1 value1.2 value1.3");
-        String response = sendMessage("RPOP list2");
-        assertEquals("[value1.3]", response);
-        response = sendMessage("RPOP list2 2");
-        assertEquals("[value1.2, value1]", response);
+    void testRpopCommand() {
+        StoreList storeList = new StoreList();
+        storeList.rPush(List.of("value1", "value1.2", "value1.3"));
+        assertEquals("value1.3", storeList.rPop(1).toString());
+        assertEquals("""
+                1) value1.2
+                2) value1""", storeList.rPop(2).toString());
     }
 
     @Test
-    void testLrangeCommand() throws IOException {
-        sendMessage("RPUSH list3 value1");
-        sendMessage("RPUSH list3 value2");
-        sendMessage("RPUSH list3 value3");
-        String response = sendMessage("LRANGE list3 0 0");
-        assertEquals("[value1]", response);
-        response = sendMessage("LRANGE list3 -3 2");
-        assertEquals("[value1, value2, value3]", response);
-        response = sendMessage("LRANGE list3 -100 100");
-        assertEquals("[value1, value2, value3]", response);
-        response = sendMessage("LRANGE list3 5 10");
-        assertEquals("[]", response);
+    void testLrangeCommand() {
+        StoreList storeList = new StoreList();
+        storeList.rPush(List.of("value1", "value2", "value3"));
+        assertEquals("value1", storeList.range(0, 0).toString());
+        assertEquals("""
+                1) value1
+                2) value2
+                3) value3""", storeList.range(-3, 2).toString());
+        assertEquals("""
+                1) value1
+                2) value2
+                3) value3""", storeList.range(-100, 100).toString());
+        assertEquals("[]", storeList.range(5, 10).toString());
     }
 
     @Test

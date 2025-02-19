@@ -5,10 +5,11 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.PrintableList;
 import me.wayne.daos.storevalues.StoreSet;
 import me.wayne.daos.storevalues.StoreValue;
 
@@ -27,9 +28,8 @@ public class SUnionCommand extends AbstractCommand<Object> {
             StoreSet hashSet = storeValue == null ? new StoreSet() : storeValue.getValue(StoreSet.class);
             hashSets.add(hashSet);
         }
-        HashSet<String> union = new HashSet<>();
-        for (StoreSet hashSet : hashSets) union.addAll(hashSet);
-        return new ArrayList<>(union);
+        Set<String> union = StoreSet.union(hashSets);
+        return new PrintableList<>(union);
     }
     
 }

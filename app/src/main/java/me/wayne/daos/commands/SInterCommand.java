@@ -5,10 +5,11 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.PrintableList;
 import me.wayne.daos.storevalues.StoreSet;
 import me.wayne.daos.storevalues.StoreValue;
 
@@ -27,9 +28,8 @@ public class SInterCommand extends AbstractCommand<List<String>> {
             StoreSet hashSet = storeValue == null ? new StoreSet() : storeValue.getValue(StoreSet.class);
             hashSets.add(hashSet);
         }
-        HashSet<String> intersection = new HashSet<>(hashSets.get(0));
-        for (int i = 1;i < hashSets.size();i++) intersection.retainAll(hashSets.get(i));
-        return new ArrayList<>(intersection);
+        Set<String> intersection = StoreSet.intersection(hashSets);
+        return new PrintableList<>(intersection);
     }
     
 }

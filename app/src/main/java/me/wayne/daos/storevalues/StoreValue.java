@@ -45,6 +45,11 @@ public class StoreValue implements Serializable {
         return (int) Math.ceil((double) timeInMillis / 1000);
     }
 
+    public void removeExpiration() {
+        stopExpirationThread();
+        expiryThread = null;
+    }
+
     public int setExpiryInMillis(Long timeInMillis, boolean nx, boolean xx, boolean gt, boolean lt, String key) {
         long currentTimestamp = System.currentTimeMillis();
         long timestamp = currentTimestamp + timeInMillis;

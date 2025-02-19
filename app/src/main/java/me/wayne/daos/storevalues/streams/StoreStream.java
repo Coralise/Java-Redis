@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.SortedSet;
@@ -13,16 +12,20 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import me.wayne.daos.Printable;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.PrintableList;
 
-public class StoreStream implements Serializable {
+public class StoreStream implements Serializable, Printable {
     private static final long serialVersionUID = 1L;
 
+    private final String storeKey;
     private final TreeSet<StreamEntry> entries = new TreeSet<>();
     private final TreeSet<ConsumerGroup> consumerGroups = new TreeSet<>();
     private transient ArrayList<Thread> readers;
 
-    public StoreStream() {
+    public StoreStream(String key) {
+        this.storeKey = key;
         readers = new ArrayList<>();
     }
 
@@ -55,6 +58,10 @@ public class StoreStream implements Serializable {
         return streamEntry.getId().toString();
     }
 
+    public SortedSet<StreamEntry> getEntries() {
+        return entries;
+    }
+
     public boolean hasEntry(StreamId entryId) {
         return entries.floor(new StreamEntry(entryId)) != null && entries.floor(new StreamEntry(entryId)).getId().equals(entryId);
     }
@@ -67,7 +74,7 @@ public class StoreStream implements Serializable {
         return entries.size();
     }
 
-    public SortedSet<StreamEntry> read(StorePrintWriter out, UUID requestUuid, String lastReadId, int count, Long block) {
+    public StoreStream read(StorePrintWriter out, UUID requestUuid, String lastReadId, int count, Long block) {
 
         if (block == null) {
             return range(lastReadId, false, "+", true, count);
@@ -81,25 +88,29 @@ public class StoreStream implements Serializable {
                     Thread.sleep(block);
                     break;
                 } catch (InterruptedException e) {
-                    out.println(requestUuid, getLastEntry());
+                    out.println(requestUuid, getLastEntry().toPrint(0));
                     currentCount++;
                 }
             }
             removeReader(Thread.currentThread());
-            return Collections.emptySortedSet();
+            return new StoreStream(storeKey);
                 
         }
 
     }
 
-    public SortedSet<StreamEntry> range(String startIdString, boolean startInclusive, String endIdString, boolean endInclusive, int count) {
+    public StoreStream range(String startIdString, boolean startInclusive, String endIdString, boolean endInclusive, int count) {
         StreamId startId = new StreamId(startIdString);
         StreamId endId = new StreamId(endIdString);
+        StoreStream subStream = new StoreStream(storeKey);
         NavigableSet<StreamEntry> subSet = entries.subSet(new StreamEntry(startId, null), startInclusive, new StreamEntry(endId, null), endInclusive);
-        if (count > 0 && subSet.size() > count) {
-            subSet = new TreeSet<>(subSet).headSet(subSet.stream().skip(count).findFirst().orElse(null), false);
+        int currentCount = 0;
+        for (StreamEntry entry : subSet) {
+            if (count > 0 && currentCount >= count) break;
+            subStream.add(entry.getId().toString(), entry.getFieldsAndValues());
+            currentCount++;
         }
-        return subSet;
+        return subStream;
     }
 
     @Nullable
@@ -147,7 +158,7 @@ public class StoreStream implements Serializable {
             StreamEntry entry = entries.floor(new StreamEntry(entryId));
             if (entry == null || !entry.getId().equals(entryId)) continue;
 
-            out.println(entry);
+            out.println(entry.toPrint(0));
             currentCount++;
             if (!noAck) {
                 consumerGroup.addToPEList(entry.getId());
@@ -164,7 +175,7 @@ public class StoreStream implements Serializable {
                     StreamId entryId = consumerGroup.getUnreadEntry();
                     StreamEntry entry = entries.floor(new StreamEntry(entryId));
                     if (entry == null || !entry.getId().equals(entryId)) continue;
-                    out.println(entry);
+                    out.println(entry.toPrint(0));
                     currentCount++;
                 }
             }
@@ -177,6 +188,14 @@ public class StoreStream implements Serializable {
     public ConsumerGroup getConsumerGroupByGroupName(String groupName) {
         ConsumerGroup floor = consumerGroups.floor(new ConsumerGroup(groupName, null));
         return floor != null && floor.getGroupName().equals(groupName) ? floor : null;
+    }
+
+    @Override
+    public String toPrint(int indent) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("1) " + storeKey + "\n");
+        stringBuilder.append("2) " + new PrintableList<>(entries, indent + 1));
+        return stringBuilder.toString();
     }
 
 }

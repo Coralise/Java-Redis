@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.storevalues.StoreMap;
@@ -22,12 +21,7 @@ public class HGetAllCommand extends AbstractCommand<List<String>> {
         String key = args.get(0);
         StoreMap hashMap = store.getStoreValue(key, StoreMap.class);
         if (hashMap == null) return new ArrayList<>();
-        List<String> fieldsAndValues = new ArrayList<>();
-        for (Map.Entry<String, String> entry : hashMap.entrySet()) {
-            fieldsAndValues.add(entry.getKey());
-            fieldsAndValues.add(entry.getValue());
-        }
-        return fieldsAndValues;
+        return hashMap.getFieldsAndValues();
     }
     
 }

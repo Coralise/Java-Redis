@@ -5,13 +5,13 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import java.util.List;
-import java.util.SortedSet;
 
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.PrintableList;
 import me.wayne.daos.storevalues.streams.StoreStream;
 import me.wayne.daos.storevalues.streams.StreamEntry;
 
-public class XRangeCommand extends AbstractCommand<SortedSet<StreamEntry>> {
+public class XRangeCommand extends AbstractCommand<PrintableList<StreamEntry>> {
 
     public XRangeCommand() {
         super("XRANGE", 3);
@@ -19,12 +19,12 @@ public class XRangeCommand extends AbstractCommand<SortedSet<StreamEntry>> {
 
     @SuppressWarnings("all")
     @Override
-    protected SortedSet<StreamEntry> processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
+    protected PrintableList<StreamEntry> processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
         String start = args.get(1);
         String end = args.get(2);
         int count = args.size() > 3 ? Integer.parseInt(args.get(4)) : -1;
-        StoreStream streamList = store.getStoreValue(key, StoreStream.class, new StoreStream());
+        StoreStream streamList = store.getStoreValue(key, StoreStream.class, new StoreStream(key));
 
         boolean startInclusive = true;
         boolean endInclusive = true;    
@@ -38,12 +38,12 @@ public class XRangeCommand extends AbstractCommand<SortedSet<StreamEntry>> {
             end = end.substring(1);
         }
 
-        return streamList.range(
+        return new PrintableList<>(streamList.range(
             start,
             startInclusive,
             end,
             endInclusive,
-            count);
+            count).getEntries());
     }
     
 }

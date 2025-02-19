@@ -22,7 +22,7 @@ public class TsAddCommand extends AbstractCommand<Object> {
     @Override
     protected Object processCommand(StorePrintWriter out, @Nullable UUID requestUuid, String inputLine, List<String> args) {
         String key = args.get(0);
-        long timestamp = args.get(1).equals("*") ? 0 : Long.parseLong(args.get(1));
+        long timestamp = args.get(1).equals("*") ? System.currentTimeMillis() : Long.parseLong(args.get(1));
         double value = Double.parseDouble(args.get(2));
 
         TimeSeries timeSeries = store.getStoreValue(key, TimeSeries.class);
@@ -35,10 +35,11 @@ public class TsAddCommand extends AbstractCommand<Object> {
             Map<String, String> labels = (Map<String, String>) options.getOrDefault("labels", new HashMap<>());
     
             timeSeries = new TimeSeries(key, duplicatePolicy, retentionPeriod, labels, ignoreMaxTimeDiff, ignoreMaxValDiff);
-            store.setStoreValue(key, timeSeries, inputLine);
         }
 
-        return timeSeries.add(timestamp, value);
+        Object res = timeSeries.add(timestamp, value);
+        store.setStoreValue(key, timeSeries, "TS.ADD " + key + " " + timestamp + " " + value);
+        return res;
     }
 
     @SuppressWarnings("all")

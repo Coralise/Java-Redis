@@ -11,6 +11,7 @@ import java.util.Map;
 
 import me.wayne.daos.Pair;
 import me.wayne.daos.io.StorePrintWriter;
+import me.wayne.daos.storevalues.PrintableList;
 import me.wayne.daos.storevalues.timeseries.TimeSeries;
 import me.wayne.daos.storevalues.timeseries.TimeSeriesAggregation;
 
@@ -32,7 +33,7 @@ public class TsRangeCommand extends AbstractCommand<List<Pair<Long, Double>>> {
 
         Map<String, Object> options = parseOptions(args.subList(3, args.size()));
 
-        return timeSeries.range(
+        return new PrintableList<>(timeSeries.range(
             start,
             end,
             options.containsKey("FILTER_BY_TS") ? (List<Long>) options.get("FILTER_BY_TS") : null,
@@ -42,7 +43,7 @@ public class TsRangeCommand extends AbstractCommand<List<Pair<Long, Double>>> {
             options.containsKey("AGGREGATION") ? TimeSeriesAggregation.valueOf(((String) ((Object[]) options.get("AGGREGATION"))[0]).toUpperCase()) : null,
             options.containsKey("AGGREGATION") ? (Long) ((Object[]) options.get("AGGREGATION"))[1] : 0,
             options.containsKey("BUCKETTIMESTAMP") ? (String) options.get("BUCKETTIMESTAMP") : null,
-            options.containsKey("EMPTY") ? (Boolean) options.get("EMPTY") : false);
+            options.containsKey("EMPTY") ? (Boolean) options.get("EMPTY") : false));
     }
 
     private Map<String, Object> parseOptions(List<String> args) {

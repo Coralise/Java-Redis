@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
@@ -23,8 +22,7 @@ public class LPopCommand extends AbstractCommand<List<String>> {
         int count = args.size() > 1 ? Integer.parseInt(args.get(1)) : 1;
         StoreValue storeValue = store.getStoreValue(key, true);
         StoreList list = storeValue.getValue(StoreList.class);
-        ArrayList<String> removeds = new ArrayList<>();
-        for (int i = 0;i < count;i++) removeds.add(list.removeFirst());
+        List<String> removeds = list.lPop(count);
         store.setStoreValue(key, list, inputLine);
         return removeds;
     }

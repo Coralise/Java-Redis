@@ -22,7 +22,7 @@ public class LPushCommand extends AbstractCommand<Integer> {
         List<String> values = args.subList(1, args.size());
         StoreValue storeValue = store.getStoreValue(key);
         StoreList list = storeValue == null ? new StoreList() : storeValue.getValue(StoreList.class);
-        for (String value : values) list.addFirst(value);
+        list.lPush(values);
         store.setStoreValue(key, list, inputLine);
         return list.size();
     }

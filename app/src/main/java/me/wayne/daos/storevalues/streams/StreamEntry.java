@@ -5,7 +5,10 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class StreamEntry implements Comparable<StreamEntry>, Serializable {
+import me.wayne.daos.Printable;
+import me.wayne.daos.storevalues.PrintableList;
+
+public class StreamEntry implements Comparable<StreamEntry>, Serializable, Printable {
     private static final long serialVersionUID = 1L;
 
     @Nonnull
@@ -51,13 +54,17 @@ public class StreamEntry implements Comparable<StreamEntry>, Serializable {
     }
 
     @Override
-    public String toString() {
-        return "[" + id.toString() + ", " + fieldsAndValues + "]";
+    public int compareTo(StreamEntry o) {
+        return id.compareTo(o.id);
     }
 
     @Override
-    public int compareTo(StreamEntry o) {
-        return id.compareTo(o.id);
+    public String toPrint(int indent) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("1) " + id.toString() + "\n");
+        for (int i = 0;i < indent*3;i++) stringBuilder.append(" ");
+        stringBuilder.append("2) " + new PrintableList<>(fieldsAndValues, indent + 1));
+        return stringBuilder.toString();
     }
 
 }
