@@ -77,6 +77,10 @@ public abstract class Commands {
         commandMap.put("UNSUBSCRIBE", new UnsubscribeCommand());
         commandMap.put("PUBLISH", new PublishCommand());
         commandMap.put("SAVE", new SaveCommand());
+        commandMap.put("VADD", new VAddCommand());
+        commandMap.put("VCREATE", new VCreateCommand());
+        commandMap.put("VSEARCH.COSIM", new VSearchCoSimCommand());
+        commandMap.put("VSEARCH.EUCLIDIST", new VSearchEucliDistCommand());
     }
 
     private Commands() {}

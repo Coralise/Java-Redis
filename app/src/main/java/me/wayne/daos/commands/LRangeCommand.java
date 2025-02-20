@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 import me.wayne.daos.io.StorePrintWriter;
-import me.wayne.daos.storevalues.PrintableList;
 import me.wayne.daos.storevalues.StoreList;
 import me.wayne.daos.storevalues.StoreValue;
 
