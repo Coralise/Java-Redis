@@ -22,10 +22,10 @@ dependencies {
     // This dependency is used by the application.
     implementation libs.guava
 
-    // Replace org.json dependency with Jackson
+    // Jackson
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 
-    // Replace snakeyaml with configurate-yaml for YAML parsing
+    // configurate-yaml for YAML parsing
     implementation 'org.spongepowered:configurate-yaml:4.1.2'
 
     // Add Mockito for testing
