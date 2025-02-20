@@ -25,10 +25,6 @@ public class App {
                 logger.info("Accepted connection from " + clientSocket.getInetAddress());
                 CommandHandler commandHandler = new CommandHandler(clientSocket);
                 new Thread(commandHandler).start();
-                if (clientSocket.isClosed()) {
-                    logger.info("Connection closed");
-                    break;
-                }
             }
         } catch (IOException e) {
             e.printStackTrace();

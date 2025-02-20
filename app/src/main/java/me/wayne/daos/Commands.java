@@ -81,6 +81,12 @@ public abstract class Commands {
         commandMap.put("VCREATE", new VCreateCommand());
         commandMap.put("VSEARCH.COSIM", new VSearchCoSimCommand());
         commandMap.put("VSEARCH.EUCLIDIST", new VSearchEucliDistCommand());
+        commandMap.put("COLLECTION.CREATE", new CollectionCreateCommand());
+        commandMap.put("COLLECTION.ADD", new CollectionAddCommand());
+        commandMap.put("COLLECTION.UPDATE", new CollectionUpdateCommand());
+        commandMap.put("COLLECTION.GET", new CollectionGetCommand());
+        commandMap.put("COLLECTION.INDEX", new CollectionIndexCommand());
+        commandMap.put("COLLECTION.SEARCH", new CollectionSearchCommand());
     }
 
     private Commands() {}

@@ -32,9 +32,9 @@ public class CommandHandler implements Runnable {
              StorePrintWriter out = new StorePrintWriter(clientSocket.getOutputStream())) {
 
             out.println();
-            out.println("----------------------------");
-            out.println("Connected to Jedis. Welcome!");
-            out.println("----------------------------");
+            out.println("-----------------------------");
+            out.println("      Welcome to Jedis!      ");
+            out.println("-----------------------------");
             out.println();
             out.print(INPUT_PREFIX);
             out.flush();
@@ -77,7 +77,11 @@ public class CommandHandler implements Runnable {
                 out.flush();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                clientSocket.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 

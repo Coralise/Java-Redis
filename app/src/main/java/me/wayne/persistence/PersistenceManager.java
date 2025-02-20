@@ -1,4 +1,4 @@
-package me.wayne;
+package me.wayne.persistence;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import me.wayne.InMemoryStore;
 import me.wayne.daos.Config;
 import me.wayne.daos.io.StorePrintWriter;
 
@@ -105,7 +106,7 @@ public class PersistenceManager {
     @SuppressWarnings("all")
     public static void loadAof() {
 
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(FOLDER_PATH.resolve("aof.log").toFile()))) ) {
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(FOLDER_PATH.resolve("aof.log").toFile())))) {
 
             StorePrintWriter out = new StorePrintWriter(System.out);
 

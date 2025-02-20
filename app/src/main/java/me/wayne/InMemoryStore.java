@@ -18,6 +18,7 @@ import me.wayne.daos.commands.AbstractCommand;
 import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.pubsub.Channel;
 import me.wayne.daos.storevalues.StoreValue;
+import me.wayne.persistence.PersistenceManager;
 
 public class InMemoryStore implements Serializable {
     private static final long serialVersionUID = 1L;
