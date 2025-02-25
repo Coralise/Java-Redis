@@ -11,7 +11,7 @@ import me.wayne.daos.vectors.VectorDB;
 public class VCreateCommand extends AbstractCommand<String> {
 
     public VCreateCommand() {
-        super("VCREATE", 2);
+        super("VCREATE", 2, 2);
     }
 
     @Override
