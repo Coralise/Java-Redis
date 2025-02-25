@@ -6,15 +6,14 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import me.wayne.AssertUtil;
-import me.wayne.daos.Printable;
 import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.vectors.VectorDB;
 import me.wayne.daos.vectors.VectorOperations;
 
-public class VAddCommand extends AbstractCommand<String> {
+public class VDotCommand extends AbstractCommand<String> {
 
-    public VAddCommand() {
-            super("VADD", 3);
+    public VDotCommand() {
+            super("VDOT", 3);
         }
     
         @Override
@@ -28,7 +27,7 @@ public class VAddCommand extends AbstractCommand<String> {
         AssertUtil.assertTrue(id1 != null, "ERR Record with ID " + id1 + " does not exist");
         AssertUtil.assertTrue(id2 != null, "ERR Record with ID " + id2 + " does not exist");
 
-        return Printable.print(0, VectorOperations.addVectors(id1, id2));
+        return VectorOperations.dotProduct(id1, id2).toString();
     }
     
 }

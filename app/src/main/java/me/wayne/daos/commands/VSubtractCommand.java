@@ -11,10 +11,10 @@ import me.wayne.daos.io.StorePrintWriter;
 import me.wayne.daos.vectors.VectorDB;
 import me.wayne.daos.vectors.VectorOperations;
 
-public class VAddCommand extends AbstractCommand<String> {
+public class VSubtractCommand extends AbstractCommand<String> {
 
-    public VAddCommand() {
-            super("VADD", 3);
+    public VSubtractCommand() {
+            super("VSUBTRACT", 3);
         }
     
         @Override
@@ -28,7 +28,7 @@ public class VAddCommand extends AbstractCommand<String> {
         AssertUtil.assertTrue(id1 != null, "ERR Record with ID " + id1 + " does not exist");
         AssertUtil.assertTrue(id2 != null, "ERR Record with ID " + id2 + " does not exist");
 
-        return Printable.print(0, VectorOperations.addVectors(id1, id2));
+        return Printable.print(0, VectorOperations.subtractVectors(id1, id2));
     }
     
 }

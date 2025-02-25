@@ -30,23 +30,23 @@ public interface VectorOperations {
         return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
     }
 
-    public static double[] addVectors(double[] v1, double[] v2) {
-        double[] result = new double[v1.length];
+    public static Double[] addVectors(double[] v1, double[] v2) {
+        Double[] result = new Double[v1.length];
         for (int i = 0; i < v1.length; i++) {
             result[i] = v1[i] + v2[i];
         }
         return result;
     }
 
-    public static double[] subtractVectors(double[] v1, double[] v2) {
-        double[] result = new double[v1.length];
+    public static Double[] subtractVectors(double[] v1, double[] v2) {
+        Double[] result = new Double[v1.length];
         for (int i = 0; i < v1.length; i++) {
             result[i] = v1[i] - v2[i];
         }
         return result;
     }
 
-    public static double dotProduct(double[] v1, double[] v2) {
+    public static Double dotProduct(double[] v1, double[] v2) {
         double result = 0.0;
         for (int i = 0; i < v1.length; i++) {
             result += v1[i] * v2[i];
